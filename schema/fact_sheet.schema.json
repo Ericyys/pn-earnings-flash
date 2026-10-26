@@ -5,206 +5,484 @@
   "description": "財報公布當天由 AI 產出。只放原文出現的原始數字與出處；不計算、不推估、不判斷。年增率、利潤率、佔比等衍生數字一律由網頁計算。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "extraction", "meta", "income_statement", "segments", "notable_items", "stated_metrics", "ambiguities"],
+  "required": [
+    "schema_version",
+    "extraction",
+    "meta",
+    "income_statement",
+    "operating_expense_items",
+    "segments",
+    "notable_items",
+    "stated_metrics",
+    "ambiguities"
+  ],
   "properties": {
-    "schema_version": { "const": "1.0" },
-    "comment": { "type": "string", "description": "人類備註，AI 不填" },
-
+    "schema_version": {
+      "const": "1.0"
+    },
+    "comment": {
+      "type": "string",
+      "description": "人類備註，AI 不填"
+    },
     "extraction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ai_name", "run_id", "extracted_at"],
+      "required": [
+        "ai_name",
+        "run_id",
+        "extracted_at"
+      ],
       "properties": {
-        "ai_name": { "type": "string", "description": "例如 Claude、ChatGPT" },
-        "ai_model": { "type": "string" },
-        "run_id": { "enum": ["A", "B"], "description": "A＝主要抽取；B＝雙重抽取時的第二份" },
-        "extracted_at": { "type": "string", "description": "ISO 8601 時間，含時區" }
+        "ai_name": {
+          "type": "string",
+          "description": "例如 Claude、ChatGPT"
+        },
+        "ai_model": {
+          "type": "string"
+        },
+        "run_id": {
+          "enum": [
+            "A",
+            "B"
+          ],
+          "description": "A＝主要抽取；B＝雙重抽取時的第二份"
+        },
+        "extracted_at": {
+          "type": "string",
+          "description": "ISO 8601 時間，含時區"
+        }
       }
     },
-
     "meta": {
       "description": "基本設定。這一區只要錯一欄，整份圖卡全錯，人工核對第一層必須逐欄確認。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["company_name", "ticker", "market", "fiscal_period", "period_end", "period_end_src", "report_date", "currency", "monetary_unit", "monetary_unit_src", "share_unit", "accounting_basis", "source_docs"],
+      "required": [
+        "company_name",
+        "ticker",
+        "market",
+        "fiscal_period",
+        "period_end",
+        "period_end_src",
+        "report_date",
+        "currency",
+        "monetary_unit",
+        "monetary_unit_src",
+        "share_unit",
+        "accounting_basis",
+        "source_docs"
+      ],
       "properties": {
-        "company_name": { "type": "string" },
-        "ticker": { "type": "string" },
-        "market": { "enum": ["us", "tw"] },
+        "company_name": {
+          "type": "string"
+        },
+        "ticker": {
+          "type": "string"
+        },
+        "market": {
+          "enum": [
+            "us",
+            "tw"
+          ]
+        },
         "fiscal_period": {
           "type": "string",
           "pattern": "^FY\\d{4}Q[1-4]$",
           "description": "公司自己的財年寫法，例如 FY2026Q3。財年與日曆年的對照寫在 company.json"
         },
-        "period_end": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "本季期末日，依原文欄名" },
-        "period_end_src": { "$ref": "#/$defs/source" },
-        "report_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
-        "monetary_unit": { "enum": ["ones", "thousands", "millions", "billions"] },
+        "period_end": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "本季期末日，依原文欄名"
+        },
+        "period_end_src": {
+          "$ref": "#/$defs/source"
+        },
+        "report_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "monetary_unit": {
+          "enum": [
+            "ones",
+            "thousands",
+            "millions",
+            "billions"
+          ]
+        },
         "monetary_unit_src": {
           "$ref": "#/$defs/source",
           "description": "原文的單位說明，例如「(in millions, except per share data)」「單位：新台幣仟元」"
         },
-        "share_unit": { "enum": ["ones", "thousands", "millions"], "description": "股數單位，常與金額單位不同" },
-        "accounting_basis": { "enum": ["US GAAP", "IFRS", "other"] },
+        "share_unit": {
+          "enum": [
+            "ones",
+            "thousands",
+            "millions"
+          ],
+          "description": "股數單位，常與金額單位不同"
+        },
+        "accounting_basis": {
+          "enum": [
+            "US GAAP",
+            "IFRS",
+            "other"
+          ]
+        },
         "source_docs": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "type", "title"],
+            "required": [
+              "id",
+              "type",
+              "title"
+            ],
             "properties": {
-              "id": { "type": "string", "description": "短代號，例如 pr、deck" },
-              "type": { "enum": ["press_release", "financial_statements", "investor_deck", "transcript", "mops", "other"] },
-              "title": { "type": "string" },
-              "url": { "type": "string" }
+              "id": {
+                "type": "string",
+                "description": "短代號，例如 pr、deck"
+              },
+              "type": {
+                "enum": [
+                  "press_release",
+                  "financial_statements",
+                  "investor_deck",
+                  "transcript",
+                  "mops",
+                  "other"
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
             }
           }
         }
       }
     },
-
     "income_statement": {
-      "description": "損益表（單季）。所有數字一律照抄原文正負號，原文括號＝負數，AI 不自行翻轉正負。正負號的意義由 profiles/*.json 的 sign_conventions 定義，網頁計算時處理。",
+      "description": "損益表（單季）。所有數字一律照抄原文正負號，原文括號＝負數，AI 不自行翻轉正負。正負號的意義由 profiles/*.json 的 sign_conventions 定義，網頁計算時處理。 標準欄位（rd_expense、cost_of_revenue、gross_profit 等）只在原文列名明確對應時才填；對應不明確或公司沒有這一列，填 null 並標 not_applicable，實際列名寫進 operating_expense_items。",
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "revenue", "cost_of_revenue", "gross_profit",
-        "rd_expense", "sm_expense", "ga_expense", "sga_expense", "other_operating_net", "operating_expenses_total",
-        "operating_income", "non_operating_net", "pretax_income", "income_tax",
-        "net_income", "net_income_to_parent", "eps_basic", "eps_diluted", "shares_diluted"
+        "revenue",
+        "cost_of_revenue",
+        "gross_profit",
+        "rd_expense",
+        "sm_expense",
+        "ga_expense",
+        "sga_expense",
+        "other_operating_net",
+        "operating_expenses_total",
+        "operating_income",
+        "non_operating_net",
+        "pretax_income",
+        "income_tax",
+        "net_income",
+        "net_income_to_parent",
+        "eps_basic",
+        "eps_diluted",
+        "shares_diluted"
       ],
       "properties": {
-        "revenue": { "$ref": "#/$defs/pair", "description": "營收／營業收入合計" },
-        "cost_of_revenue": { "$ref": "#/$defs/pair", "description": "營業成本" },
-        "gross_profit": { "$ref": "#/$defs/pair", "description": "毛利（金額）" },
-        "rd_expense": { "$ref": "#/$defs/pair", "description": "研發費用" },
-        "sm_expense": { "$ref": "#/$defs/pair", "description": "銷售／推銷費用" },
-        "ga_expense": { "$ref": "#/$defs/pair", "description": "管理費用" },
-        "sga_expense": { "$ref": "#/$defs/pair", "description": "銷管費用合併列示時使用；已分開列示則填 null（not_applicable）" },
-        "other_operating_net": { "$ref": "#/$defs/pair", "description": "營業費用合計之外、營業利益之前的其他營業收益及費損淨額（台股 IFRS 常見）。照抄原文正負號；沒有這一列填 null（not_applicable）" },
-        "operating_expenses_total": { "$ref": "#/$defs/pair", "description": "營業費用合計" },
-        "operating_income": { "$ref": "#/$defs/pair", "description": "營業利益（損失）" },
-        "non_operating_net": { "$ref": "#/$defs/pair", "description": "業外收支淨額（營業外收入及支出合計）" },
-        "pretax_income": { "$ref": "#/$defs/pair", "description": "稅前淨利" },
-        "income_tax": { "$ref": "#/$defs/pair", "description": "所得稅費用，照抄原文正負號" },
-        "net_income": { "$ref": "#/$defs/pair", "description": "本期淨利" },
-        "net_income_to_parent": { "$ref": "#/$defs/pair", "description": "歸屬母公司業主淨利；EPS 以此計算" },
-        "eps_basic": { "$ref": "#/$defs/pair", "description": "基本每股盈餘" },
-        "eps_diluted": { "$ref": "#/$defs/pair", "description": "稀釋每股盈餘" },
-        "shares_diluted": { "$ref": "#/$defs/pair", "description": "稀釋加權平均股數（單位見 meta.share_unit）" }
+        "revenue": {
+          "$ref": "#/$defs/pair",
+          "description": "營收／營業收入合計"
+        },
+        "cost_of_revenue": {
+          "$ref": "#/$defs/pair",
+          "description": "營業成本"
+        },
+        "gross_profit": {
+          "$ref": "#/$defs/pair",
+          "description": "毛利（金額）"
+        },
+        "rd_expense": {
+          "$ref": "#/$defs/pair",
+          "description": "研發費用"
+        },
+        "sm_expense": {
+          "$ref": "#/$defs/pair",
+          "description": "銷售／推銷費用"
+        },
+        "ga_expense": {
+          "$ref": "#/$defs/pair",
+          "description": "管理費用"
+        },
+        "sga_expense": {
+          "$ref": "#/$defs/pair",
+          "description": "銷管費用合併列示時使用；已分開列示則填 null（not_applicable）"
+        },
+        "other_operating_net": {
+          "$ref": "#/$defs/pair",
+          "description": "營業費用合計之外、營業利益之前的其他營業收益及費損淨額（台股 IFRS 常見）。照抄原文正負號；沒有這一列填 null（not_applicable）"
+        },
+        "operating_expenses_total": {
+          "$ref": "#/$defs/pair",
+          "description": "營業費用合計"
+        },
+        "operating_income": {
+          "$ref": "#/$defs/pair",
+          "description": "營業利益（損失）"
+        },
+        "non_operating_net": {
+          "$ref": "#/$defs/pair",
+          "description": "業外收支淨額（營業外收入及支出合計）"
+        },
+        "pretax_income": {
+          "$ref": "#/$defs/pair",
+          "description": "稅前淨利"
+        },
+        "income_tax": {
+          "$ref": "#/$defs/pair",
+          "description": "所得稅費用，照抄原文正負號"
+        },
+        "net_income": {
+          "$ref": "#/$defs/pair",
+          "description": "本期淨利"
+        },
+        "net_income_to_parent": {
+          "$ref": "#/$defs/pair",
+          "description": "歸屬母公司業主淨利；EPS 以此計算"
+        },
+        "eps_basic": {
+          "$ref": "#/$defs/pair",
+          "description": "基本每股盈餘"
+        },
+        "eps_diluted": {
+          "$ref": "#/$defs/pair",
+          "description": "稀釋每股盈餘"
+        },
+        "shares_diluted": {
+          "$ref": "#/$defs/pair",
+          "description": "稀釋加權平均股數（單位見 meta.share_unit）"
+        }
       }
     },
-
-    "segments": {
-      "description": "部門營收。key 必須與 company.json 的 segments 一致。沒有部門揭露就給空陣列。",
-      "type": "array",
-      "items": { "$ref": "#/$defs/breakdown_item" }
-    },
-
-    "geographies": {
-      "description": "地區營收。key 必須與 company.json 的 geographies 一致。",
-      "type": "array",
-      "items": { "$ref": "#/$defs/breakdown_item" }
-    },
-
-    "kpis": {
-      "description": "公司揭露的營運指標（用戶數、ARPU、出貨量、在手訂單等）。只抽 company.json 列出的項目。",
+    "operating_expense_items": {
+      "description": "損益表上營業費用（或總費用）區塊的每一列，依原文順序逐列照抄，不合併、不改名。所有公司都要填；這是損益流向圖的費用來源。像券商、銀行這類沒有「營業成本／毛利」的公司，所有費用列都放在這裡。",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["key", "label_source", "unit", "current"],
+        "required": [
+          "key",
+          "label_source",
+          "amount"
+        ],
         "properties": {
-          "key": { "type": "string", "pattern": "^[a-z0-9_]+$" },
-          "label_source": { "type": "string", "description": "原文名稱，逐字照抄" },
-          "unit": { "type": "string", "description": "照原文，例如 millions、% 、units" },
-          "current": { "$ref": "#/$defs/datapoint" },
-          "prior_year": { "$ref": "#/$defs/datapoint" }
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$",
+            "description": "由原文名稱轉成的英文小寫代號，例如 technology_and_development"
+          },
+          "label_source": {
+            "type": "string",
+            "description": "原文名稱，逐字照抄"
+          },
+          "amount": {
+            "$ref": "#/$defs/pair"
+          }
         }
       }
     },
-
+    "segments": {
+      "description": "公司揭露的營收拆分：部門、產品線或收入類型（例如券商的交易收入、利息收入）。若有 company.json，key 必須與其一致；沒有就由原文名稱轉成英文小寫代號。沒有拆分就給空陣列。",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/breakdown_item"
+      }
+    },
+    "geographies": {
+      "description": "地區營收。key 必須與 company.json 的 geographies 一致。",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/breakdown_item"
+      }
+    },
+    "kpis": {
+      "description": "公司揭露的營運指標（用戶數、資產規模、ARPU、出貨量、在手訂單等）。有 company.json 時只抽其列出的項目；沒有時，抽新聞稿中營運指標段落（例如 Key Performance Metrics）的全部項目。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "label_source",
+          "unit",
+          "current"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "label_source": {
+            "type": "string",
+            "description": "原文名稱，逐字照抄"
+          },
+          "unit": {
+            "type": "string",
+            "description": "照原文，例如 millions、% 、units"
+          },
+          "current": {
+            "$ref": "#/$defs/datapoint"
+          },
+          "prior_year": {
+            "$ref": "#/$defs/datapoint"
+          }
+        }
+      }
+    },
     "cash_flow": {
       "description": "現金流量。現金流量表多為「年初至今累計」，每個數字都要標 period_type。照抄原文正負號（資本支出在原文通常是負數，照抄即可）。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["operating_cash_flow", "capex"],
+      "required": [
+        "operating_cash_flow",
+        "capex"
+      ],
       "properties": {
-        "operating_cash_flow": { "$ref": "#/$defs/pair" },
-        "capex": { "$ref": "#/$defs/pair" },
-        "free_cash_flow_stated": { "$ref": "#/$defs/pair", "description": "公司自己寫出的自由現金流，只用於交叉驗證" }
+        "operating_cash_flow": {
+          "$ref": "#/$defs/pair"
+        },
+        "capex": {
+          "$ref": "#/$defs/pair"
+        },
+        "free_cash_flow_stated": {
+          "$ref": "#/$defs/pair",
+          "description": "公司自己寫出的自由現金流，只用於交叉驗證"
+        }
       }
     },
-
     "capital_return": {
       "description": "股東回饋。照抄原文正負號。",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "buybacks": { "$ref": "#/$defs/pair" },
-        "dividends_paid": { "$ref": "#/$defs/pair" },
+        "buybacks": {
+          "$ref": "#/$defs/pair"
+        },
+        "dividends_paid": {
+          "$ref": "#/$defs/pair"
+        },
         "new_buyback_authorization": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["amount", "label_source"],
+          "required": [
+            "amount",
+            "label_source"
+          ],
           "properties": {
-            "amount": { "$ref": "#/$defs/datapoint" },
-            "label_source": { "type": "string" }
+            "amount": {
+              "$ref": "#/$defs/datapoint"
+            },
+            "label_source": {
+              "type": "string"
+            }
           }
         }
       }
     },
-
     "guidance_next": {
       "description": "本次財報給出的「下一季」財測，給 K1 使用。公司沒給就省略此區。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["period_label", "items"],
+      "required": [
+        "period_label",
+        "items"
+      ],
       "properties": {
-        "period_label": { "type": "string", "pattern": "^FY\\d{4}Q[1-4]$" },
-        "items": { "type": "array", "items": { "$ref": "#/$defs/guidance_item" } }
+        "period_label": {
+          "type": "string",
+          "pattern": "^FY\\d{4}Q[1-4]$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guidance_item"
+          }
+        }
       }
     },
-
     "notable_items": {
       "description": "只列公司自己標示為一次性、非經常性或特殊的項目（例如 restructuring、impairment、處分利益）。AI 不自行判斷什麼算重要。沒有就給空陣列。",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["label_source", "amount", "line_item"],
+        "required": [
+          "label_source",
+          "amount",
+          "line_item"
+        ],
         "properties": {
-          "label_source": { "type": "string", "description": "原文名稱，逐字照抄" },
-          "amount": { "$ref": "#/$defs/datapoint" },
+          "label_source": {
+            "type": "string",
+            "description": "原文名稱，逐字照抄"
+          },
+          "amount": {
+            "$ref": "#/$defs/datapoint"
+          },
           "line_item": {
-            "enum": ["cost_of_revenue", "rd_expense", "sm_expense", "ga_expense", "sga_expense", "other_operating_net", "non_operating_net", "income_tax", "unknown"],
+            "enum": [
+              "cost_of_revenue",
+              "rd_expense",
+              "sm_expense",
+              "ga_expense",
+              "sga_expense",
+              "other_operating_net",
+              "non_operating_net",
+              "income_tax",
+              "unknown"
+            ],
             "description": "這筆金額包含在損益表哪一列"
           }
         }
       }
     },
-
     "stated_metrics": {
       "description": "公司原文自己寫出的比率（例如「營收年增 25%」「毛利率 58.0%」）。只用來交叉驗證網頁的計算結果，不直接印在圖上。",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["metric", "value", "unit", "src"],
+        "required": [
+          "metric",
+          "value",
+          "unit",
+          "src"
+        ],
         "properties": {
           "metric": {
             "type": "string",
             "pattern": "^(revenue_yoy|revenue_qoq|gross_margin|operating_margin|net_margin|eps_yoy|segment:[a-z0-9_]+:yoy|other:[a-z0-9_]+)$"
           },
-          "value": { "type": "number" },
-          "unit": { "enum": ["percent", "pp"] },
-          "src": { "$ref": "#/$defs/source" }
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "enum": [
+              "percent",
+              "pp"
+            ]
+          },
+          "src": {
+            "$ref": "#/$defs/source"
+          }
         }
       }
     },
-
     "market_specific": {
       "type": "object",
       "additionalProperties": false,
@@ -214,9 +492,15 @@
           "additionalProperties": false,
           "description": "Non-GAAP 數字。市場預期的 EPS 多半是 Non-GAAP，E 模組比較時必須同基準。",
           "properties": {
-            "non_gaap_eps_diluted": { "$ref": "#/$defs/pair" },
-            "non_gaap_operating_income": { "$ref": "#/$defs/pair" },
-            "non_gaap_net_income": { "$ref": "#/$defs/pair" }
+            "non_gaap_eps_diluted": {
+              "$ref": "#/$defs/pair"
+            },
+            "non_gaap_operating_income": {
+              "$ref": "#/$defs/pair"
+            },
+            "non_gaap_net_income": {
+              "$ref": "#/$defs/pair"
+            }
           }
         },
         "tw": {
@@ -229,10 +513,18 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["month", "value"],
+                "required": [
+                  "month",
+                  "value"
+                ],
                 "properties": {
-                  "month": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
-                  "value": { "$ref": "#/$defs/datapoint" }
+                  "month": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}$"
+                  },
+                  "value": {
+                    "$ref": "#/$defs/datapoint"
+                  }
                 }
               }
             }
@@ -240,128 +532,312 @@
         }
       }
     },
-
     "consensus": {
       "description": "市場預期。【Ryan 人工填寫，AI 不填】新聞稿裡沒有這項資料，必須來自外部來源並附網址。比較時基準必須相同（例如 Non-GAAP EPS 對 Non-GAAP EPS）。",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["metric", "basis", "value", "source_name", "url", "as_of"],
+        "required": [
+          "metric",
+          "basis",
+          "value",
+          "source_name",
+          "url",
+          "as_of"
+        ],
         "properties": {
-          "metric": { "enum": ["revenue", "eps", "gross_margin", "operating_income", "other"] },
-          "basis": { "enum": ["GAAP", "non-GAAP", "IFRS", "unspecified"] },
-          "value": { "type": "number", "description": "金額類用與 meta.monetary_unit 相同的單位" },
-          "source_name": { "type": "string" },
-          "url": { "type": "string" },
-          "as_of": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+          "metric": {
+            "enum": [
+              "revenue",
+              "eps",
+              "gross_margin",
+              "operating_income",
+              "other"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "GAAP",
+              "non-GAAP",
+              "IFRS",
+              "unspecified"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "description": "金額類用與 meta.monetary_unit 相同的單位"
+          },
+          "source_name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "as_of": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
         }
       }
     },
-
     "ambiguities": {
       "description": "原文有矛盾、看不清楚、或不確定該用哪一欄時，寫在這裡，不要自行選擇。沒有就給空陣列。每一項都必須人工處理。",
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["issue", "locations"],
+        "required": [
+          "issue",
+          "locations"
+        ],
         "properties": {
-          "issue": { "type": "string" },
-          "related_field": { "type": "string", "description": "相關欄位路徑，例如 income_statement.gross_profit" },
-          "locations": { "type": "array", "items": { "$ref": "#/$defs/source" } }
+          "issue": {
+            "type": "string"
+          },
+          "related_field": {
+            "type": "string",
+            "description": "相關欄位路徑，例如 income_statement.gross_profit"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/source"
+            }
+          }
         }
       }
     }
   },
-
   "$defs": {
     "source": {
       "description": "出處。表格數字填列名＋欄名；文字段落中的數字填原句。全部逐字照抄原文，不翻譯、不改寫。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["doc", "page"],
+      "required": [
+        "doc",
+        "page"
+      ],
       "properties": {
-        "doc": { "type": "string", "description": "對應 meta.source_docs[].id" },
-        "page": { "type": "integer", "minimum": 1 },
-        "row_label": { "type": "string", "description": "表格列名" },
-        "column_label": { "type": "string", "description": "表格欄名，必須含期間文字，例如 Three Months Ended September 30, 2026" },
-        "quote": { "type": "string", "maxLength": 300, "description": "非表格資訊時，照抄含該數字的原句" }
+        "doc": {
+          "type": "string",
+          "description": "對應 meta.source_docs[].id"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "row_label": {
+          "type": "string",
+          "description": "表格列名"
+        },
+        "column_label": {
+          "type": "string",
+          "description": "表格欄名，必須含期間文字，例如 Three Months Ended September 30, 2026"
+        },
+        "quote": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "非表格資訊時，照抄含該數字的原句"
+        }
       },
       "anyOf": [
-        { "required": ["row_label", "column_label"] },
-        { "required": ["quote"] }
+        {
+          "required": [
+            "row_label",
+            "column_label"
+          ]
+        },
+        {
+          "required": [
+            "quote"
+          ]
+        }
       ]
     },
-
     "datapoint": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["value"],
+      "required": [
+        "value"
+      ],
       "properties": {
         "value": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "description": "照原文數字與單位，不換算、不四捨五入。原文沒有就填 null，並寫 null_reason"
         },
         "period_type": {
-          "enum": ["quarter", "ytd", "point_in_time"],
+          "enum": [
+            "quarter",
+            "ytd",
+            "point_in_time"
+          ],
           "default": "quarter",
           "description": "quarter＝單季；ytd＝年初至今累計；point_in_time＝時點數（例如期末用戶數）"
         },
-        "src": { "$ref": "#/$defs/source" },
-        "null_reason": { "enum": ["not_disclosed", "not_applicable"] }
+        "src": {
+          "$ref": "#/$defs/source"
+        },
+        "null_reason": {
+          "enum": [
+            "not_disclosed",
+            "not_applicable"
+          ]
+        }
       },
-      "if": { "properties": { "value": { "type": "null" } } },
-      "then": { "required": ["null_reason"] },
-      "else": { "required": ["src"] }
+      "if": {
+        "properties": {
+          "value": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "null_reason"
+        ]
+      },
+      "else": {
+        "required": [
+          "src"
+        ]
+      }
     },
-
     "pair": {
       "description": "本季與去年同期。去年同期會跟歷史存檔比對，用來確認 AI 讀對欄位。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["current", "prior_year"],
+      "required": [
+        "current",
+        "prior_year"
+      ],
       "properties": {
-        "current": { "$ref": "#/$defs/datapoint" },
-        "prior_year": { "$ref": "#/$defs/datapoint" }
+        "current": {
+          "$ref": "#/$defs/datapoint"
+        },
+        "prior_year": {
+          "$ref": "#/$defs/datapoint"
+        }
       }
     },
-
     "breakdown_item": {
       "description": "部門或地區。公司揭露金額就填 revenue；只揭露百分比（台股法說會常見）就填 share_percent，例如 25.0 代表 25%。兩者都有就都填，網頁會交叉驗證。",
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "label_source"],
+      "required": [
+        "key",
+        "label_source"
+      ],
       "properties": {
-        "key": { "type": "string", "pattern": "^[a-z0-9_]+$" },
-        "label_source": { "type": "string", "description": "原文名稱，逐字照抄" },
-        "revenue": { "$ref": "#/$defs/pair" },
-        "share_percent": { "$ref": "#/$defs/pair" },
-        "operating_income": { "$ref": "#/$defs/pair" }
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "label_source": {
+          "type": "string",
+          "description": "原文名稱，逐字照抄"
+        },
+        "revenue": {
+          "$ref": "#/$defs/pair"
+        },
+        "share_percent": {
+          "$ref": "#/$defs/pair"
+        },
+        "operating_income": {
+          "$ref": "#/$defs/pair"
+        }
       },
       "anyOf": [
-        { "required": ["revenue"] },
-        { "required": ["share_percent"] }
+        {
+          "required": [
+            "revenue"
+          ]
+        },
+        {
+          "required": [
+            "share_percent"
+          ]
+        }
       ]
     },
-
     "guidance_item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["metric", "label_source", "basis", "unit", "src"],
+      "required": [
+        "metric",
+        "label_source",
+        "basis",
+        "unit",
+        "src"
+      ],
       "properties": {
-        "metric": { "enum": ["revenue", "gross_margin", "operating_margin", "operating_income", "eps", "other"] },
-        "label_source": { "type": "string" },
-        "basis": { "enum": ["GAAP", "non-GAAP", "IFRS", "unspecified"] },
-        "unit": { "enum": ["monetary", "percent", "per_share", "other"] },
-        "low": { "type": ["number", "null"] },
-        "high": { "type": ["number", "null"] },
-        "point": { "type": ["number", "null"], "description": "公司只給單一數字時使用" },
-        "src": { "$ref": "#/$defs/source" }
+        "metric": {
+          "enum": [
+            "revenue",
+            "gross_margin",
+            "operating_margin",
+            "operating_income",
+            "eps",
+            "other"
+          ]
+        },
+        "label_source": {
+          "type": "string"
+        },
+        "basis": {
+          "enum": [
+            "GAAP",
+            "non-GAAP",
+            "IFRS",
+            "unspecified"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "monetary",
+            "percent",
+            "per_share",
+            "other"
+          ]
+        },
+        "low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "point": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "公司只給單一數字時使用"
+        },
+        "src": {
+          "$ref": "#/$defs/source"
+        }
       },
       "anyOf": [
-        { "required": ["low", "high"] },
-        { "required": ["point"] }
+        {
+          "required": [
+            "low",
+            "high"
+          ]
+        },
+        {
+          "required": [
+            "point"
+          ]
+        }
       ]
     }
   }

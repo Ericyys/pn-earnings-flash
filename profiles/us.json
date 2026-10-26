@@ -27,6 +27,8 @@
   ],
   "line_item_aliases": {
     "revenue": [
+      "Net revenues",
+      "Total net revenues",
       "Total revenue",
       "Total revenues",
       "Revenue",
@@ -196,5 +198,8 @@
       "enabled": true,
       "requires": "上一季存檔中的 guidance_next，或本季人工填寫的 consensus"
     }
-  }
+  },
+  "industry_notes": [
+    "券商、銀行、保險等金融業的損益表通常沒有營業成本與毛利：cost_of_revenue、gross_profit 填 null（not_applicable），費用逐列放進 operating_expense_items；毛利率相關的檢查與規則自動略過。"
+  ]
 }
