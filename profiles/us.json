@@ -8,7 +8,7 @@
     "share_unit": "millions",
     "accounting_basis": "US GAAP",
     "display_unit": "billions",
-    "display_currency_prefix": "US$"
+    "display_currency": "USD"
   },
   "extraction_prompt": "prompts/extract_us.md",
   "primary_sources": [

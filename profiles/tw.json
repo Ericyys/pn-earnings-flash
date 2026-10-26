@@ -8,9 +8,9 @@
     "share_unit": "thousands",
     "accounting_basis": "IFRS",
     "display_unit": "hundred_millions",
-    "display_currency_prefix": "NT$"
+    "display_currency": "TWD"
   },
-  "display_note": "台股圖卡以「億元」顯示（原文仟元 ÷ 100,000）。換算一律由網頁執行，AI 只照抄原文單位。",
+  "display_note": "台股圖卡以「億」顯示（原文仟元 ÷ 100,000），貨幣標示為 TWD。換算一律由網頁執行，AI 只照抄原文單位。",
   "extraction_prompt": "prompts/extract_tw.md",
   "primary_sources": [
     {
