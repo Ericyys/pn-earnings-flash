@@ -1,0 +1,1093 @@
+{
+  "schema_version": "1.0",
+  "extraction": {
+    "ai_name": "Claude",
+    "ai_model": "Claude Opus 5.5",
+    "run_id": "A",
+    "extracted_at": "2026-10-27T07:20:00+08:00"
+  },
+  "meta": {
+    "company_name": "Netflix, Inc.",
+    "ticker": "NFLX",
+    "market": "us",
+    "fiscal_period": "FY2026Q3",
+    "period_end": "2026-09-30",
+    "period_end_src": {
+      "doc": "pr",
+      "page": 8,
+      "row_label": "Revenues",
+      "column_label": "Three Months Ended September 30, 2026"
+    },
+    "report_date": "2026-10-20",
+    "currency": "USD",
+    "monetary_unit": "thousands",
+    "monetary_unit_src": {
+      "doc": "pr",
+      "page": 8,
+      "quote": "(in thousands, except per share data)"
+    },
+    "share_unit": "thousands",
+    "accounting_basis": "US GAAP",
+    "source_docs": [
+      {
+        "id": "pr",
+        "type": "press_release",
+        "title": "Netflix shareholder letter, October 20, 2026 (with unaudited financial statements)"
+      }
+    ]
+  },
+  "income_statement": {
+    "revenue": {
+      "current": {
+        "value": 12874176,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 11510307,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Revenues",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "cost_of_revenue": {
+      "current": {
+        "value": 6079016,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Cost of revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 6164250,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Cost of revenues",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "gross_profit": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "rd_expense": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "sm_expense": {
+      "current": {
+        "value": 837051,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Sales and marketing",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 786295,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Sales and marketing",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "ga_expense": {
+      "current": {
+        "value": 466367,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "General and administrative",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 457931,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "General and administrative",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "sga_expense": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "other_operating_net": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "operating_expenses_total": {
+      "current": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      }
+    },
+    "operating_income": {
+      "current": {
+        "value": 4458600,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Operating income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 3248247,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Operating income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "non_operating_net": {
+      "current": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      }
+    },
+    "pretax_income": {
+      "current": {
+        "value": 4316905,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Income before income taxes",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 3109410,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Income before income taxes",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "income_tax": {
+      "current": {
+        "value": -652978,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Provision for income taxes",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -562494,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Provision for income taxes",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "net_income": {
+      "current": {
+        "value": 3663927,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2546916,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "net_income_to_parent": {
+      "current": {
+        "value": 3663927,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2546916,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "eps_basic": {
+      "current": {
+        "value": 0.89,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Earnings per share*: Basic",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 0.6,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Earnings per share*: Basic",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "eps_diluted": {
+      "current": {
+        "value": 0.87,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Earnings per share*: Diluted",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 0.59,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Earnings per share*: Diluted",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "shares_diluted": {
+      "current": {
+        "value": 4195127,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Weighted-average shares of common stock outstanding*: Diluted",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 4340392,
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Weighted-average shares of common stock outstanding*: Diluted",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    }
+  },
+  "operating_expense_items": [
+    {
+      "key": "sales_and_marketing",
+      "label_source": "Sales and marketing",
+      "amount": {
+        "current": {
+          "value": 837051,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Sales and marketing",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 786295,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Sales and marketing",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    },
+    {
+      "key": "technology_and_development",
+      "label_source": "Technology and development",
+      "amount": {
+        "current": {
+          "value": 1033142,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Technology and development",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 853584,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Technology and development",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    },
+    {
+      "key": "general_and_administrative",
+      "label_source": "General and administrative",
+      "amount": {
+        "current": {
+          "value": 466367,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "General and administrative",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 457931,
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "General and administrative",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    }
+  ],
+  "segments": [],
+  "geographies": [
+    {
+      "key": "ucan",
+      "label_source": "UCAN",
+      "revenue": {
+        "current": {
+          "value": 5628215,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "UCAN",
+            "column_label": "Three Months Ended September 30, 2026 As Reported"
+          }
+        },
+        "prior_year": {
+          "value": 5071781,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "UCAN",
+            "column_label": "Three Months Ended September 30, 2025 As Reported"
+          }
+        }
+      }
+    },
+    {
+      "key": "emea",
+      "label_source": "EMEA",
+      "revenue": {
+        "current": {
+          "value": 4106572,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "EMEA",
+            "column_label": "Three Months Ended September 30, 2026 As Reported"
+          }
+        },
+        "prior_year": {
+          "value": 3699052,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "EMEA",
+            "column_label": "Three Months Ended September 30, 2025 As Reported"
+          }
+        }
+      }
+    },
+    {
+      "key": "latam",
+      "label_source": "LATAM",
+      "revenue": {
+        "current": {
+          "value": 1602603,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "LATAM",
+            "column_label": "Three Months Ended September 30, 2026 As Reported"
+          }
+        },
+        "prior_year": {
+          "value": 1370913,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "LATAM",
+            "column_label": "Three Months Ended September 30, 2025 As Reported"
+          }
+        }
+      }
+    },
+    {
+      "key": "apac",
+      "label_source": "APAC",
+      "revenue": {
+        "current": {
+          "value": 1536786,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "APAC",
+            "column_label": "Three Months Ended September 30, 2026 As Reported"
+          }
+        },
+        "prior_year": {
+          "value": 1368561,
+          "src": {
+            "doc": "pr",
+            "page": 12,
+            "row_label": "APAC",
+            "column_label": "Three Months Ended September 30, 2025 As Reported"
+          }
+        }
+      }
+    }
+  ],
+  "kpis": [],
+  "cash_flow": {
+    "operating_cash_flow": {
+      "current": {
+        "value": 3162279,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Net cash provided by operating activities",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2825174,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Net cash provided by operating activities",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "capex": {
+      "current": {
+        "value": -278766,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Purchases of property and equipment",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -164719,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Purchases of property and equipment",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "free_cash_flow_stated": {
+      "current": {
+        "value": 2883513,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 11,
+          "row_label": "Non-GAAP free cash flow",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2660455,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 11,
+          "row_label": "Non-GAAP free cash flow",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    }
+  },
+  "capital_return": {
+    "buybacks": {
+      "current": {
+        "value": -4796725,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Repurchases of common stock",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -1856885,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Repurchases of common stock",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    }
+  },
+  "guidance_next": {
+    "period_label": "FY2026Q4",
+    "items": [
+      {
+        "metric": "revenue",
+        "label_source": "Revenue",
+        "basis": "unspecified",
+        "unit": "monetary",
+        "point": 13442,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Revenue",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "other",
+        "label_source": "Y/Y % Growth",
+        "basis": "unspecified",
+        "unit": "percent",
+        "point": 11.5,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Y/Y % Growth",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "operating_income",
+        "label_source": "Operating Income",
+        "basis": "unspecified",
+        "unit": "monetary",
+        "point": 3500,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Operating Income",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "operating_margin",
+        "label_source": "Operating Margin",
+        "basis": "unspecified",
+        "unit": "percent",
+        "point": 26.0,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Operating Margin",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "other",
+        "label_source": "Net Income",
+        "basis": "unspecified",
+        "unit": "monetary",
+        "point": 2787,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Net Income",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "eps",
+        "label_source": "Diluted EPS",
+        "basis": "unspecified",
+        "unit": "per_share",
+        "point": 0.67,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Diluted EPS",
+          "column_label": "Q4'26 Forecast"
+        }
+      }
+    ]
+  },
+  "notable_items": [],
+  "stated_metrics": [
+    {
+      "metric": "revenue_yoy",
+      "value": 11.8,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 1,
+        "row_label": "Y/Y % Growth",
+        "column_label": "Q3'26"
+      }
+    },
+    {
+      "metric": "revenue_yoy",
+      "value": 12,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "Revenue in Q3 grew 12% year over year (+11% on a foreign exchange (F/X) neutral basis), and was in-line with our forecast."
+      }
+    },
+    {
+      "metric": "other:revenue_yoy_fx_neutral",
+      "value": 11,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "Revenue in Q3 grew 12% year over year (+11% on a foreign exchange (F/X) neutral basis), and was in-line with our forecast."
+      }
+    },
+    {
+      "metric": "operating_margin",
+      "value": 34.6,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 1,
+        "row_label": "Operating Margin",
+        "column_label": "Q3'26"
+      }
+    },
+    {
+      "metric": "other:operating_income_yoy",
+      "value": 37,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "Q3’26 operating income totaled $4.5B (+37% year over year) and operating margin of 34.6% was up versus 28.2% in Q3’25."
+      }
+    },
+    {
+      "metric": "eps_yoy",
+      "value": 49,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "As a result, diluted EPS for the quarter amounted to $0.87 vs. $0.59 in Q3’25 (+49% year over year)."
+      }
+    },
+    {
+      "metric": "other:geo_ucan_yoy",
+      "value": 11,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "UCAN",
+        "column_label": "Change Q3'26 vs. Q3'25 Reported Change"
+      }
+    },
+    {
+      "metric": "other:geo_ucan_yoy_fx_neutral",
+      "value": 11,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "UCAN",
+        "column_label": "Change Q3'26 vs. Q3'25 Constant Currency Change"
+      }
+    },
+    {
+      "metric": "other:geo_emea_yoy",
+      "value": 11,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "EMEA",
+        "column_label": "Change Q3'26 vs. Q3'25 Reported Change"
+      }
+    },
+    {
+      "metric": "other:geo_emea_yoy_fx_neutral",
+      "value": 9,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "EMEA",
+        "column_label": "Change Q3'26 vs. Q3'25 Constant Currency Change"
+      }
+    },
+    {
+      "metric": "other:geo_latam_yoy",
+      "value": 17,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "LATAM",
+        "column_label": "Change Q3'26 vs. Q3'25 Reported Change"
+      }
+    },
+    {
+      "metric": "other:geo_latam_yoy_fx_neutral",
+      "value": 12,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "LATAM",
+        "column_label": "Change Q3'26 vs. Q3'25 Constant Currency Change"
+      }
+    },
+    {
+      "metric": "other:geo_apac_yoy",
+      "value": 12,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "APAC",
+        "column_label": "Change Q3'26 vs. Q3'25 Reported Change"
+      }
+    },
+    {
+      "metric": "other:geo_apac_yoy_fx_neutral",
+      "value": 15,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 12,
+        "row_label": "APAC",
+        "column_label": "Change Q3'26 vs. Q3'25 Constant Currency Change"
+      }
+    },
+    {
+      "metric": "other:india_revenue_yoy_fx_neutral",
+      "value": 18,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 5,
+        "quote": "with our first transaction-based loyalty bundle with Flipkart, we achieved our largest quarter ever of paid net additions in India and grew Q3 revenue in India ~18% year over year on a F/X neutral basis."
+      }
+    },
+    {
+      "metric": "other:ytd_operating_margin",
+      "value": 33.5,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 13,
+        "row_label": "As Reported: Operating Margin",
+        "column_label": "YTD 2026"
+      }
+    },
+    {
+      "metric": "other:ytd_operating_margin_fx_adjusted",
+      "value": 33.3,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 13,
+        "row_label": "Adjusted*: Operating Margin",
+        "column_label": "YTD 2026"
+      }
+    }
+  ],
+  "ambiguities": [
+    {
+      "issue": "上傳文件中沒有出現股票代號。meta.ticker 填 NFLX 是依公司名稱的外部常識，不是原文，請人工確認。",
+      "related_field": "meta.ticker",
+      "locations": []
+    },
+    {
+      "issue": "幣別原文只寫「$」，未寫 USD；accounting_basis 依文中「prepared in accordance with GAAP」判定為 US GAAP。文件是股東信加附未經查核財務報表，source_docs.type 歸為 press_release。",
+      "related_field": "meta.currency",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 7,
+          "quote": "or other financial measures prepared in accordance with GAAP."
+        }
+      ]
+    },
+    {
+      "issue": "單位不一致：損益表、現金流量表、非 GAAP 表皆為仟元（thousands），本 JSON 的實際數均取自這些表；但第 1 頁摘要表與 Q4 財測為百萬元（millions）。guidance_next 的金額照抄第 1 頁的百萬元數字，未換算，與 meta.monetary_unit 不同，網頁使用前必須處理。",
+      "related_field": "guidance_next.items",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "quote": "(in thousands, except per share data)"
+        },
+        {
+          "doc": "pr",
+          "page": 1,
+          "quote": "(in millions except per share data)"
+        }
+      ]
+    },
+    {
+      "issue": "股數單位：第 8 頁表頭未單獨說明股數單位，依「(in thousands, except per share data)」判定為 thousands；第 1 頁 Shares (FD) 以百萬股列示（Q3'26 為 4,195）。",
+      "related_field": "meta.share_unit",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Weighted-average shares of common stock outstanding*: Diluted",
+          "column_label": "Three Months Ended September 30, 2026"
+        },
+        {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Shares (FD)",
+          "column_label": "Q3'26"
+        }
+      ]
+    },
+    {
+      "issue": "去年同期（Q3'25）的 EPS 與股數已追溯調整十比一股票分割。若歷史存檔是分割前數字，比對會不一致。",
+      "related_field": "income_statement.shares_diluted",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "quote": "* Share and per share amounts have been retroactively adjusted to reflect the ten-for-one forward stock split which was effected on November 14, 2025."
+        }
+      ]
+    },
+    {
+      "issue": "原文列名為「Technology and development」，不是明確的 Research and development，因此 rd_expense 填 null（not_applicable），實際數字放在 operating_expense_items。是否視為研發費用請人工決定。",
+      "related_field": "income_statement.rd_expense",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Technology and development",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "損益表沒有費用合計列，也沒有毛利列；Cost of revenues 與 Sales and marketing 等三列在同一區塊、同一縮排，中間沒有小計。我把 Cost of revenues 只放在 income_statement.cost_of_revenue，未放進 operating_expense_items（避免流向圖重複扣除）；若流向圖需要四列全收，請人工加回。另外第 13 頁有公司自己標示的「Operating Expenses」，但只有年初至今（YTD 2026）數字，沒有單季數，因此 operating_expenses_total 填 null。",
+      "related_field": "income_statement.operating_expenses_total",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Cost of revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        },
+        {
+          "doc": "pr",
+          "page": 13,
+          "row_label": "As Reported: Operating Expenses",
+          "column_label": "YTD 2026"
+        }
+      ]
+    },
+    {
+      "issue": "「Other income (expense):」區塊沒有合計列，只有兩列：Interest expense 本季 (184,701)、去年同期 (175,294)；Interest and other income (expense) 本季 43,006、去年同期 36,457。non_operating_net 因此填 null。",
+      "related_field": "income_statement.non_operating_net",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Interest expense",
+          "column_label": "Three Months Ended September 30, 2026"
+        },
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Interest and other income (expense)",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "營收年增率原文有兩種寫法：第 1 頁表格 11.8%，第 2 頁內文 12%（stated_metrics 兩筆都列）。Q4 財測年增率也一樣：第 1 頁表格 11.5%，第 2 頁內文 12%。請人工決定交叉驗證用哪一個。",
+      "related_field": "stated_metrics",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Y/Y % Growth",
+          "column_label": "Q3'26"
+        },
+        {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Y/Y % Growth",
+          "column_label": "Q4'26 Forecast"
+        },
+        {
+          "doc": "pr",
+          "page": 2,
+          "quote": "In Q4, we expect revenue of $13.4 billion, which represents year over year growth of 12% (or 11% F/X neutral) driven by growth in memberships, pricing, and ad revenue."
+        }
+      ]
+    },
+    {
+      "issue": "財測未註明 GAAP 或 non-GAAP，basis 一律填 unspecified。Q4 營業利益率財測 26.0% 含約 120 個基點的裁員相關負面影響。另有全年 2026 展望（營收 $51.1B、年增 13%、營業利益率 31.5%、自由現金流約 $12.0B、廣告營收約 $2.7B），依指示未放入 guidance_next。",
+      "related_field": "guidance_next",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 2,
+          "quote": "We project a Q4 operating margin of 26.0% which includes ~120 basis points negative impact associated with our recently announced headcount reductions, and compares with 24.5% in the year ago quarter."
+        },
+        {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Our guidance for Q4 means that for the full year 2026 we expect revenue of $51.1B, or growth of 13% (+12% on a F/X neutral basis)."
+        },
+        {
+          "doc": "pr",
+          "page": 5,
+          "quote": "We have adjusted our expected 2026 FCF forecast to approximately $12.0B (vs. our prior projection of $12.5B) due primarily to the expected closing of a real estate transaction in Q4."
+        }
+      ]
+    },
+    {
+      "issue": "原文的 $22.3B 是「剩餘回購額度」，不是本次新增的回購授權，因此 capital_return.new_buyback_authorization 省略。公司未發股利，dividends_paid 省略。",
+      "related_field": "capital_return.new_buyback_authorization",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 5,
+          "quote": "In Q3, we bought back 63.9 million shares for $4.8B, our largest quarter ever of stock repurchases, and we currently have $22.3B of capacity left in our remaining authorizations."
+        }
+      ]
+    },
+    {
+      "issue": "未揭露產品線或收入類型（訂閱／廣告）的單季金額，segments 給空陣列。地區營收取自第 12 頁仟元表的 As Reported 欄；第 6 頁另有同一組數據的百萬元版本。沒有 company.json，地區 key 自訂為 ucan、emea、latam、apac。",
+      "related_field": "geographies",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 12,
+          "row_label": "Total Revenues",
+          "column_label": "Three Months Ended September 30, 2026 As Reported"
+        },
+        {
+          "doc": "pr",
+          "page": 6,
+          "row_label": "Revenue",
+          "column_label": "Q3'26"
+        }
+      ]
+    },
+    {
+      "issue": "文件沒有 Key Performance Metrics 之類的營運指標段落，kpis 給空陣列。內文有零星數字（印度觀看時數年增 24%、期末總債務 $15.3B、現金 $8.2B 等）未抽入。",
+      "related_field": "kpis",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 4,
+          "quote": "As a result, view hours in India grew 24% year over year, while view hours per member grew low-to-mid single digits in the quarter."
+        },
+        {
+          "doc": "pr",
+          "page": 5,
+          "quote": "We ended Q3 with gross debt of $15.3B and cash and cash equivalents of $8.2B."
+        }
+      ]
+    },
+    {
+      "issue": "未揭露單季 non-GAAP EPS、營業利益或淨利，market_specific 省略。文件中的 non-GAAP 指標有：自由現金流（已填 cash_flow.free_cash_flow_stated）、F/X neutral 營收、YTD F/X 調整後營業利益 12,512,643 與利益率 33.3%（僅年初至今）、淨負債 7,113,850（時點數）。",
+      "related_field": "market_specific.us",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 13,
+          "row_label": "Adjusted*: Operating Profit",
+          "column_label": "YTD 2026"
+        },
+        {
+          "doc": "pr",
+          "page": 13,
+          "row_label": "Net debt",
+          "column_label": "As of September 30, 2026"
+        }
+      ]
+    }
+  ]
+}

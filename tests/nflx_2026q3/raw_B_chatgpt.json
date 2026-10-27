@@ -1,0 +1,881 @@
+
+{
+  "schema_version": "1.0",
+  "extraction": {
+    "ai_name": "ChatGPT",
+    "ai_model": "GPT-6",
+    "run_id": "B",
+    "extracted_at": "2026-10-27T07:29:00+08:00"
+  },
+  "meta": {
+    "company_name": "Netflix, Inc.",
+    "ticker": "NFLX",
+    "market": "us",
+    "fiscal_period": "FY2026Q3",
+    "period_end": "2026-09-30",
+    "period_end_src": {
+      "doc": "pr",
+      "page": 8,
+      "row_label": "Revenues",
+      "column_label": "Three Months Ended September 30, 2026"
+    },
+    "report_date": "2026-10-20",
+    "currency": "USD",
+    "monetary_unit": "thousands",
+    "monetary_unit_src": {
+      "doc": "pr",
+      "page": 8,
+      "quote": "(in thousands, except per share data)"
+    },
+    "share_unit": "thousands",
+    "accounting_basis": "US GAAP",
+    "source_docs": [
+      {
+        "id": "pr",
+        "type": "press_release",
+        "title": "Netflix, Inc. Q3 2026 Shareholder Letter and Financial Statements"
+      }
+    ]
+  },
+  "income_statement": {
+    "revenue": {
+      "current": {
+        "value": 12874176,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 11510307,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Revenues",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "cost_of_revenue": {
+      "current": {
+        "value": 6079016,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Cost of revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 6164250,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Cost of revenues",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "gross_profit": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "rd_expense": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "sm_expense": {
+      "current": {
+        "value": 837051,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Sales and marketing",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 786295,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Sales and marketing",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "ga_expense": {
+      "current": {
+        "value": 466367,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "General and administrative",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 457931,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "General and administrative",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "sga_expense": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "other_operating_net": {
+      "current": {
+        "value": null,
+        "null_reason": "not_applicable"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_applicable"
+      }
+    },
+    "operating_expenses_total": {
+      "current": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      }
+    },
+    "operating_income": {
+      "current": {
+        "value": 4458600,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Operating income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 3248247,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Operating income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "non_operating_net": {
+      "current": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      },
+      "prior_year": {
+        "value": null,
+        "null_reason": "not_disclosed"
+      }
+    },
+    "pretax_income": {
+      "current": {
+        "value": 4316905,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Income before income taxes",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 3109410,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Income before income taxes",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "income_tax": {
+      "current": {
+        "value": -652978,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Provision for income taxes",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -562494,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Provision for income taxes",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "net_income": {
+      "current": {
+        "value": 3663927,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2546916,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "net_income_to_parent": {
+      "current": {
+        "value": 3663927,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 2546916,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Net income",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "eps_basic": {
+      "current": {
+        "value": 0.89,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Basic",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 0.6,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Basic",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "eps_diluted": {
+      "current": {
+        "value": 0.87,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Diluted",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 0.59,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Diluted",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    },
+    "shares_diluted": {
+      "current": {
+        "value": 4195127,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Diluted",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 4340392,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Diluted",
+          "column_label": "Three Months Ended September 30, 2025"
+        }
+      }
+    }
+  },
+  "operating_expense_items": [
+    {
+      "key": "cost_of_revenues",
+      "label_source": "Cost of revenues",
+      "amount": {
+        "current": {
+          "value": 6079016,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Cost of revenues",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 6164250,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Cost of revenues",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    },
+    {
+      "key": "sales_and_marketing",
+      "label_source": "Sales and marketing",
+      "amount": {
+        "current": {
+          "value": 837051,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Sales and marketing",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 786295,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Sales and marketing",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    },
+    {
+      "key": "technology_and_development",
+      "label_source": "Technology and development",
+      "amount": {
+        "current": {
+          "value": 1033142,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Technology and development",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 853584,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "Technology and development",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    },
+    {
+      "key": "general_and_administrative",
+      "label_source": "General and administrative",
+      "amount": {
+        "current": {
+          "value": 466367,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "General and administrative",
+            "column_label": "Three Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 457931,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 8,
+            "row_label": "General and administrative",
+            "column_label": "Three Months Ended September 30, 2025"
+          }
+        }
+      }
+    }
+  ],
+  "segments": [
+    {
+      "key": "ucan",
+      "label_source": "UCAN",
+      "revenue": {
+        "current": {
+          "value": 5628,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'26"
+          }
+        },
+        "prior_year": {
+          "value": 5072,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'25"
+          }
+        }
+      }
+    },
+    {
+      "key": "emea",
+      "label_source": "EMEA",
+      "revenue": {
+        "current": {
+          "value": 4107,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'26"
+          }
+        },
+        "prior_year": {
+          "value": 3699,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'25"
+          }
+        }
+      }
+    },
+    {
+      "key": "latam",
+      "label_source": "LATAM",
+      "revenue": {
+        "current": {
+          "value": 1603,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'26"
+          }
+        },
+        "prior_year": {
+          "value": 1371,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'25"
+          }
+        }
+      }
+    },
+    {
+      "key": "apac",
+      "label_source": "APAC",
+      "revenue": {
+        "current": {
+          "value": 1537,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'26"
+          }
+        },
+        "prior_year": {
+          "value": 1369,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 1,
+            "row_label": "Revenue",
+            "column_label": "Q3'25"
+          }
+        }
+      }
+    }
+  ],
+  "kpis": [
+    {
+      "key": "view_hours_india_yoy",
+      "label_source": "view hours in India grew 24% year over year",
+      "unit": "percent",
+      "current": {
+        "value": 24,
+        "period_type": "quarter",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "quote": "As a result, view hours in India grew 24% year over year, while view hours per member grew low-to-mid single digits in the quarter."
+        }
+      }
+    }
+  ],
+  "cash_flow": {
+    "operating_cash_flow": {
+      "current": {
+        "value": 10196296,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Net cash provided by operating activities",
+          "column_label": "Nine Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": 8037631,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Net cash provided by operating activities",
+          "column_label": "Nine Months Ended September 30, 2025"
+        }
+      }
+    },
+    "capex": {
+      "current": {
+        "value": -693540,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Purchases of property and equipment",
+          "column_label": "Nine Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -448885,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Purchases of property and equipment",
+          "column_label": "Nine Months Ended September 30, 2025"
+        }
+      },
+      "free_cash_flow_stated": {
+        "current": {
+          "value": 9502756,
+          "period_type": "ytd",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Non-GAAP free cash flow",
+            "column_label": "Nine Months Ended September 30, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 7588746,
+          "period_type": "ytd",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Non-GAAP free cash flow",
+            "column_label": "Nine Months Ended September 30, 2025"
+          }
+        }
+      }
+    }
+  },
+  "capital_return": {
+    "buybacks": {
+      "current": {
+        "value": -10781716,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Repurchases of common stock",
+          "column_label": "Nine Months Ended September 30, 2026"
+        }
+      },
+      "prior_year": {
+        "value": -7047608,
+        "period_type": "ytd",
+        "src": {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Repurchases of common stock",
+          "column_label": "Nine Months Ended September 30, 2025"
+        }
+      }
+    },
+    "new_buyback_authorization": {
+      "amount": {
+        "value": 22.3,
+        "period_type": "point_in_time",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "quote": "In Q3, we bought back 63.9 million shares for $4.8B, our largest quarter ever of stock repurchases, and we currently have $22.3B of capacity left in our remaining authorizations."
+        }
+      },
+      "label_source": "capacity left in our remaining authorizations"
+    }
+  },
+  "guidance_next": {
+    "period_label": "FY2026Q4",
+    "items": [
+      {
+        "metric": "revenue",
+        "label_source": "Revenue",
+        "basis": "GAAP",
+        "unit": "monetary",
+        "point": 13442,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Revenue",
+          "column_label": "Q4'26 Forecast"
+        }
+      },
+      {
+        "metric": "operating_margin",
+        "label_source": "Operating Margin",
+        "basis": "GAAP",
+        "unit": "percent",
+        "point": 26.0,
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "row_label": "Operating Margin",
+          "column_label": "Q4'26 Forecast"
+        }
+      }
+    ]
+  },
+  "notable_items": [],
+  "stated_metrics": [
+    {
+      "metric": "revenue_yoy",
+      "value": 12,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "Revenue in Q3 grew 12% year over year (+11% on a foreign exchange (F/X) neutral basis), and was in-line with our forecast."
+      }
+    },
+    {
+      "metric": "operating_margin",
+      "value": 34.6,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 1,
+        "row_label": "Operating Margin",
+        "column_label": "Q3'26"
+      }
+    },
+    {
+      "metric": "eps_yoy",
+      "value": 49,
+      "unit": "percent",
+      "src": {
+        "doc": "pr",
+        "page": 2,
+        "quote": "As a result, diluted EPS for the quarter amounted to $0.87 vs. $0.59 in Q3’25 (+49% year over year)."
+      }
+    }
+  ],
+  "market_specific": {
+    "us": {
+      "non_gaap_operating_income": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      }
+    }
+  },
+  "ambiguities": [
+    {
+      "issue": "公司財報使用日曆年財年；FY2026Q3 對應截至 2026-09-30 的第三季。",
+      "related_field": "meta.fiscal_period",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Revenues",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "損益表未列示 Gross profit、Research and development 或 Total operating expenses；依規則不計算缺失科目。Operating expenses 合計未直接揭露。",
+      "related_field": "income_statement",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Operating income",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "Other income (expense) 下分別揭露 Interest expense 與 Interest and other income (expense)，沒有直接列示業外收支淨額，故不自行加總。",
+      "related_field": "income_statement.non_operating_net",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Interest expense",
+          "column_label": "Three Months Ended September 30, 2026"
+        },
+        {
+          "doc": "pr",
+          "page": 8,
+          "row_label": "Interest and other income (expense)",
+          "column_label": "Three Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "股東信摘要表的單位為 millions，正式 Consolidated Statements of Operations 的單位為 thousands；損益表採正式財務報表單位。分部收入沿用摘要表的 millions。",
+      "related_field": "meta.monetary_unit",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 8,
+          "quote": "(in thousands, except per share data)"
+        },
+        {
+          "doc": "pr",
+          "page": 1,
+          "quote": "(in millions except per share data)"
+        }
+      ]
+    },
+    {
+      "issue": "新聞稿另揭露 2026 全年營收與營業利益率展望、全年 FCF 展望及廣告收入展望；依規則 guidance_next 僅收錄下一季數字，全年展望未納入。",
+      "related_field": "guidance_next",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Our guidance for Q4 means that for the full year 2026 we expect revenue of $51.1B, or growth of 13% (+12% on a F/X neutral basis)."
+        },
+        {
+          "doc": "pr",
+          "page": 2,
+          "quote": "We anticipate an operating margin of 31.5% for 2026 (31.4% based on F/X rates as of January 1, 2026) vs. 29.5% in 2025."
+        }
+      ]
+    },
+    {
+      "issue": "新聞稿以文字明確揭露 Q3 回購 63.9 million shares、金額 $4.8B，並揭露剩餘回購授權容量 $22.3B；現金流量表的 Repurchases of common stock 為年初至今累計，兩者期間與單位不同。",
+      "related_field": "capital_return",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 5,
+          "quote": "In Q3, we bought back 63.9 million shares for $4.8B, our largest quarter ever of stock repurchases, and we currently have $22.3B of capacity left in our remaining authorizations."
+        },
+        {
+          "doc": "pr",
+          "page": 10,
+          "row_label": "Repurchases of common stock",
+          "column_label": "Nine Months Ended September 30, 2026"
+        }
+      ]
+    },
+    {
+      "issue": "公司揭露 Adjusted operating profit and margin、Non-GAAP free cash flow 等其他調整後指標，但未將其作為 Non-GAAP EPS、Non-GAAP operating income 或 Non-GAAP net income 的同名數字列示；依規則未填入 market_specific.us。",
+      "related_field": "market_specific.us",
+      "locations": [
+        {
+          "doc": "pr",
+          "page": 7,
+          "quote": "This shareholder letter and its attachments include reference to the non-GAAP financial measures of F/X neutral revenue and adjusted operating profit and margin, free cash flow and net debt."
+        }
+      ]
+    }
+  ]
+}

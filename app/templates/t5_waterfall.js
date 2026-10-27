@@ -6,7 +6,8 @@
 //     { label: "營業現金流", value: 12.4, type: "total" },   // total：從 0 畫到 value
 //     { label: "資本支出",   value: 6.8,  type: "use" },     // use：用掉的金額（正數），柱子往下，灰色
 //     { label: "自由現金流", value: 5.6,  type: "total" },
-//     { label: "部門 A",     value: 1.2,  type: "delta" }    // delta：可正可負，漲藍跌橘
+//     { label: "部門 A",     value: 1.2,  type: "delta" },   // delta：可正可負，漲藍跌橘
+//     { label: "庫藏股買回", value: 4.8, type: "bar", group: "股東回饋" }  // bar：獨立長條，從 0 畫起，不與前面連動
 //   ]
 // }
 // total 的 value 由網頁從報告值帶入；底稿只畫，不驗算（驗算在 QC 階段）。
@@ -25,7 +26,7 @@ export function renderT5(box, ctx, spec) {
   const legendItems = [];
   const types = new Set(b.steps.map((s) => s.type));
   if (types.has("total")) legendItems.push(["小計", c.text]);
-  if (types.has("use")) legendItems.push(["支出", c.other]);
+  if (types.has("use") || types.has("bar")) legendItems.push(["支出", c.other]);
   if (b.steps.some((s) => s.type === "delta" && s.value > 0)) legendItems.push(["增加", c.up]);
   if (b.steps.some((s) => s.type === "delta" && s.value < 0)) legendItems.push(["減少", c.down]);
   {
@@ -44,6 +45,7 @@ export function renderT5(box, ctx, spec) {
     let y0, y1, color, shown;
     if (s.type === "total") { y0 = 0; y1 = s.value; run = s.value; color = c.text; shown = f(s.value); }
     else if (s.type === "use") { y0 = run; y1 = run - s.value; run = y1; color = c.other; shown = f(-s.value); }
+    else if (s.type === "bar") { y0 = 0; y1 = s.value; color = c.other; shown = f(s.value); }
     else { y0 = run; y1 = run + s.value; run = y1; color = s.value >= 0 ? c.up : c.down; shown = null; }
     return { ...s, y0, y1, color, shown };
   });
@@ -55,7 +57,9 @@ export function renderT5(box, ctx, spec) {
   const barW = Math.min(100, slot * 0.6);
   const catLines = bars.map((x) => wrapText(x.label, lab, slot - 8, measure).slice(0, 2));
   const axisH = Math.max(...catLines.map((l) => l.length)) * lineBox(lab) + 8;
-  const plotTop = box.y + lineBox(small) + 32 + lineBox(lab) + 4;
+  const hasGroup = bars.some((x) => x.type === "bar" && x.group);
+  const groupTop = box.y + lineBox(small) + 32;
+  const plotTop = groupTop + (hasGroup ? lineBox(lab) + 16 : 0) + lineBox(lab) + 4;
   const plotBottom = box.y + box.h - axisH - (lo < 0 ? lineBox(lab) + 4 : 0);
   const k = (plotBottom - plotTop) / (hi - lo || 1);
   const sy = (v) => plotBottom - (v - lo) * k;
@@ -64,8 +68,8 @@ export function renderT5(box, ctx, spec) {
     const cx = box.x + slot * i + slot / 2;
     const top = sy(Math.max(x.y0, x.y1)), bot = sy(Math.min(x.y0, x.y1));
     svg += rect(cx - barW / 2, top, barW, Math.max(bot - top, 1), x.color);
-    // 連接線
-    if (i < n - 1) {
+    // 連接線（獨立長條不連）
+    if (i < n - 1 && bars[i + 1].type !== "bar" && x.type !== "bar") {
       const ny = sy(x.y1);
       svg += hline(cx + barW / 2, cx + slot - barW / 2, ny, c.rule);
     }
@@ -77,6 +81,15 @@ export function renderT5(box, ctx, spec) {
     svg += text(cx, ly, label, lab, { fill: c.text, anchor: "middle", num: true });
   });
   svg += hline(box.x, box.x + box.w, sy(0), c.text);
+
+  // 獨立長條群組：前方畫分隔線，上方寫群組名稱
+  const firstBar = bars.findIndex((x) => x.type === "bar");
+  if (firstBar > 0) {
+    const sepX = box.x + slot * firstBar;
+    svg += ctx.vline(sepX, groupTop, plotBottom, c.rule);
+    const gName = bars[firstBar].group;
+    if (gName) svg += text(sepX + 12, baseline(groupTop, lab), gName, lab, { fill: c.muted });
+  }
 
   // 類別標籤
   catLines.forEach((lines, i) => {

@@ -18,7 +18,11 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "enum": [
+        "1.0",
+        "1.1"
+      ],
+      "description": "1.1 起財測必須標單位"
     },
     "comment": {
       "type": "string",
@@ -311,7 +315,7 @@
       }
     },
     "kpis": {
-      "description": "公司揭露的營運指標（用戶數、資產規模、ARPU、出貨量、在手訂單等）。有 company.json 時只抽其列出的項目；沒有時，抽新聞稿中營運指標段落（例如 Key Performance Metrics）的全部項目。",
+      "description": "公司揭露的營運指標（用戶數、資產規模、ARPU、出貨量、在手訂單等）。有 company.json 時只抽其列出的項目；沒有時，抽新聞稿中營運指標段落（例如 Key Performance Metrics）的全部項目。 只收指標本身的數值（數量、金額、比率），不收「成長了幾 %」這類變動率；變動率若原文有寫，放 stated_metrics。",
       "type": "array",
       "items": {
         "type": "object",
@@ -390,7 +394,8 @@
             "label_source": {
               "type": "string"
             }
-          }
+          },
+          "description": "只有原文明確寫出「本季新核准／新增」的回購授權金額才填；「剩餘額度」「尚可回購金額」不是新授權，寫進 ambiguities。"
         }
       }
     },
@@ -400,6 +405,7 @@
       "additionalProperties": false,
       "required": [
         "period_label",
+        "monetary_unit",
         "items"
       ],
       "properties": {
@@ -412,6 +418,18 @@
           "items": {
             "$ref": "#/$defs/guidance_item"
           }
+        },
+        "monetary_unit": {
+          "enum": [
+            "ones",
+            "thousands",
+            "millions",
+            "billions"
+          ],
+          "description": "財測金額的單位，照抄財測表格或段落的單位說明；常與損益表不同（例如損益表仟元、財測百萬元）"
+        },
+        "monetary_unit_src": {
+          "$ref": "#/$defs/source"
         }
       }
     },
@@ -707,7 +725,7 @@
       }
     },
     "pair": {
-      "description": "本季與去年同期。去年同期會跟歷史存檔比對，用來確認 AI 讀對欄位。",
+      "description": "本季與去年同期（必填），上一季（選填）。去年同期會跟歷史存檔比對，用來確認 AI 讀對欄位。",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -720,6 +738,10 @@
         },
         "prior_year": {
           "$ref": "#/$defs/datapoint"
+        },
+        "prior_quarter": {
+          "$ref": "#/$defs/datapoint",
+          "description": "選填：上一季單季（原文表格有上一季欄位時才填），用於季變動"
         }
       }
     },
