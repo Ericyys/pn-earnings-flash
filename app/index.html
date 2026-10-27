@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PN 財報快報</title>
+<link id="gf" rel="stylesheet" href="">
+<style>
+  :root {
+    --bg: #FFFFFF; --paper: #F7F9FB; --band: #EEF2F6; --text: #0A1628; --text2: #3E4C5E; --muted: #5F6B7D;
+    --rule: #D5DCE4; --up: #0A6E99; --down: #C2410C; --warn: #8A6A08;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--text); font: 16px/1.7 Inter, "Noto Sans TC", sans-serif; }
+  header { background: var(--bg); border-bottom: 1px solid var(--text); padding: 16px; }
+  header h1 { margin: 0; font: 400 24px/1.25 "Source Serif 4", "Noto Serif TC", serif; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  main { max-width: 1120px; margin: 0 auto; padding: 16px; }
+  section { background: var(--bg); border-top: 1px solid var(--text); margin: 24px 0; padding: 16px 0 24px; }
+  section[hidden] { display: none; }
+  h2 { font: 400 22px/1.25 "Source Serif 4", "Noto Serif TC", serif; margin: 0 16px 8px; }
+  h3 { font-weight: 400; font-size: 17px; margin: 24px 16px 8px; }
+  .pad { padding: 0 16px; }
+  .note { color: var(--muted); font-size: 14px; }
+  label.block { display: block; margin: 16px 0 4px; color: var(--text2); font-size: 14px; }
+  textarea { width: 100%; min-height: 160px; font: 13px/1.5 ui-monospace, Menlo, monospace; border: 1px solid var(--rule); padding: 8px; border-radius: 0; }
+  select, input[type=text] { font: inherit; border: 1px solid var(--rule); padding: 8px; border-radius: 0; background: var(--bg); max-width: 100%; }
+  button { font: inherit; padding: 8px 16px; border: 1px solid var(--text); background: var(--text); color: var(--bg); border-radius: 0; cursor: pointer; }
+  button.ghost { background: var(--bg); color: var(--text); }
+  button:disabled { background: var(--rule); border-color: var(--rule); color: var(--muted); cursor: not-allowed; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+  th { background: var(--band); font-weight: 400; color: var(--text2); border-top: 1px solid var(--text); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.src { color: var(--muted); font-size: 13px; }
+  .pass { color: var(--up); } .fail { color: var(--down); } .warn { color: var(--warn); } .skip { color: var(--muted); }
+  .banner { margin: 8px 16px; padding: 12px 16px; border-left: 4px solid var(--down); background: var(--paper); }
+  .banner.ok { border-left-color: var(--up); }
+  .progress { height: 4px; background: var(--rule); margin: 8px 16px; }
+  .progress > div { height: 100%; background: var(--up); width: 0; transition: width .2s; }
+  input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--text); }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; padding: 0 16px; }
+  figure { margin: 0; } figure svg { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+  figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; font-size: 14px; color: var(--text2); }
+  details summary { cursor: pointer; color: var(--text2); }
+  .reason { width: 100%; margin-top: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PN 財報快報｜出圖工具</h1>
+  <p>貼上 AI 抽出的數據 → 自動檢查 → 人工核對 → 產出圖卡 → 下載</p>
+</header>
+<main>
+
+<!-- 步驟 1 -->
+<section id="s1">
+  <h2>1｜貼上數據</h2>
+  <div class="pad">
+    <p class="note">還沒有數據？先下載 <a href="../prompts/extract_us.md" download>美股抽取指令</a> 與 <a href="../schema/fact_sheet.schema.json" download>資料規格</a>，連同財報 PDF 一起交給 AI。</p>
+    <label class="block" for="company">公司設定檔</label>
+    <select id="company"><option value="">沒有設定檔（新公司）</option></select>
+    <label class="block" for="fsA">A｜主要抽取結果（必填）</label>
+    <textarea id="fsA" placeholder="把 AI 交出的 JSON 整段貼在這裡（有沒有 ```json 框都可以）"></textarea>
+    <input type="file" id="fileA" accept=".json,.txt">
+    <label class="block" for="fsB">B｜第二個 AI 的抽取結果（新公司前 2 次必填，其他選填）</label>
+    <textarea id="fsB" placeholder="選填"></textarea>
+    <input type="file" id="fileB" accept=".json,.txt">
+    <div class="row"><button id="btnCheck">檢查</button><span id="s1msg" class="note"></span></div>
+  </div>
+</section>
+
+<!-- 步驟 2 -->
+<section id="s2" hidden>
+  <h2>2｜自動檢查</h2>
+  <div id="formatBox"></div>
+  <h3>勾稽與合理性</h3>
+  <div class="tablewrap pad"><table id="checks"><thead><tr><th>結果</th><th>項目</th><th>說明</th></tr></thead><tbody></tbody></table></div>
+  <div id="diffBox"></div>
+</section>
+
+<!-- 步驟 3 -->
+<section id="s3" hidden>
+  <h2>3｜人工核對</h2>
+  <p class="pad note">每一項都要打開 PDF，用 Ctrl＋F（Mac 是 ⌘F）搜尋「列名」，確認那一列、那一欄的數字與這裡一致，再打勾。全部打勾才能產出圖卡。</p>
+  <div class="progress"><div id="bar"></div></div>
+  <p class="pad note" id="progressText"></p>
+  <div id="manualBox"></div>
+  <div class="row pad"><button id="btnRender" disabled>產出圖卡</button></div>
+</section>
+
+<!-- 步驟 4 -->
+<section id="s4" hidden>
+  <h2>4｜圖卡</h2>
+  <div class="pad" id="selBox"></div>
+  <div class="pad">
+    <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示）</label>
+    <input type="text" id="nextDate" placeholder="YYYY-MM-DD">
+    <div class="row">
+      <button class="ghost" id="btnLight">淺底</button><button class="ghost" id="btnDark">深底</button>
+      <button id="btnApply" class="ghost">套用日期</button>
+      <button id="btnAll">下載全部 PNG</button>
+      <button id="btnArchive" class="ghost">下載本季存檔</button>
+    </div>
+    <p class="note" id="exportMsg"></p>
+  </div>
+  <div id="grid"></div>
+</section>
+
+</main>
+<script type="module">
+import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
+import { validate } from "./lib/validate.js";
+import { renderCard } from "./templates/index.js";
+import { createMeasurer } from "./lib/text.js";
+import { ensureFonts, installLocalAliases } from "./lib/fonts.js";
+import { svgToPng, download } from "./lib/export.js";
+
+const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const getJSON = async (p) => { const r = await fetch(p); if (!r.ok) throw new Error(`讀取失敗：${p}`); return r.json(); };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const brand = await getJSON("./brand.json");
+const fontCss = q.get("fontcss") || brand.fonts.web_source;   // 本機測試可指定替代字型表
+if (q.get("local") === "1") installLocalAliases(); else $("gf").href = brand.fonts.web_source;
+const schema = await getJSON("../schema/fact_sheet.schema.json");
+const triggers = await getJSON("../rules/triggers.json");
+const labels = (await getJSON("../references/labels_zh.json")).labels;
+const profiles = { us: await getJSON("../profiles/us.json"), tw: await getJSON("../profiles/tw.json") };
+const companyList = (await getJSON("../companies/index.json")).companies;
+for (const c of companyList) $("company").insertAdjacentHTML("beforeend", `<option value="${esc(c.path)}">${esc(c.label)}</option>`);
+
+let state = {};
+let measure = null;
+let theme = "light";
+
+// 檔案上傳 → 填入文字框
+for (const k of ["A", "B"]) {
+  $(`file${k}`).addEventListener("change", async (e) => { const f = e.target.files[0]; if (f) $(`fs${k}`).value = await f.text(); });
+}
+
+// ───── 步驟 1 → 2
+$("btnCheck").onclick = async () => {
+  $("s1msg").textContent = "";
+  ["s2", "s3", "s4"].forEach((id) => ($(id).hidden = true));
+  let A, B = null;
+  try { A = parseFactSheet($("fsA").value); } catch (e) { $("s1msg").innerHTML = `<span class="fail">A 不是有效的 JSON：${esc(e.message)}</span>`; return; }
+  if ($("fsB").value.trim()) {
+    try { B = parseFactSheet($("fsB").value); } catch (e) { $("s1msg").innerHTML = `<span class="fail">B 不是有效的 JSON：${esc(e.message)}</span>`; return; }
+  }
+  const company = $("company").value ? await getJSON(`../companies/${$("company").value}`) : {};
+  const errA = validate(schema, A), errB = B ? validate(schema, B) : [];
+  state = { A, B, company, errA, errB };
+
+  // 格式檢查
+  const fmtList = (name, errs) => errs.length
+    ? `<div class="banner"><b class="fail">${name} 格式有 ${errs.length} 處錯誤</b><ul>${errs.slice(0, 20).map((e) => `<li><code>${esc(e.path || "（最上層）")}</code>：${esc(e.message)}</li>`).join("")}</ul></div>`
+    : `<div class="banner ok"><b class="pass">${name} 格式通過</b></div>`;
+  $("formatBox").innerHTML = `<h3>格式</h3>${fmtList("A", errA)}${B ? fmtList("B", errB) : ""}`;
+  $("s2").hidden = false;
+  if (errA.length) {
+    $("formatBox").insertAdjacentHTML("beforeend", `<p class="pad">A 的格式錯誤必須先修正：把錯誤訊息貼回給 AI，請它修正後重新輸出，再貼回來檢查。</p>`);
+    $("checks").querySelector("tbody").innerHTML = ""; $("diffBox").innerHTML = "";
+    return;
+  }
+
+  const profile = profiles[A.meta.market] || profiles.us;
+  const out = analyze(A, { profile, company, triggers, labels, history: [] });
+  state.out = out; state.profile = profile;
+  const lab = { pass: "通過", fail: "不通過", warn: "需確認", skip: "略過" };
+  $("checks").querySelector("tbody").innerHTML = out.checks.map((c) =>
+    `<tr><td class="${c.status}">${lab[c.status]}</td><td>${esc(c.label)}</td><td>${esc(c.detail)}</td></tr>`).join("");
+
+  // A／B 比對
+  state.diffs = B ? diffForReview(A, B) : [];
+  $("diffBox").innerHTML = B ? `<h3>A／B 比對：${state.diffs.length} 處不同</h3>
+    <p class="pad note">差異已列在步驟 3 第三層，每一處都要回原文確認（只用於驗算的欄位不列入）。<b>圖卡只使用 A 的數字</b>：若 A 錯，請修正 A 後重新檢查；若 A 對，在步驟 3 打勾。</p>` : "";
+
+  buildManual();
+  $("s3").hidden = false;
+  $("s3").scrollIntoView({ behavior: "smooth" });
+};
+
+// ───── 步驟 3：人工核對清單
+const FIELD_ZH = {
+  revenue: "營收", cost_of_revenue: "營業成本", gross_profit: "毛利", operating_income: "營業利益",
+  pretax_income: "稅前淨利", income_tax: "所得稅", net_income: "淨利", net_income_to_parent: "歸屬母公司淨利",
+  eps_diluted: "稀釋 EPS", shares_diluted: "稀釋股數", non_operating_net: "業外收支淨額", operating_expenses_total: "營業費用合計",
+  operating_cash_flow: "營業現金流", capex: "資本支出", free_cash_flow_stated: "自由現金流（公司公布）",
+  buybacks: "庫藏股買回", dividends_paid: "現金股利",
+};
+const PERIOD_ZH = { current: "本季", prior_year: "去年同期", prior_quarter: "上季" };
+const srcText = (s) => !s ? "（無出處）" : `p.${s.page}｜${s.row_label ? `${s.row_label}｜${s.column_label}` : `「${s.quote}」`}`;
+
+function manualItems() {
+  const { A } = state;
+  const unit = A.meta.monetary_unit;
+  const items = [];
+  const addPair = (group, name, pair, u = unit) => {
+    if (!pair) return;
+    for (const p of ["current", "prior_year", "prior_quarter"]) {
+      const dp = pair[p];
+      if (dp && typeof dp.value === "number") items.push({ group, name: `${name}｜${PERIOD_ZH[p]}${dp.period_type === "ytd" ? "（累計）" : ""}`, value: dp.value, unit: u, src: dp.src });
+    }
+  };
+  for (const k of ["revenue", "cost_of_revenue", "gross_profit", "operating_income", "non_operating_net", "pretax_income", "income_tax", "net_income", "net_income_to_parent", "eps_diluted", "shares_diluted"]) {
+    addPair("損益表", FIELD_ZH[k], A.income_statement[k], k === "eps_diluted" ? "每股" : k === "shares_diluted" ? `股（${A.meta.share_unit}）` : unit);
+  }
+  for (const it of A.operating_expense_items || []) addPair("費用逐列", it.label_source, it.amount);
+  for (const s of A.segments || []) { addPair("部門", s.label_source, s.revenue); addPair("部門佔比", s.label_source, s.share_percent, "%"); }
+  for (const s of A.geographies || []) { addPair("地區", s.label_source, s.revenue); addPair("地區佔比", s.label_source, s.share_percent, "%"); }
+  for (const k of A.kpis || []) addPair("營運指標", k.label_source, { current: k.current, prior_year: k.prior_year }, k.unit);
+  for (const [k, v] of Object.entries(A.cash_flow || {})) addPair("現金流量", FIELD_ZH[k] || k, v);
+  for (const [k, v] of Object.entries(A.capital_return || {})) if (k !== "new_buyback_authorization") addPair("股東回饋", FIELD_ZH[k] || k, v);
+  if (A.capital_return?.new_buyback_authorization) {
+    const a = A.capital_return.new_buyback_authorization;
+    items.push({ group: "股東回饋", name: `新增回購授權（確認原文是新授權，不是剩餘額度）`, value: a.amount?.value, unit, src: a.amount?.src });
+  }
+  const g = A.guidance_next;
+  if (g) for (const it of g.items) {
+    const v = it.point ?? `${it.low}–${it.high}`;
+    items.push({ group: `下季財測（${g.period_label}）`, name: it.label_source, value: v, unit: it.unit === "monetary" ? (g.monetary_unit || "（未標單位）") : it.unit === "percent" ? "%" : it.unit === "per_share" ? "每股" : "", src: it.src });
+  }
+  return items;
+}
+
+function buildManual() {
+  const { A, out, diffs } = state;
+  const blocks = [];
+  // 第一層：基本設定
+  const metaRows = [["公司", A.meta.company_name], ["代號", A.meta.ticker], ["會計期間", A.meta.fiscal_period], ["期末日", A.meta.period_end],
+    ["金額單位", A.meta.monetary_unit], ["股數單位", A.meta.share_unit], ["幣別", A.meta.currency], ["會計準則", A.meta.accounting_basis]];
+  blocks.push(`<h3>第一層｜基本設定（錯一欄整份錯）</h3><div class="tablewrap pad"><table><thead><tr><th>✓</th><th>欄位</th><th>AI 填的值</th></tr></thead><tbody>
+    ${metaRows.map(([k, v]) => `<tr><td><input type="checkbox" class="mc"></td><td>${k}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>`);
+  // 第二層：數字
+  const items = manualItems();
+  blocks.push(`<h3>第二層｜數字對原文（${items.length} 項）</h3><div class="tablewrap pad"><table><thead><tr><th>✓</th><th>類別</th><th>項目</th><th>數值（原文單位）</th><th>出處：頁｜列名｜欄名</th></tr></thead><tbody>
+    ${items.map((it) => `<tr><td><input type="checkbox" class="mc"></td><td>${esc(it.group)}</td><td>${esc(it.name)}</td>
+      <td class="num">${esc(typeof it.value === "number" ? it.value.toLocaleString("en-US", { maximumFractionDigits: 6 }) : it.value)} <span class="note">${esc(it.unit)}</span></td>
+      <td class="src">${esc(srcText(it.src))}</td></tr>`).join("")}</tbody></table></div>`);
+  // 第三層：需確認的項目
+  const third = [];
+  for (const c of out.checks.filter((c) => c.status === "fail")) third.push({ kind: "fail", text: `不通過：${c.label}｜${c.detail}`, needReason: true });
+  for (const c of out.checks.filter((c) => c.status === "warn" && c.id !== "ambiguities")) third.push({ kind: "warn", text: `需確認：${c.label}｜${c.detail}` });
+  for (const a of A.ambiguities || []) third.push({ kind: "amb", text: `AI 疑慮（${a.related_field || "—"}）：${a.issue}` });
+  for (const d of diffs) third.push({ kind: "diff", text: `A／B 不同｜${d.path}｜A＝${d.a}｜B＝${d.b}` });
+  if (out.derived.length) third.push({ kind: "derived", text: `PN 計算的數字：${out.derived.join("；")}。確認原文確實沒有這些列，且計算依據符合 rules/derivations.json。` });
+  blocks.push(`<h3>第三層｜不通過、需確認、AI 疑慮、A／B 差異（${third.length} 項）</h3>
+    <p class="pad note">「不通過」的項目若確認 A 的數字其實正確（例如公司自己的算法不同），打勾並寫下理由；若 A 錯了，請修正 A 後回到步驟 1 重新檢查。</p>
+    <div class="tablewrap pad"><table><thead><tr><th>✓</th><th>內容</th></tr></thead><tbody>
+    ${third.map((t, i) => `<tr><td><input type="checkbox" class="mc" data-reason="${t.needReason ? i : ""}"></td><td class="${t.kind === "fail" ? "fail" : ""}">${esc(t.text)}
+      ${t.needReason ? `<input type="text" class="reason" data-for="${i}" placeholder="必填：確認無誤的理由">` : ""}</td></tr>`).join("")}</tbody></table></div>`);
+  $("manualBox").innerHTML = blocks.join("");
+  state.third = third;
+  const update = () => {
+    const boxes = [...document.querySelectorAll(".mc")];
+    const done = boxes.filter((b) => {
+      if (!b.checked) return false;
+      const r = b.dataset.reason;
+      return r === "" || r === undefined || (document.querySelector(`.reason[data-for="${r}"]`)?.value.trim().length > 0);
+    }).length;
+    $("bar").style.width = `${(done / boxes.length) * 100}%`;
+    $("progressText").textContent = `已核對 ${done} / ${boxes.length}`;
+    $("btnRender").disabled = done !== boxes.length;
+  };
+  $("manualBox").querySelectorAll("input").forEach((el) => el.addEventListener("input", update));
+  update();
+}
+
+// ───── 步驟 4：圖卡
+$("btnRender").onclick = async () => {
+  $("s4").hidden = false;
+  await drawCards();
+  $("s4").scrollIntoView({ behavior: "smooth" });
+};
+
+function selectionHtml() {
+  const s = state.out.selection;
+  const fired = Object.entries(s.fired).map(([k, v]) => `${k}（${v.join("、")}）`).join("；") || "無";
+  const skipped = Object.entries(s.skipped).map(([k, v]) => `${k}（缺 ${v.join("、")}）`).join("；") || "無";
+  return `<p>這次的張次：<b>${s.deck.join(" → ")}</b></p><p class="note">觸發：${esc(fired)}<br>因資料不足略過：${esc(skipped)}<br>PN 計算的數字：${esc(state.out.derived.join("；") || "無")}</p>`;
+}
+
+async function drawCards() {
+  const cards = structuredClone(state.out.cards);
+  const k1 = cards.find((c) => c.id === "K1");
+  const nd = $("nextDate").value.trim();
+  k1.body.sections = k1.body.sections.filter((s) => s.heading !== "下次財報日期");
+  if (nd) k1.body.sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: nd, value: "下一季財報公布（公司公告）", text: true }] });
+  state.cards = cards;
+  $("selBox").innerHTML = selectionHtml();
+  await ensureFonts(brand, cards);
+  measure = measure || createMeasurer();
+  const grid = $("grid");
+  grid.innerHTML = "";
+  state.rendered = [];
+  cards.forEach((spec, i) => {
+    const r = renderCard({ ...spec, theme }, brand, measure);
+    const fname = `${state.A.meta.ticker}_${spec.header.period}_${String(i + 1).padStart(2, "0")}_${spec.id}_${theme}.png`;
+    state.rendered.push({ svg: r.svg, fname });
+    const fig = document.createElement("figure");
+    fig.innerHTML = r.svg + `<figcaption><span>${i + 1}｜${spec.id}${r.fallback ? "（" + r.fallback + "）" : ""}</span><button class="ghost" data-i="${state.rendered.length - 1}">下載 PNG</button></figcaption>`;
+    grid.appendChild(fig);
+  });
+  grid.querySelectorAll("button[data-i]").forEach((b) => (b.onclick = () => exportOne(+b.dataset.i)));
+}
+
+async function exportOne(i) {
+  const { svg, fname } = state.rendered[i];
+  $("exportMsg").textContent = `正在產生 ${fname}…`;
+  const { png, fontInfo } = await svgToPng(svg, { fontCssUrl: fontCss });
+  download(png, fname);
+  $("exportMsg").textContent = fontInfo.error
+    ? `已下載 ${fname}，但字型嵌入失敗（${fontInfo.error}），圖片可能使用替代字型，請檢查。`
+    : `已下載 ${fname}（嵌入 ${fontInfo.count} 個字型切片）`;
+  return fontInfo;
+}
+
+$("btnAll").onclick = async () => {
+  for (let i = 0; i < state.rendered.length; i++) { await exportOne(i); await new Promise((r) => setTimeout(r, 400)); }
+  $("exportMsg").textContent += `｜全部 ${state.rendered.length} 張完成`;
+};
+$("btnLight").onclick = () => { theme = "light"; drawCards(); };
+$("btnDark").onclick = () => { theme = "dark"; drawCards(); };
+$("btnApply").onclick = () => drawCards();
+
+$("btnArchive").onclick = () => {
+  const { A, out } = state;
+  const reasons = [...document.querySelectorAll(".reason")].map((el) => ({ item: state.third[+el.dataset.for].text, reason: el.value }));
+  const archive = {
+    archive_version: "1.0",
+    created_at: new Date().toISOString(),
+    fact_sheet: A,
+    checks: out.checks,
+    derived: out.derived,
+    selection: out.selection,
+    override_reasons: reasons,
+    second_extraction_used: !!state.B,
+    diff_count: state.diffs.length,
+  };
+  const blob = new Blob([JSON.stringify(archive, null, 2)], { type: "application/json" });
+  download(blob, `${A.meta.ticker}_${A.meta.fiscal_period}.json`);
+  $("exportMsg").textContent = `已下載存檔。請上傳到 repo 的 history/${A.meta.market}/${A.meta.ticker}/ 資料夾，下一季比對與 E 卡會用到。`;
+};
+
+window.__pnReady = true;
+</script>
+</body>
+</html>

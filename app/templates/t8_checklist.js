@@ -20,8 +20,10 @@ export function renderT8(box, ctx, spec) {
   let y = box.y;
 
   for (const sec of b.sections) {
-    svg += text(box.x, baseline(y, h3), sec.heading, h3, { fill: c.text });
-    y += lineBox(h3) + 16;
+    if (sec.heading) {
+      svg += text(box.x, baseline(y, h3), sec.heading, h3, { fill: c.text });
+      y += lineBox(h3) + 16;
+    }
     const cols = [
       { label: sec.columns[0], align: "left", width: 1.2 },
       { label: sec.columns[1], align: sec.rows.some((r) => r.text) ? "left" : "right", width: 1.6 },

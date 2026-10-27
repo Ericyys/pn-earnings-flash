@@ -27,6 +27,8 @@ export function renderCard(spec, brand, measure) {
   const tpl = TEMPLATES[s.template];
   if (!tpl) throw new Error(`未知的底稿：${s.template}`);
   if (tpl.layout) s.layout = tpl.layout;
+  // 中間的圖卡只放圖：不放標題句（小組決定，2026-10-27）。T1 封面、T8 清單卡保留文字。
+  if (!["T1", "T8"].includes(s.template) && s.layout !== "titled") s.layout = "chart";
 
   // T4 無法表達虧損：改用 T5 損益瀑布，並在結果中註記
   if (s.template === "T4") {

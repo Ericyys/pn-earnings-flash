@@ -4,7 +4,9 @@
 //   unit: "%", kind: "pct",                       // 數值格式
 //   periods: ["2024Q4", ..., "2026Q3"],           // 最多 8 期
 //   series: [{ name: "毛利率", values: [...] }],   // 最多 6 條
-//   table: {                                       // 選填：本季數值與變動
+//   endDelta: { kind: "pp", values: [6.3, 6.4, 6.3] }, // 選填：末端標值後面加上變動（▲ 6.4 pp）
+//   兩期資料且沒有表格時，自動改為「斜線圖」：不畫刻度，兩端直接標數值
+//   table: {                                       // 選填（舊版）：本季數值與變動
 //     columns: ["指標", "本季", "年變動", "季變動"],
 //     deltaKind: "pp",
 //     rows: [{ name, value, yoy, qoq }]
@@ -12,6 +14,7 @@
 // }
 
 import { legend, deltaSegments } from "../lib/frame.js";
+import { richLine } from "../lib/text.js";
 import { table, tableHeight } from "../lib/table.js";
 
 function niceTicks(min, max, count = 4) {
@@ -49,18 +52,28 @@ export function renderT3(box, ctx, spec) {
   const plotTop = y + lineBox(lab) / 2;
 
   const all = b.series.flatMap((s) => s.values.filter((v) => v !== null && v !== undefined));
+  const n = b.periods.length;
+  const slope = n === 2 && !b.table;
   const ticks = niceTicks(Math.min(...all), Math.max(...all));
   const t0 = ticks[0], t1 = ticks[ticks.length - 1];
-  const tickW = Math.max(...ticks.map((t) => measure(f(t), lab, true)));
-  const endW = Math.max(...b.series.map((s) => measure(f(s.values[s.values.length - 1]), lab, true))) + 24;
+  const endSegs = b.series.map((s, si) => {
+    const segs = [{ str: f(s.values[s.values.length - 1]), fill: c.text, num: true }];
+    const dv = b.endDelta?.values?.[si];
+    if (dv !== null && dv !== undefined) segs.push({ str: "\u00A0\u00A0", fill: c.text }, ...deltaSegments(ctx, dv, b.endDelta.kind || "pp"));
+    return segs;
+  });
+  const segW = (segs) => segs.reduce((a, x) => a + measure(x.str, lab, !!x.num), 0);
+  const tickW = slope ? Math.max(...b.series.map((s) => measure(f(s.values[0]), lab, true))) : Math.max(...ticks.map((t) => measure(f(t), lab, true)));
+  const endW = Math.max(...endSegs.map(segW)) + 24;
   const x0 = box.x + tickW + 16;
   const x1 = box.x + box.w - endW;
   const sy = (v) => plotBottom - ((v - t0) / (t1 - t0)) * (plotBottom - plotTop);
-  const n = b.periods.length;
   const sx = (i) => (n === 1 ? (x0 + x1) / 2 : x0 + ((x1 - x0) * i) / (n - 1));
 
-  // 格線與軸標
-  ticks.forEach((t, i) => {
+  // 格線與軸標（斜線圖只畫兩條時間直線）
+  if (slope) {
+    for (const i of [0, 1]) svg += ctx.vline(sx(i), plotTop - lineBox(lab) / 2, plotBottom, c.rule);
+  } else ticks.forEach((t, i) => {
     const yy = sy(t);
     svg += hline(x0, x1, yy, i === 0 ? c.text : c.rule);
     svg += text(box.x + tickW, yy + lab.size * 0.33, f(t), lab, { fill: c.muted, anchor: "end", num: true });
@@ -78,7 +91,8 @@ export function renderT3(box, ctx, spec) {
     svg += `<path d="${d}" fill="none" stroke="${cat(si)}" stroke-width="${ctx.brand.lines.data_width}" stroke-linejoin="round" stroke-linecap="round"/>`;
     const last = pts[pts.length - 1];
     svg += dot(last[0], last[1], 6, cat(si));
-    ends.push({ y: last[1], str: f(s.values[s.values.length - 1]) });
+    if (slope) svg += dot(pts[0][0], pts[0][1], 6, cat(si));
+    ends.push({ y: last[1], segs: endSegs[si], y0: pts[0][1], start: f(s.values[0]) });
   });
 
   // 末端標值：避免重疊（最小間距一行）
@@ -88,8 +102,13 @@ export function renderT3(box, ctx, spec) {
     if (order[i].y - order[i - 1].y < minGap) order[i].y = order[i - 1].y + minGap;
   }
   order.forEach((e) => {
-    svg += text(x1 + 16, e.y + lab.size * 0.33, e.str, lab, { fill: c.text, num: true });
+    svg += richLine(x1 + 16, e.y + lab.size * 0.33, e.segs, lab, {}, measure).svg;
   });
+  if (slope) {
+    const st0 = ends.map((e) => ({ ...e, y: e.y0 })).sort((a, b2) => a.y - b2.y);
+    for (let i = 1; i < st0.length; i++) if (st0[i].y - st0[i - 1].y < minGap) st0[i].y = st0[i - 1].y + minGap;
+    st0.forEach((e) => (svg += text(x0 - 16, e.y + lab.size * 0.33, e.start, lab, { fill: c.text2, anchor: "end", num: true })));
+  }
 
   if (b.table) {
     const cols = b.table.columns.map((label, i) => ({ label, align: i === 0 ? "left" : "right", width: i === 0 ? 1.8 : 1.3 }));

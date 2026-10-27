@@ -1,17 +1,36 @@
 {
   "rules_version": "1.0",
   "comment": "第 1 步的選圖規則。門檻是起始值，試跑後在這裡調整，不用改程式。所有指標由網頁從核對過的數據計算，AI 不參與選圖。",
-
   "deck": {
-    "fixed": ["A1", "C", "K1"],
+    "fixed": [
+      "A1",
+      "C",
+      "K1"
+    ],
     "max_conditional": 2,
-    "order_on_deck": ["A1", "C", "E", "B", "D", "F", "G", "I", "K1"],
-    "selection_priority": ["E:outside", "B", "D", "F", "G", "E:inside", "I"],
+    "order_on_deck": [
+      "A1",
+      "C",
+      "E",
+      "B",
+      "D",
+      "F",
+      "G",
+      "I",
+      "K1"
+    ],
+    "selection_priority": [
+      "E:outside",
+      "B",
+      "D",
+      "F",
+      "G",
+      "E:inside",
+      "I"
+    ],
     "priority_note": "條件模組超過 2 個被觸發時，依 selection_priority 取前 2 個；選中後依 order_on_deck 排列張次"
   },
-
   "missing_data_policy": "某條規則需要的數據不存在（例如還沒有 8 季歷史），該條規則視為不觸發，並在選圖結果中列出「因資料不足略過」",
-
   "metrics": {
     "revenue_yoy": "本季營收 ÷ 去年同期營收 − 1",
     "gross_margin": "毛利 ÷ 營收",
@@ -36,10 +55,12 @@
     "new_buyback_authorization": "本季數據中有新回購授權",
     "peers_available": "同業本季數據已存在歷史存檔（由 Ryan 在網頁勾選啟用）"
   },
-
   "modules": {
-    "A1": { "name": "數字快報封面", "template": "T1", "type": "fixed" },
-
+    "A1": {
+      "name": "數字快報封面",
+      "template": "T1",
+      "type": "fixed"
+    },
     "C": {
       "name": "損益流向",
       "template": "T4",
@@ -47,90 +68,180 @@
       "annotations": [
         {
           "id": "highlight_non_operating",
-          "when": { "any": [
-            { "metric": "non_operating_share_of_net_income", "op": "gte", "value": 0.10 },
-            { "metric": "notable_items_share_of_net_income", "op": "gte", "value": 0.10 }
-          ]},
+          "when": {
+            "any": [
+              {
+                "metric": "non_operating_share_of_net_income",
+                "op": "gte",
+                "value": 0.1
+              },
+              {
+                "metric": "notable_items_share_of_net_income",
+                "op": "gte",
+                "value": 0.1
+              }
+            ]
+          },
           "effect": "在流向圖上另外標出業外或一次性項目，並加註原文名稱"
         }
       ]
     },
-
     "E": {
       "name": "對比預期",
       "template": "T6",
       "type": "conditional",
-      "requires_any": ["guidance_position", "consensus_gap"],
+      "requires_any": [
+        "guidance_position",
+        "consensus_gap"
+      ],
       "variants": {
-        "E:outside": { "when": { "metric": "guidance_position", "op": "in", "value": ["below", "above"] } },
-        "E:inside": { "when": { "any": [
-          { "metric": "guidance_position", "op": "eq", "value": "inside" },
-          { "metric": "consensus_gap", "op": "exists" }
-        ]}}
+        "E:outside": {
+          "when": {
+            "metric": "guidance_position",
+            "op": "in",
+            "value": [
+              "below",
+              "above"
+            ]
+          }
+        },
+        "E:inside": {
+          "when": {
+            "any": [
+              {
+                "metric": "guidance_position",
+                "op": "eq",
+                "value": "inside"
+              },
+              {
+                "metric": "consensus_gap",
+                "op": "exists"
+              }
+            ]
+          }
+        }
       }
     },
-
     "B": {
       "name": "營收拆解",
       "template": "T2",
       "alt_template": "T5",
       "type": "conditional",
-      "when": { "any": [
-        { "metric": "segment_share_change_pp_yoy", "op": "abs_gte", "value": 3 },
-        { "metric": "segment_yoy_gap_pp", "op": "abs_gte", "value": 10 },
-        { "metric": "geo_share_change_pp_yoy", "op": "abs_gte", "value": 3 }
-      ]},
+      "when": {
+        "any": [
+          {
+            "metric": "segment_share_change_pp_yoy",
+            "op": "abs_gte",
+            "value": 3
+          },
+          {
+            "metric": "segment_yoy_gap_pp",
+            "op": "abs_gte",
+            "value": 10
+          },
+          {
+            "metric": "geo_share_change_pp_yoy",
+            "op": "abs_gte",
+            "value": 3
+          }
+        ]
+      },
       "template_rule": "預設 T2 堆疊長條；若成長歸因更清楚（單一部門貢獻超過整體增量的 80%），改用 T5 瀑布圖"
     },
-
     "D": {
       "name": "獲利能力",
       "template": "T3",
       "type": "conditional",
-      "when": { "any": [
-        { "metric": "gross_margin_change_pp_yoy", "op": "abs_gte", "value": 1 },
-        { "metric": "gross_margin_change_pp_qoq", "op": "abs_gte", "value": 1 },
-        { "metric": "operating_margin_change_pp_yoy", "op": "abs_gte", "value": 1 },
-        { "metric": "operating_margin_change_pp_qoq", "op": "abs_gte", "value": 1 },
-        { "metric": "margin_8q_extreme", "op": "is_true" }
-      ]}
+      "when": {
+        "any": [
+          {
+            "metric": "gross_margin_change_pp_yoy",
+            "op": "abs_gte",
+            "value": 1
+          },
+          {
+            "metric": "gross_margin_change_pp_qoq",
+            "op": "abs_gte",
+            "value": 1
+          },
+          {
+            "metric": "operating_margin_change_pp_yoy",
+            "op": "abs_gte",
+            "value": 1
+          },
+          {
+            "metric": "operating_margin_change_pp_qoq",
+            "op": "abs_gte",
+            "value": 1
+          },
+          {
+            "metric": "margin_8q_extreme",
+            "op": "is_true"
+          }
+        ]
+      }
     },
-
     "F": {
       "name": "關鍵營運指標",
       "template": "T2",
       "alt_template": "T3",
       "type": "conditional",
-      "when": { "any": [
-        { "metric": "kpi_extreme", "op": "is_true" },
-        { "metric": "kpi_growth_sign_flip", "op": "is_true" }
-      ]}
+      "when": {
+        "any": [
+          {
+            "metric": "kpi_extreme",
+            "op": "is_true"
+          },
+          {
+            "metric": "kpi_growth_sign_flip",
+            "op": "is_true"
+          }
+        ]
+      }
     },
-
     "G": {
       "name": "現金與資本配置",
       "template": "T5",
       "type": "conditional",
-      "when": { "any": [
-        { "metric": "capex_yoy", "op": "abs_gte", "value": 0.20 },
-        { "metric": "capital_return_yoy", "op": "abs_gte", "value": 0.20 },
-        { "metric": "new_buyback_authorization", "op": "is_true" }
-      ]}
+      "when": {
+        "any": [
+          {
+            "metric": "capex_yoy",
+            "op": "abs_gte",
+            "value": 0.2
+          },
+          {
+            "metric": "capital_return_yoy",
+            "op": "abs_gte",
+            "value": 0.2
+          },
+          {
+            "metric": "new_buyback_authorization",
+            "op": "is_true"
+          }
+        ]
+      }
     },
-
     "I": {
       "name": "同業對比",
       "template": "T7",
       "type": "conditional",
-      "when": { "metric": "peers_available", "op": "is_true" }
+      "when": {
+        "metric": "peers_available",
+        "op": "is_true"
+      }
     },
-
-    "K1": { "name": "下一步與預告", "template": "T8", "type": "fixed" }
+    "K1": {
+      "name": "下季財測",
+      "template": "T8",
+      "type": "fixed",
+      "note": "只列公司公布的下季財測（與公司公告的下次財報日期，若有）；不放預告或其他資訊"
+    }
   },
-
   "market_overrides": {
     "tw": {
       "E": "依 profiles/tw.json：只有 company.json 標示 gives_guidance: true 時啟用"
     }
-  }
+  },
+  "layout_note": "A1 封面與 K1 保留文字；中間的圖卡只放圖，頁首標示公司、季度與圖名，底部保留資料來源（2026-10-27 小組決定）"
 }

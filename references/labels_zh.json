@@ -15,6 +15,12 @@
     "operations": "營運",
     "total operating expenses": "營業費用合計",
     "interest expense": "利息費用",
-    "interest and other income (expense)": "利息及其他收支"
+    "interest and other income (expense)": "利息及其他收支",
+    "net income": "淨利",
+    "y/y % growth": "營收年增率",
+    "diluted eps": "稀釋 EPS",
+    "operating margin": "營益率",
+    "operating income": "營業利益",
+    "revenue": "營收"
   }
 }

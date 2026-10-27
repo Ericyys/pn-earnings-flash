@@ -42,15 +42,7 @@ export const DEMO_CARDS = [
         { name: "廣告", values: [5.1, 5.3, 5.5, 5.8, 6.1] },
         { name: "授權", values: [2.23, 2.2, 2.2, 2.3, 2.33] },
       ],
-      table: {
-        columns: ["業務", "2026Q3 營收", "佔比", "年增"],
-        rows: [
-          { name: "雲端", value: 17.6, share: 50.17, yoy: 34.35 },
-          { name: "裝置", value: 9.05, share: 25.8, yoy: -1.63 },
-          { name: "廣告", value: 6.1, share: 17.39, yoy: 19.61 },
-          { name: "授權", value: 2.33, share: 6.64, yoy: 4.48 },
-        ],
-      },
+      yoy: [34.35, -1.63, 19.61, 4.48],
     },
   },
   {
@@ -64,14 +56,7 @@ export const DEMO_CARDS = [
         { name: "營益率", values: [26.0, 26.8, 27.1, 27.5, 28.4, 28.9, 30.1, 31.2] },
         { name: "淨利率", values: [21.5, 22.6, 22.9, 23.0, 24.1, 24.5, 26.0, 29.2] },
       ],
-      table: {
-        columns: ["指標", "2026Q3", "年變動", "季變動"], deltaKind: "pp",
-        rows: [
-          { name: "毛利率", value: 58.6, yoy: 2.2, qoq: 0.7 },
-          { name: "營益率", value: 31.2, yoy: 3.7, qoq: 1.1 },
-          { name: "淨利率", value: 29.2, yoy: 6.2, qoq: 3.2 },
-        ],
-      },
+      endDelta: { kind: "pp", values: [2.2, 3.7, 6.2] },
     },
   },
   {
@@ -95,9 +80,8 @@ export const DEMO_CARDS = [
         { label: "營業現金流", value: 12.4, type: "total" },
         { label: "資本支出", value: 6.8, type: "use" },
         { label: "自由現金流", value: 5.6, type: "total" },
-        { label: "庫藏股買回", value: 3.2, type: "use" },
-        { label: "現金股利", value: 1.1, type: "use" },
-        { label: "回饋後餘額", value: 1.3, type: "total" },
+        { label: "庫藏股買回", value: 3.2, type: "bar", group: "股東回饋" },
+        { label: "現金股利", value: 1.1, type: "bar", group: "股東回饋" },
       ],
     },
   },
@@ -118,25 +102,21 @@ export const DEMO_CARDS = [
   },
   {
     id: "K1", template: "T8", header, source,
-    title: "接下來看什麼",
+    title: "公司下季財測（2026Q4）",
     body: {
       sections: [
         {
-          heading: "公司下季財測（2026Q4）", columns: ["項目", "財測區間"],
+          heading: "", columns: ["項目", "財測區間"],
           rows: [
             { label: "營收（USD B）", value: "36.50–37.50" },
             { label: "毛利率（%）", value: "58.0%–59.0%" },
           ],
         },
         {
-          heading: "下一個關注日期", columns: ["日期", "事件"],
-          rows: [
-            { label: "2026-12-10", value: "投資人日（公司公告）", text: true },
-            { label: "2027-01-28", value: "2026Q4 財報公布（預計）", text: true },
-          ],
+          heading: "下次財報日期", columns: ["日期", "事件"],
+          rows: [{ label: "2027-01-28", value: "下一季財報公布（公司公告）", text: true }],
         },
       ],
-      teaser: { title: "完整拆解寫在路上", text: "下一篇拆解雲端業務的營收結構與成本變化。" },
     },
   },
   {

@@ -405,7 +405,6 @@
       "additionalProperties": false,
       "required": [
         "period_label",
-        "monetary_unit",
         "items"
       ],
       "properties": {
@@ -861,6 +860,24 @@
           ]
         }
       ]
+    }
+  },
+  "if": {
+    "properties": {
+      "schema_version": {
+        "const": "1.1"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "guidance_next": {
+        "required": [
+          "period_label",
+          "monetary_unit",
+          "items"
+        ]
+      }
     }
   }
 }

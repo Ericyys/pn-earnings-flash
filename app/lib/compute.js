@@ -307,9 +307,8 @@ export function analyze(fs, ctx) {
   const highlight = triggers.modules.C.annotations[0];
   const hl = evalCond(highlight.when, M).value;
   cards.push({
-    id: "C", template: "T4", header,
+    id: "C", template: "T4", header: { ...header, label: "損益流向" },
     source: withDerived(derived),
-    title: `每 100 元營收，留下 ${fmt1(M.net_margin)} 元淨利`,
     body: {
       unit: unitText,
       revenue: disp(rev.c), cogs: disp(cogs.c ?? 0), grossProfit: disp(gp.c ?? rev.c),
@@ -334,18 +333,12 @@ export function analyze(fs, ctx) {
         .filter((x) => x[2] !== null && (x[0] !== "毛利率" || cogs.c !== null))
         .sort((a, b) => Math.abs(b[2]) - Math.abs(a[2]))[0];
       cards.push({
-        id: "D", template: "T3", header, source: withDerived(derived.filter((d) => d.startsWith("毛利"))),
-        title: `${pick[0]} ${fmt1(pick[1])}%，年${pick[2] >= 0 ? "增" : "減"} ${fmt1(Math.abs(pick[2]))} 個百分點`,
+        id: "D", template: "T3", header: { ...header, label: "利潤率" }, source: withDerived(derived.filter((d) => d.startsWith("毛利"))),
         body: {
           unit: "%", kind: "pct",
           periods: [shiftYear(period, -1), period],
           series,
-          table: (() => {
-            const qoqOf = { 毛利率: M.gross_margin_change_pp_qoq, 營益率: M.operating_margin_change_pp_qoq, 淨利率: M.net_margin_change_pp_qoq };
-            const hasQ = series.every((x) => qoqOf[x.name] !== null && qoqOf[x.name] !== undefined);
-            return { columns: hasQ ? ["指標", period, "年變動", "季變動"] : ["指標", period, "年變動"], deltaKind: "pp",
-              rows: series.map((x) => ({ name: x.name, value: x.values[1], yoy: x.values[1] - x.values[0], qoq: qoqOf[x.name] })) };
-          })(),
+          endDelta: { kind: "pp", values: series.map((x) => x.values[1] - x.values[0]) },
         },
       });
     }
@@ -354,12 +347,11 @@ export function analyze(fs, ctx) {
       const label = src === seg ? "業務" : "地區";
       const top = [...src.rows].sort((a, b) => Math.abs((b.share - b.share_p)) - Math.abs((a.share - a.share_p)))[0];
       cards.push({
-        id: "B", template: "T2", header, source: `${baseSource}。`,
-        title: `${top.name}營收佔比 ${fmt1(top.share)}%，年${top.share - top.share_p >= 0 ? "增" : "減"} ${fmt1(Math.abs(top.share - top.share_p))} 個百分點`,
+        id: "B", template: "T2", header: { ...header, label: src === seg ? "營收組成" : "各地區營收" }, source: `${baseSource}。`,
         body: {
           unit: unitText, kind: "amount", periods: [shiftYear(period, -1), period],
           series: src.rows.map((r) => ({ name: r.name, values: [disp(r.p), disp(r.c)] })),
-          table: { columns: [label, `${period} 營收`, "佔比", "年增"], rows: src.rows.map((r) => ({ name: r.name, value: disp(r.c), share: r.share, yoy: r.yoy })) },
+          yoy: src.rows.map((r) => r.yoy),
         },
       });
     }
@@ -380,8 +372,7 @@ export function analyze(fs, ctx) {
         ? `${t[0]} ${unitText.split(" ")[0]} ${fmt2(disp(t[1]))}${DISPLAY_LABEL[dispUnit]}，年${t[2] >= 0 ? "增" : "減"} ${fmt1(Math.abs(t[2]))}%`
         : `新增庫藏股買回授權 ${fmt2(disp(num(auth?.amount)))}（待人工確認單位）`;
       cards.push({
-        id: "G", template: "T5", header, source: `${baseSource}。${fcfStated !== null ? "自由現金流為公司公布的非 GAAP 數字。" : ""}`,
-        title: gTitle,
+        id: "G", template: "T5", header: { ...header, label: "現金流量與股東回饋" }, source: `${baseSource}。${fcfStated !== null ? "自由現金流為公司公布的非 GAAP 數字。" : ""}`,
         body: { unit: unitText, kind: "amount", steps },
       });
     }
@@ -396,17 +387,27 @@ export function analyze(fs, ctx) {
       return it.point !== null && it.point !== undefined ? v(it.point) : `${v(it.low)}–${v(it.high)}`;
     };
     const names = { revenue: `營收（${unitText}）`, operating_income: `營業利益（${unitText}）`, operating_margin: "營益率", gross_margin: "毛利率", eps: `稀釋 EPS（${profile.defaults.display_currency}）` };
-    for (const it of g.items) if (names[it.metric]) gRows.push({ label: names[it.metric], value: show(it) });
+    // 公司給的每一項都列出（忠實呈現），沒有標準代號的用中文對照或原文名稱
+    for (const it of g.items) {
+      let label = names[it.metric];
+      if (!label) {
+        const zh = zhLabel(it.label_source, ctx);
+        label = it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${profile.defaults.display_currency}）` : zh;
+      }
+      gRows.push({ label, value: show(it) });
+    }
   }
   cards.push({
-    id: "K1", template: "T8", header, source: `${baseSource}。`,
-    title: "接下來看什麼",
+    id: "K1", template: "T8", header: { ...header, label: "下季財測" }, source: `${baseSource}。`,
+    title: gRows.length ? `公司下季財測（${fiscalToCalendar(g.period_label, company.fiscal_year_end_month || 12)}）` : "公司下季財測",
     body: {
+      // 只放公司公布的內容，不加預告或其他資訊（小組決定，2026-10-27）
       sections: [
-        ...(gRows.length ? [{ heading: `公司下季財測（${fiscalToCalendar(g.period_label, company.fiscal_year_end_month || 12)}）`, columns: ["項目", "財測"], rows: gRows }] : []),
-        { heading: "下一個關注日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date || "待公司公告", value: "下一季財報公布", text: true }] },
+        gRows.length
+          ? { heading: "", columns: ["項目", "財測"], rows: gRows }
+          : { heading: "", columns: ["項目", "內容"], rows: [{ label: "下季財測", value: "公司本次未提供", text: true }] },
+        ...(company.next_report_date ? [{ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date, value: "下一季財報公布（公司公告）", text: true }] }] : []),
       ],
-      teaser: { title: "完整拆解寫在路上", text: `${name} ${period} 的完整拆解整理中。` },
     },
   });
 
@@ -510,6 +511,22 @@ export function diffExtractions(a, b) {
     else if (x.value !== y.value || x.period_type !== y.period_type) diffs.push({ path: k, a: `${x.value}${x.period_type && x.period_type !== "quarter" ? "（" + x.period_type + "）" : ""}`, b: `${y.value}${y.period_type && y.period_type !== "quarter" ? "（" + y.period_type + "）" : ""}`, type: "數值不同" });
   }
   return diffs;
+}
+
+/** 給人工核對用的差異清單：略過只用於驗算的欄位，並把同一項目的本季／去年／上季合併成一列 */
+export function diffForReview(a, b) {
+  const raw = diffExtractions(a, b).filter((d) => !/^stated_metrics|^market_specific/.test(d.path) && !(d.a === null && d.b === null));
+  const groups = new Map();
+  for (const d of raw) {
+    const key = d.path.replace(/\.(current|prior_year|prior_quarter|point|low|high|basis)$/, "");
+    const tag = (d.path.match(/\.(current|prior_year|prior_quarter|point|low|high|basis)$/) || [])[1];
+    const tagZh = { current: "本季", prior_year: "去年", prior_quarter: "上季", point: "數值", low: "下緣", high: "上緣", basis: "基準" }[tag] || "";
+    if (!groups.has(key)) groups.set(key, { path: key, a: [], b: [], type: d.type });
+    const g = groups.get(key);
+    g.a.push(tagZh ? `${tagZh} ${d.a}` : d.a);
+    g.b.push(tagZh ? `${tagZh} ${d.b}` : d.b);
+  }
+  return [...groups.values()].map((g) => ({ ...g, a: g.a.join("；"), b: g.b.join("；") }));
 }
 
 /** 貼上的文字 → JSON：自動去掉 ```json 程式碼框 */

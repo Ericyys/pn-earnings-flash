@@ -1,0 +1,6 @@
+{
+  "comment": "網頁的公司下拉選單從這裡讀。新增公司設定檔後，在這裡加一行。",
+  "companies": [
+    { "path": "us/NFLX.json", "label": "NFLX｜Netflix" }
+  ]
+}

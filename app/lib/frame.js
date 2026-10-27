@@ -42,9 +42,9 @@ export function card(spec, brand, measure, body) {
   // 背景
   svg += rect(0, 0, W, H, c.bg);
 
-  // ── 頁首：左「代號 · 季度 財報快報」，右「帳號」
+  // ── 頁首：左「代號 · 季度 · 圖名」，右「帳號」
   const hdr = spec.header || {};
-  const kicker = [hdr.ticker, [hdr.period, hdr.label || "財報快報"].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+  const kicker = [hdr.ticker, hdr.period, hdr.label || "財報快報"].filter(Boolean).join(" · ");
   svg += text(S, baseline(S, small), kicker, small, { fill: c.text2 });
   svg += text(W - S, baseline(S, small), brand.identity.handle, small, { fill: c.muted, anchor: "end" });
   const ruleY = S + lineBox(small) + 12;
@@ -68,9 +68,9 @@ export function card(spec, brand, measure, body) {
     bottom = srcTop - 24;
   }
 
-  // ── 標題與副標
+  // ── 標題與副標（封面自己排版；圖卡 layout="chart" 不放標題，只放圖）
   let top = ruleY + 48;
-  if (spec.layout !== "cover") {
+  if (spec.layout !== "cover" && spec.layout !== "chart") {
     const h2 = st("h2");
     const tl = wrap(spec.title || "", h2, innerW, measure, { balance: true });
     const tb = textBlock(S, top, tl, h2, { fill: c.text });

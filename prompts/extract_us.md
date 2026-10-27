@@ -24,6 +24,9 @@
 
 ## 逐區說明
 
+### schema_version
+- 填 `"1.1"`。
+
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
 - `run_id`：依本指令最後一行的說明填寫；沒有說明就填 `"A"`。`extracted_at`：目前時間（ISO 8601，含時區），不確定就填日期。
