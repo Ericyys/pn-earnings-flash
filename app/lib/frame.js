@@ -112,13 +112,22 @@ export function legend(ctx, x, top, maxW, items) {
   return { svg, height: cy - top + lineBox(s) };
 }
 
-/** 漲跌字串：箭頭用漲跌色，數字用主文字色。decimals 省略時為 1 位 */
+/**
+ * 漲跌字串：箭頭用漲跌色，數字用主文字色。decimals 省略時為 1 位。
+ * value 為 { label }（年增率的「轉正」「轉負」「N/M」）時：中性灰色、不加 ▲▼。
+ * 後綴（例如「年增」）標 suffix: true，底稿可用較小字級。
+ */
 export function deltaSegments(ctx, value, kind, suffix = "", decimals) {
-  const d = ctx.fmt.delta(value, kind, decimals);
   const segs = [];
+  if (value && typeof value === "object" && value.label) {
+    segs.push({ str: value.label, fill: ctx.c.muted, num: true });
+    if (suffix) segs.push({ str: "\u00A0" + suffix, fill: ctx.c.muted, suffix: true });
+    return segs;
+  }
+  const d = ctx.fmt.delta(value, kind, decimals);
   // 用不換行空格（U+00A0）：SVG 會吃掉一般空格
   if (d.arrow) segs.push({ str: d.arrow + "\u00A0", fill: ctx.dirColor(d.dir) });
   segs.push({ str: d.text, fill: ctx.c.text, num: true });
-  if (suffix) segs.push({ str: "\u00A0" + suffix, fill: ctx.c.muted });
+  if (suffix) segs.push({ str: "\u00A0" + suffix, fill: ctx.c.muted, suffix: true });
   return segs;
 }

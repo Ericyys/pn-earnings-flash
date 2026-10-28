@@ -2,7 +2,7 @@
 // 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（可修改、可交給 AI）→ 4 產出圖卡、下載 PNG 與本季存檔
 // 計算在 lib/compute.js、修改在 lib/review.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.3.0（2026-10-29）";
+export const APP_VERSION = "1.4.0（2026-10-29）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -167,8 +167,10 @@ function layer2Items() {
     addPair("損益表", FIELD_ZH[k], `income_statement.${k}`, A.income_statement[k], k === epsK ? "每股" : k === shK ? `股（${A.meta.share_unit}）` : unit);
   }
   for (const it of A.operating_expense_items || []) addPair("費用逐列", it.label_source, `operating_expense_items[${it.key}].amount`, it.amount);
-  for (const s of A.segments || []) { addPair("部門", s.label_source, `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
-  for (const s of A.geographies || []) { addPair("地區", s.label_source, `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
+  // 調節項目（列在部門小計之外、但計入總營收）：名稱後註明，核對時一併確認是否標對
+  const recTag = (s) => ((state.company.segments || []).concat(state.company.geographies || []).find((x) => x.key === s.key)?.reconciling ?? s.reconciling) ? "（調節項目：不畫進柱子，放註腳）" : "";
+  for (const s of A.segments || []) { addPair("部門", s.label_source + recTag(s), `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
+  for (const s of A.geographies || []) { addPair("地區", s.label_source + recTag(s), `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const k of A.kpis || []) {
     for (const p of ["current", "prior_year"]) if (k[p] && (typeof k[p].value === "number" || editOf(`kpis[${k.key}].${p}`)))
       items.push({ group: "營運指標", name: `${k.label_source}｜${PERIOD_ZH[p]}`, path: `kpis[${k.key}].${p}`, kind: "datapoint", value: k[p].value, text: rawNum(k[p], "value"), ptype: k[p].period_type || "quarter", unit: k.unit, src: k[p].src });

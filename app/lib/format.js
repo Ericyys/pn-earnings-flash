@@ -53,7 +53,8 @@ export const count = (v) => signed(v, 0);
 /**
  * 漲跌：回傳 { arrow, text, dir }。arrow 由底稿著色（漲藍跌橘），text 用主文字色。
  * kind: "pct"（年增率等，單位 %）或 "pp"（百分點）
- * 0 或四捨五入後為 0 → 不加箭頭，dir="flat"
+ * 0 或四捨五入後為 0 → 不加箭頭，dir="flat"（顯示 0.0%）
+ * 年增率的「轉正」「轉負」「N/M」不經過這裡：由 compute.js 判斷後傳 { label }，frame.js 的 deltaSegments 用中性灰色顯示
  * decimals：預設 1 位；採用公司公布的比率時（例如 EPS 年增 49%）依原文位數
  */
 export function delta(v, kind = "pct", decimals = 1) {

@@ -20,7 +20,25 @@ import { parseWithDecimals, itemDecimals, decOf } from "./decimals.js";
 const num = (dp) => (dp && typeof dp.value === "number" ? dp.value : null);
 const cur = (pair) => num(pair?.current);
 const pri = (pair) => num(pair?.prior_year);
-const yoy = (a, b) => (a !== null && b !== null && b !== 0 ? (a / Math.abs(b) - Math.sign(b)) * 100 : null);
+// 年增率：只在去年同期 > 0 時計算；不以分母取絕對值的方式處理負基期（去年同期 ≤ 0 → null）
+const yoy = (a, b) => (a !== null && b !== null && b > 0 ? (a / b - 1) * 100 : null);
+/**
+ * 圖卡上的年增率標示（依序判斷，符合第一個條件即採用）：
+ *   1. 去年同期 = 0 → N/M
+ *   2. 去年同期 > 0、本期 ≥ 0 → 百分比（▲▼；四捨五入後為 0.0% 不加箭頭）
+ *   3. 去年同期 > 0、本期 < 0 → 轉負
+ *   4. 去年同期 < 0、本期 > 0 → 轉正
+ *   5. 去年同期 < 0、本期 ≤ 0 → N/M
+ * 回傳數字（百分比）或 { label }（底稿用中性灰色顯示，不加 ▲▼）；缺資料回傳 null。
+ * pct：情況 2 要顯示的百分比（例如採用公司公布的 EPS 年增率），省略時自行計算。
+ */
+const yoyShown = (a, b, pct) => {
+  if (a === null || b === null || a === undefined || b === undefined) return null;
+  if (b === 0) return { label: "N/M" };
+  if (b > 0) return a >= 0 ? (pct ?? yoy(a, b)) : { label: "轉負" };
+  return a > 0 ? { label: "轉正" } : { label: "N/M" };
+};
+const yoyText = (v) => (v === null ? "—" : typeof v === "object" ? v.label : `${fmt1(v)}%`);
 const pctOf = (a, b) => (a !== null && b !== null && b !== 0 ? (a / b) * 100 : null);
 
 const UNIT_POWER = { ones: 0, thousands: 3, millions: 6, billions: 9 };
@@ -235,7 +253,9 @@ export function analyze(fs, ctx) {
     const rows = list.filter((s) => s.revenue).map((s) => {
       const c = cur(s.revenue), p = pri(s.revenue);
       const meta = (company.geographies || []).concat(company.segments || []).find((x) => x.key === s.key);
-      return { key: s.key, nm: nameOf(s, `${listName}[${s.key}]`, ctx, meta?.label_zh), c, p, share: pctOf(c, rev.c), share_p: pctOf(p, rev.p), yoy: yoy(c, p), reconciling: meta?.reconciling };
+      return { key: s.key, nm: nameOf(s, `${listName}[${s.key}]`, ctx, meta?.label_zh), c, p, share: pctOf(c, rev.c), share_p: pctOf(p, rev.p), yoy: yoy(c, p), shown: yoyShown(c, p),
+        // 調節項目：列在各部門小計之外、但計入總營收的項目（公司設定檔或 AI 標示）。不畫進柱子，改放註腳
+        reconciling: !!(meta?.reconciling ?? s.reconciling) };
     });
     const main = rows.filter((r) => !r.reconciling);
     if (!main.length) return null;
@@ -395,12 +415,12 @@ export function analyze(fs, ctx) {
     id: "A1", template: "T1", header, source: `${baseSource}。`,
     body: {
       ticker: m.ticker, company: name, period,
-      headline: `營收 ${unitText.split(" ")[0]} ${fmt2(disp(rev.c))}${DISPLAY_LABEL[dispUnit]}，年增 ${fmt1(M.revenue_yoy)}%`,
+      headline: `營收 ${unitText.split(" ")[0]} ${fmt2(disp(rev.c))}${DISPLAY_LABEL[dispUnit]}，年增 ${yoyText(yoyShown(rev.c, rev.p))}`,
       kpis: [
-        { label: "營收", unit: unitText, value: disp(rev.c), kind: "amount", delta: { value: M.revenue_yoy, kind: "pct", label: "年增" }, note: `去年同期 ${fmt2(disp(rev.p))}` },
+        { label: "營收", unit: unitText, value: disp(rev.c), kind: "amount", delta: { value: yoyShown(rev.c, rev.p), kind: "pct", label: "年增" }, note: `去年同期 ${fmt2(disp(rev.p))}` },
         { label: "營益率", unit: "%", value: M.operating_margin, kind: "pct", delta: { value: M.operating_margin_change_pp_yoy, kind: "pp", label: "年變動" }, note: `去年同期 ${fmt1(M.operating_margin_p)}%` },
         // EPS 是原文直接抽取、未經換算的數字：位數依原文（本季與去年同期取較多位，不足補 0）
-        { label: epsZh, unit: profile.defaults.display_currency, value: eps.c, kind: "perShare", decimals: epsDec, delta: { value: M.eps_yoy, kind: "pct", label: "年增", decimals: M.eps_yoy_decimals }, note: `去年同期 ${fixed(eps.p, epsDec)}` },
+        { label: epsZh, unit: profile.defaults.display_currency, value: eps.c, kind: "perShare", decimals: epsDec, delta: { value: yoyShown(eps.c, eps.p, M.eps_yoy), kind: "pct", label: "年增", decimals: M.eps_yoy_decimals }, note: `去年同期 ${fixed(eps.p, epsDec)}` },
       ],
     },
   });
@@ -449,12 +469,29 @@ export function analyze(fs, ctx) {
       // 畫觸發 B 的那個維度：部門規則有命中就畫部門，否則畫地區
       const segHit = (selection.fired.B || []).some((h) => h.startsWith("segment_"));
       const src = (segHit && seg) || geo || seg;
+      const periodsB = [shiftYear(period, -1), period];
+      // 一般部門畫成柱子（負值畫在 0 軸下方）；調節項目兩期都不畫、不列入圖例，改放註腳。同一項目兩期處理方式相同。
+      const barRows = src.rows.filter((r) => !r.reconciling), recRows = src.rows.filter((r) => r.reconciling);
+      const totalsB = [disp(rev.p), disp(rev.c)]; // 柱頂總額＝財報公布的營收淨額
+      const r2 = (v) => Math.round(v * 100) / 100;
+      const foot = recRows.length ? periodsB.map((pl, i) => {
+        const parts = recRows.filter((r) => (i ? r.c : r.p) !== null).map((r) => `${useName(r.nm)} ${fmt2(disp(i ? r.c : r.p))}`);
+        return parts.length ? `${pl} 總營收 ${fmt2(totalsB[i])} 含 ${parts.join("、")}` : null;
+      }).filter(Boolean).join("；") : "";
+      // 柱內各段加總＋註腳項目＝柱頂總額（依圖上顯示的 2 位小數，容許四捨五入誤差）
+      periodsB.forEach((pl, i) => {
+        const vals = src.rows.map((r) => (i ? r.c : r.p)).filter((v) => v !== null).map((v) => r2(disp(v)));
+        if (totalsB[i] === null || !vals.length) return;
+        const d = vals.reduce((a, x) => a + x, 0) - r2(totalsB[i]);
+        add(`b_card_sum_${i ? "c" : "p"}`, `營收拆解卡（${pl}）：柱內加總＋註腳＝柱頂總額`, Math.abs(d) <= 0.005 * (vals.length + 1) + 1e-9 ? "pass" : "fail", `差 ${d.toFixed(2)}`);
+      });
       cards.push({
-        id: "B", template: "T2", header: { ...header, label: src === seg ? "營收組成" : "各地區營收" }, source: `${baseSource}。`,
+        id: "B", template: "T2", header: { ...header, label: src === seg ? "營收組成" : "各地區營收" }, source: `${baseSource}。${foot ? `${foot}。` : ""}`,
         body: {
-          unit: unitText, kind: "amount", periods: [shiftYear(period, -1), period],
-          series: src.rows.map((r) => ({ name: useName(r.nm), values: [disp(r.p), disp(r.c)] })),
-          yoy: src.rows.map((r) => r.yoy),
+          unit: unitText, kind: "amount", periods: periodsB,
+          series: barRows.map((r) => ({ name: useName(r.nm), values: [disp(r.p), disp(r.c)] })),
+          totals: totalsB,
+          yoy: barRows.map((r) => r.shown),
         },
       });
     }

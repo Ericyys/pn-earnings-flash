@@ -23,9 +23,10 @@
         "1.1",
         "1.2",
         "1.3",
-        "1.4"
+        "1.4",
+        "1.5"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）"
     },
     "comment": {
       "type": "string",
@@ -918,6 +919,10 @@
           "type": "string",
           "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
         },
+        "reconciling": {
+          "type": "boolean",
+          "description": "調節項目填 true：營收表中列在各部門（或地區）小計之外、但計入總營收的項目，例如 Hedging gains (losses)、Corporate and other、Eliminations。圖卡不畫進柱子、不列入圖例，改放註腳。一般部門不填（即使是負值也是一般部門）。"
+        },
         "revenue": {
           "$ref": "#/$defs/pair"
         },
@@ -1070,7 +1075,8 @@
               "1.1",
               "1.2",
               "1.3",
-              "1.4"
+              "1.4",
+              "1.5"
             ]
           }
         }
@@ -1093,7 +1099,8 @@
           "schema_version": {
             "enum": [
               "1.3",
-              "1.4"
+              "1.4",
+              "1.5"
             ]
           }
         }

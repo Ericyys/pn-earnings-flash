@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.5）
+# PN 財報快報｜美股數據抽取指令（v0.6）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -29,7 +29,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.4"`。
+- 填 `"1.5"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -62,6 +62,7 @@
 - 金額單位必須與損益表相同（見規則 5-2）。
 - 只放「加總起來等於某個合計」的拆分項目；如果有多層（例如交易收入合計＋其下各項），**放最細的那一層**，並在 `notes` 說明層級結構。
 - 只揭露百分比時填 `share_percent`。
+- **調節項目**：營收表中列在各部門（或地區）小計之外、但計入總營收的項目（例如 Hedging gains (losses)、Corporate and other、Eliminations），一樣放進來並填 `"reconciling": true`。一般部門不填，即使數字是負的也一樣。所有項目（含調節項目）加總應等於總營收。
 
 ### kpis
 - 抽新聞稿中營運指標段落（例如 Key Performance Metrics、Operating Highlights）的全部項目。

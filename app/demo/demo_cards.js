@@ -153,4 +153,33 @@ export const DEMO_CARDS = [
       margins: { gross: 39.29, operating: -7.38, net: -5.71 },
     },
   },
+  // 年增率標示：四捨五入後為 0.0% 不加箭頭；去年同期為負、本期為正 →「轉正」（中性灰色、不加 ▲▼）
+  {
+    id: "A1-flip", template: "T1", header, source,
+    body: {
+      ticker: "DEMO", company: "Demo Corp", period: "2026Q3",
+      headline: "營收 USD 1.78B，年增 0.0%",
+      kpis: [
+        { label: "營收", unit: "USD B", value: 1.78, kind: "amount", delta: { value: 0.03, kind: "pct", label: "年增" }, note: "去年同期 1.78" },
+        { label: "營益率", unit: "%", value: 12.4, kind: "pct", delta: { value: 15.1, kind: "pp", label: "年變動" }, note: "去年同期 −2.7%" },
+        { label: "稀釋 EPS", unit: "USD", value: 0.35, kind: "perShare", decimals: 2, delta: { value: { label: "轉正" }, kind: "pct", label: "年增" }, note: "去年同期 −0.10" },
+      ],
+    },
+  },
+  // 堆疊柱狀圖：一般部門出現負值畫在 0 軸下方；調節項目（避險損益）不畫進柱子、不列入圖例，兩期都放註腳；柱頂為財報公布的淨額
+  {
+    id: "B-neg", template: "T2", header: { ...header, label: "營收組成" },
+    source: `${source}2025Q3 總營收 1.87 含 避險損益 0.02；2026Q3 總營收 1.78 含 避險損益 −0.01。`,
+    body: {
+      unit: "USD B", kind: "amount",
+      periods: ["2025Q3", "2026Q3"],
+      series: [
+        { name: "交易收入", values: [1.10, 1.25] },
+        { name: "淨利息收入", values: [0.70, 0.62] },
+        { name: "其他收入", values: [0.05, -0.08] },
+      ],
+      totals: [1.87, 1.78],
+      yoy: [13.64, -11.43, { label: "轉負" }],
+    },
+  },
 ];

@@ -134,7 +134,7 @@ export function periodColumnCheck(fs, periodEnd) {
  */
 export function correctionPrompt({ userDecisions = [], aiItems = [], edits = [], general = "" }) {
   const L = [];
-  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.4\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
+  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.5\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
   L.push("");
   if (userDecisions.length) {
     L.push("## 一、人工判斷（已由人對照原文決定，請直接照做）");

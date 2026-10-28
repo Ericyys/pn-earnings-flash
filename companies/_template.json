@@ -24,7 +24,7 @@
       "label_zh": "其他與調節",
       "source_labels": ["Corporate and other", "Eliminations"],
       "reconciling": true,
-      "note": "reconciling: true 的項目會納入加總檢查，但不畫成主要長條"
+      "note": "reconciling: true＝調節項目（列在部門小計之外、但計入總營收）：納入加總檢查，但不畫進柱子、不列入圖例，兩期都放註腳「總營收 X 含 項目名 金額」。這裡的設定優先於 AI 的標示"
     }
   ],
 

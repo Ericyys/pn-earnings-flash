@@ -58,7 +58,7 @@ export function renderT1(box, ctx, spec) {
     svg += text(box.x, vb, valueText, kpi, { fill: c.text, num: true });
     if (k.delta) {
       const segs = deltaSegments(ctx, k.delta.value, k.delta.kind, k.delta.label, k.delta.decimals);
-      svg += richLine(box.x + box.w, vb, segs.map((s) => ({ ...s, st: s.fill === c.muted ? small : num })), num, { anchor: "end" }, measure).svg;
+      svg += richLine(box.x + box.w, vb, segs.map((s) => ({ ...s, st: s.suffix ? small : num })), num, { anchor: "end" }, measure).svg;
     }
     ky += rowH;
   }
