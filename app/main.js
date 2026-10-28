@@ -2,7 +2,7 @@
 // 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（可修改、可交給 AI）→ 4 產出圖卡、下載 PNG 與本季存檔
 // 計算在 lib/compute.js、修改在 lib/review.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.2.1（2026-10-28）";
+export const APP_VERSION = "1.3.0（2026-10-29）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -78,12 +78,15 @@ async function runCheck() {
       const now = getNode(A, e.path);
       const nowV = e.kind === "datapoint" ? now?.value : now;
       const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
-      if (same(nowV, e.value)) absorbed++;
-      else if (same(nowV, e.ai)) { state.edits.push(e); kept++; }
+      if (same(nowV, e.value)) {
+        absorbed++;
+        // 你填的科目譯名 AI 已照用 → 這個譯名視為已確認，不必再確認一次
+        if (e.labelFor) state.choices[`label:${e.path}|${e.value}`] = { choice: "ok", text: "" };
+      } else if (same(nowV, e.ai)) { state.edits.push(e); kept++; }
       else dropped++;
     }
     state.ticks = new Set(prev.ticks);
-    for (const [id, ch] of Object.entries(prev.choices)) if (ch.choice !== "ai") state.choices[id] = ch;
+    for (const [id, ch] of Object.entries(prev.choices)) if (ch.choice !== "ai" && !state.choices[id]) state.choices[id] = ch;
     carry = `沿用上一輪的核對紀錄：勾選 ${prev.ticks.size} 項（數值有變的會自動取消）、修改 ${kept} 項仍需套用、${absorbed} 項 AI 已照改、${dropped} 項 AI 改成其他值（需重新核對）、你的判斷 ${Object.keys(state.choices).length} 項。上一輪交給 AI 的問題若仍存在，這一輪會改列在「需要你判斷」。`;
   }
   $("carryMsg").innerHTML = carry ? `<div class="banner ok">${esc(carry)}</div>` : "";
@@ -216,8 +219,8 @@ function layer3Items() {
   const out = state.out, A = state.Aeff, sent = state.sentToAI || new Set();
   const list = [];
   const push = (it) => {
-    // 交給 AI 的項目若使用者標記「原文如此」，改列在「需要你判斷」並視為已處理
-    if (it.group === "ai" && state.choices[it.id]?.choice === "ok") it.group = "user";
+    // 交給 AI 的項目若使用者標記「原文如此」（科目名稱則是「自己填譯名」），改列在「需要你判斷」
+    if (it.group === "ai" && ["ok", "rename"].includes(state.choices[it.id]?.choice)) it.group = "user";
     list.push(it);
   };
   if (state.choices["meta:period"]) push({ id: "meta:period", group: "user", kind: "period", path: "meta.period_end", text: "期末日與本季數字的出處欄名不是同一期（AI 可能抓錯整欄），工具不允許直接修改" });
@@ -230,6 +233,20 @@ function layer3Items() {
       const group = AUTO_WARN.has(c.id) ? "auto" : c.id === "fiscal_period_vs_end" || sent.has(id) ? "user" : "ai";
       push({ id, group, kind: "warn", text: `需確認：${c.label}｜${c.detail}`, escalated: group === "user" && sent.has(id), request: AI_REQUEST[c.id] || GENERIC_FAIL,
         reason: group === "auto" ? "數字已在第二層對照原文核對，這是資訊性提示" : "" });
+    }
+  }
+  // 科目中文名稱：圖卡標籤一律中文。AI 譯名 → 需要你確認；缺少中文名稱 → 第一次交給 AI 翻譯，仍沒有就由你填
+  for (const lb of out.labels || []) {
+    const aiZh = getNode(state.A, lb.path);
+    const id = `label:${lb.path}|${aiZh ?? ""}`; // 以 AI 原始譯名為準：你改了譯名不會變成新項目；AI 換了譯名要重新確認
+    if (lb.origin === "missing") {
+      const group = sent.has(id) ? "user" : "ai";
+      push({ id, group, kind: "label", missing: true, path: lb.path, en: lb.en, escalated: group === "user",
+        text: `需要確認：科目沒有中文名稱｜${lb.en}（對照表沒有，AI 也沒有翻譯）`,
+        request: `請為「${lb.en}」填 label_zh：用台灣常用的財報用語翻譯成中文，不要保留英文。` });
+    } else {
+      push({ id, group: "user", kind: "label", path: lb.path, en: lb.en,
+        text: `需要確認：科目中文名稱｜${lb.en} → ${aiZh && aiZh !== lb.zh ? `AI 譯名「${aiZh}」，已改為「${lb.zh}」` : `「${lb.zh}」（AI 翻譯，對照表沒有這個科目）`}` });
     }
   }
   for (const d of out.derivable) push({ id: `derived:${d.id}`, group: "auto", kind: "derived", text: `計算得出的數字：${d.name}＝${d.formula}`, reason: "原文沒有這一列；依 rules/derivations.json 計算，結果與原文科目恆等，圖卡底部已註明" });
@@ -258,8 +275,14 @@ const USER_OUTCOMES = [
   ["ok", "原文如此，維持現狀"],
   ["ai", "需要修正：寫下你的判斷，連同其他問題一起交給 AI"],
 ];
-/** 「需要你判斷」的項目是否已處理完（選「原文如此」才算；「需要修正」要等 AI 回來） */
-const resolved = (it) => state.choices[it.id]?.choice === "ok";
+/** 「需要你判斷」的項目是否已處理完（選「原文如此」才算；「需要修正」要等 AI 回來）。科目名稱：譯名正確，或已填入新譯名 */
+const resolved = (it) => {
+  const ch = state.choices[it.id];
+  if (it.kind === "label") return (ch?.choice === "ok" && !it.missing) || (ch?.choice === "rename" && !!(ch.text || "").trim());
+  return ch?.choice === "ok";
+};
+// 科目名稱的兩種結果：直接在這裡改，不交給 AI
+const LABEL_OUTCOMES = [["ok", "譯名正確"], ["rename", "改用這個譯名："]];
 
 // 對「不通過」選「數據正確」時，工具為了不畫出與數字矛盾的圖，會自動少畫的部分
 const OVERRIDE_EFFECT = {
@@ -317,21 +340,23 @@ function buildManual() {
     const cid = it.id.startsWith("check:") ? it.id.slice(6) : "";
     let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>`;
     if (it.escalated) body += `<div class="note">上一輪已交給 AI，仍未解決</div>`;
-    body += USER_OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
+    const outcomes = it.kind === "label" ? LABEL_OUTCOMES.filter(([v]) => !(it.missing && v === "ok")) : USER_OUTCOMES;
+    body += outcomes.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
+    if (it.kind === "label" && ch.choice === "rename") body += `<input type="text" data-rename="${esc(it.id)}" data-path="${esc(it.path)}" value="${esc(ch.text || "")}" placeholder="台灣常用的財報用語，例如「重組費用」（輸入後按 Enter）">`;
     if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「原文如此」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
     if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次表頭的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。數字或單位可以直接在第一、二層改，改對後這一項會自動消失。</div>`;
     if (ch.choice === "ai") body += `<textarea data-text="${esc(it.id)}" placeholder="你的判斷（必填）：例如「財測單位是 millions」「這兩列都要算進營業費用」">${esc(ch.text || "")}</textarea>`;
-    const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">未判斷</span>`;
+    const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">${it.kind === "label" ? "未確認" : "未判斷"}</span>`;
     return `<tr><td>${st}</td><td>${body}</td></tr>`;
   };
   const aiRow = (it) => `<tr><td><span class="pending">交給 AI</span></td><td><div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>
     <div class="note">給 AI 的要求：${esc(it.request)}</div>
-    <div class="row" style="margin-top:4px"><button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button></div></td></tr>`;
+    <div class="row" style="margin-top:4px">${it.kind === "label" ? `<button class="ghost small" data-keep="${esc(it.id)}" data-val="rename">不用交給 AI（我自己填譯名）</button>` : `<button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button>`}</div></td></tr>`;
   const autoRow = (it) => `<tr><td><span class="resolved">自動</span></td><td><div class="item">${esc(it.text)}</div><div class="note">${esc(it.reason || "")}</div>
     ${it.adoptable ? `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>` : ""}</td></tr>`;
   const table3 = (rows) => `<div class="tablewrap pad t3"><table><thead><tr><th style="width:90px">狀態</th><th>內容</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   blocks.push(`<h3>第三層｜數字以外的問題（${l3.length} 項，工具已自動分類）</h3>
-    <p class="pad note">第一、二層把數字對過原文後，剩下的是算法、AI 抓取邏輯與重大風險。<b>需要你判斷</b>的先處理；<b>交給 AI</b> 的不用逐條看，工具會連同你的判斷整理成一段文字，貼回原本的 AI 對話，再把 AI 重新輸出的 JSON 貼回步驟 1。<b>自動處理</b>的不需要動作。</p>
+    <p class="pad note">第一、二層把數字對過原文後，剩下的是算法、AI 抓取邏輯、重大風險，以及 AI 翻譯的科目名稱（圖卡標籤一律中文，對照表沒有的科目由 AI 翻譯，要你確認或直接改）。<b>需要你判斷</b>的先處理；<b>交給 AI</b> 的不用逐條看，工具會連同你的判斷整理成一段文字，貼回原本的 AI 對話，再把 AI 重新輸出的 JSON 貼回步驟 1。<b>自動處理</b>的不需要動作。</p>
     <h3>需要你判斷（${users.length}）</h3>
     ${users.length ? table3(users.map(userRow).join("")) : `<p class="pad note">沒有。</p>`}
     <h3>交給 AI（${ais.length}）</h3>
@@ -417,13 +442,17 @@ function bindManual() {
   box.querySelectorAll("[data-choice]").forEach((r) => r.addEventListener("change", () => {
     const id = r.dataset.choice;
     state.choices[id] = { choice: r.value, text: state.choices[id]?.text || "" };
+    // 科目名稱改選「譯名正確」：取消先前填的譯名
+    if (r.value !== "rename") state.edits = state.edits.filter((e) => e.labelFor !== id);
     recompute();
+    const rn = document.querySelector(`input[data-rename="${CSS.escape(id)}"]`);
+    if (rn) rn.focus();
     const t = document.querySelector(`textarea[data-text="${CSS.escape(id)}"]`);
     if (t) t.focus();
   }));
   if ($("aiDetails")) $("aiDetails").addEventListener("toggle", (e) => (state.aiOpen = e.target.open));
   box.querySelectorAll("[data-keep]").forEach((btn) => (btn.onclick = () => {
-    state.choices[btn.dataset.keep] = { choice: "ok", text: "" };
+    state.choices[btn.dataset.keep] = { choice: btn.dataset.val || "ok", text: "" };
     recompute();
   }));
   box.querySelectorAll("[data-adopt]").forEach((btn) => (btn.onclick = () => {
@@ -439,6 +468,14 @@ function bindManual() {
       return;
     }
     for (const p of it.d.paths) putEdit({ layer: 3, kind: "replace", path: p, ai: getNode(state.A, p), value: getNode(state.B, p), note: "A／B 比對：改用 B 的值" });
+    recompute();
+  }));
+  // 科目譯名：輸入完成（Enter 或離開輸入框）後直接套用到數據表，圖卡用這個名稱
+  box.querySelectorAll("[data-rename]").forEach((inp) => inp.addEventListener("change", () => {
+    const id = inp.dataset.rename, path = inp.dataset.path, v = inp.value.trim();
+    state.choices[id] = { choice: "rename", text: v };
+    state.edits = state.edits.filter((e) => e.labelFor !== id);
+    if (v) state.edits.push({ layer: 3, kind: "field", path, ai: getNode(state.A, path), value: v, note: "第三層：科目中文名稱", labelFor: id, at: new Date().toISOString() });
     recompute();
   }));
   box.querySelectorAll("[data-text]").forEach((t) => t.addEventListener("input", () => {
@@ -548,7 +585,7 @@ function updateGate() {
   const ticked = boxes.filter((b) => b.checked).length;
   const l3 = state.l3 || [];
   const users = l3.filter((x) => x.group === "user"), ais = l3.filter((x) => x.group === "ai");
-  const userOpen = users.filter((x) => !state.choices[x.id]?.choice);
+  const userOpen = users.filter((x) => !state.choices[x.id]?.choice || (x.kind === "label" && !resolved(x)));
   const userToAI = users.filter((x) => state.choices[x.id]?.choice === "ai");
   const userToAIEmpty = userToAI.filter((x) => !(state.choices[x.id].text || "").trim());
   const general = $("general").value.trim();
@@ -676,7 +713,7 @@ $("btnApply").onclick = () => drawCards();
 $("btnArchive").onclick = () => {
   const { A, Aeff, out } = state;
   const archive = {
-    archive_version: "1.2",
+    archive_version: "1.3",
     app_version: APP_VERSION,
     created_at: new Date().toISOString(),
     fact_sheet: Aeff,                 // 套用人工修改後、實際用來出圖的數據
@@ -685,6 +722,8 @@ $("btnArchive").onclick = () => {
     overrides: out.checks.filter((c) => c.status === "fail" && state.choices[`check:${c.id}`]?.choice === "ok").map((c) => c.id), // 確認「數據正確」的不通過項目
     review_items: (state.l3 || []).map((it) => ({ group: it.group, item: it.text, choice: state.choices[it.id]?.choice || null, note: state.choices[it.id]?.text || "" })),
     correction_rounds: state.rounds,  // 請 AI 修正的次數
+    // 本季確認過的科目譯名（AI 翻譯或人工填寫）：維護者可據此補進 references/labels_zh.json，下次就不用再確認
+    label_translations: (state.l3 || []).filter((it) => it.kind === "label" && resolved(it)).map((it) => ({ en: it.en, zh: getNode(Aeff, it.path), by: state.choices[it.id].choice === "rename" ? "人工填寫" : "AI 翻譯，人工確認" })),
     checks: out.checks,
     derived: out.derived,
     selection: out.selection,

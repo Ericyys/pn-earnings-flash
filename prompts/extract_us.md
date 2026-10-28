@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.4）
+# PN 財報快報｜美股數據抽取指令（v0.5）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -24,11 +24,12 @@
 7. **標準欄位只在明確對應時才填。** `cost_of_revenue`、`gross_profit`、`rd_expense`、`sm_expense`、`ga_expense` 等，只有原文列名明確就是該科目時才填；否則填 `null`（`not_applicable`）。
 8. **輸出格式。** 只輸出一個 JSON 程式碼區塊，不要加任何解說。內容太長被截斷時，我會說「繼續」，請從中斷處接著輸出。
 9. **不要推定。** 原文沒寫的屬性一律不填或填 `unspecified`，例如財測沒寫 GAAP 就不要填 GAAP；文件沒出現股票代號，`ticker` 仍可依公司名稱填寫，但要在 `notes` 註明。
+10. **科目附中文名稱 `label_zh`。** 每個有 `label_source`（原文名稱）的項目，都另外填 `label_zh`：用**台灣常用的財報用語**翻譯成中文，例如 Restructuring charges → 重組費用、Content amortization → 內容攤銷、UCAN → 美國與加拿大。不要保留英文（常用縮寫如 EPS、EBITDA 可以夾在中文裡，例如「調整後 EBITDA」）。`label_source` 仍照抄原文，不要改。這是唯一允許你自己寫的文字，會由人確認。
 
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.3"`。
+- 填 `"1.4"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -105,6 +106,7 @@
 - 每個非 null 數字都有 `src`；表格數字的 `column_label` 都含期間文字。
 - 本季與去年同期都是單季欄位；只有原文完全沒有單季欄時才用累計。
 - 所有金額與損益表同單位（財測例外，但財測要標 `monetary_unit`）。
+- 每個有 `label_source` 的項目都有 `label_zh`（台灣常用的財報用語，不是英文）。
 - 沒有任何自己算出來的數字；小數位數與原文相同（尾數的 0 也照寫）。
 - `meta.eps_basis` 填 `"diluted"`，`eps_diluted` 與 `shares_diluted` 都有填。
 - 需要人決定的寫進 `ambiguities`，依規則處理好的說明寫進 `notes`。

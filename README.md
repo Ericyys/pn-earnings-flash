@@ -35,6 +35,7 @@
 ## 維護
 
 - **新增追蹤公司**：複製 `companies/_template.json` 成 `companies/<市場>/<代號>.json` 填好，再到 `companies/index.json` 加一行，公司才會出現在選單。
+- **新增科目譯名**：核對時確認過的 AI 譯名會記在本季存檔的 `label_translations`；常出現的科目加進 `references/labels_zh.json`，之後就不必再確認。
 - **調整選圖門檻**：改 `rules/triggers.json`，不用改程式。
 - **調整圖卡樣式**：改 `app/brand.json`，同步更新 `references/card_style.md`；改完打開 `app/demo/preview.html` 檢查所有底稿。
 - **更新檔案**：在 GitHub 按 Add file → Upload files，同名檔案會覆蓋。上傳後等 1–2 分鐘；若畫面還是舊的，按 Ctrl＋Shift＋R（Mac：⌘＋Shift＋R）強制重新整理。頁首會顯示目前版本。

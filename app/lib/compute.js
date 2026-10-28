@@ -5,6 +5,7 @@
 //   checks    自動檢查結果（pass／fail／warn／skip）
 //   derived   依損益表科目計算、原文沒有直接列出的數字（圖卡底部會註明）
 //   derivable 可計算的數字清單（核對畫面第三層列出，供確認原文確實沒有這一列）
+//   labels    圖卡上用到、需要人確認的科目名稱：AI 譯名（origin: ai）或缺少中文名稱（origin: missing）
 //   metrics   指標（年增率、利潤率、佔比…）
 //   selection 這次做哪幾張、哪些規則觸發、哪些因資料不足略過、哪些因覆寫而不畫
 //   cards     給底稿的 spec（A1、C、條件模組、K1）
@@ -29,9 +30,27 @@ const DISPLAY_LABEL = { billions: "B", hundred_millions: "億", millions: "M" };
 /** 依標籤正規化，用來辨識「營業成本」等列 */
 const norm = (s) => String(s || "").toLowerCase().replace(/[*:：]/g, "").replace(/\s+/g, " ").trim();
 
-function zhLabel(src, ctx) {
-  const n = norm(src);
-  return ctx.labels?.[n] || src;
+const HAS_CJK = /[\u3400-\u9fff]/;
+
+/**
+ * 科目中文名稱。圖卡標籤一律中文，依序採用：
+ *   1. 公司設定檔的 label_zh（companies/*.json）
+ *   2. 原文本身就是中文（台股）
+ *   3. 科目對照表（references/labels_zh.json）
+ *   4. AI 的譯名 label_zh（台灣常用財報用語）→ 第三層「需要確認」
+ *   5. 都沒有 → 標為缺少中文名稱（第三層處理，不直接印英文）
+ * path：該項目在數據表中的路徑（例如 operating_expense_items[technology_and_development]），用來修改譯名
+ */
+function nameOf(item, path, ctx, companyZh) {
+  const en = item.label_source;
+  const at = { en, path: `${path}.label_zh` };
+  if (companyZh) return { ...at, zh: companyZh, origin: "company" };
+  if (HAS_CJK.test(en)) return { ...at, zh: en, origin: "source" };
+  const dict = ctx.labels?.[norm(en)];
+  if (dict) return { ...at, zh: dict, origin: "dict" };
+  const ai = String(item.label_zh || "").trim();
+  if (HAS_CJK.test(ai)) return { ...at, zh: ai, origin: "ai" };
+  return { ...at, zh: en, origin: "missing" };
 }
 
 // ───────── 主函式 ─────────
@@ -41,6 +60,9 @@ export function analyze(fs, ctx) {
   const derived = [];
   const derivable = [];
   const dropped = [];
+  // 圖卡上實際用到、需要人確認的科目名稱（AI 譯名或缺少中文名稱）
+  const labelsUsed = new Map();
+  const useName = (n) => { if (n.origin === "ai" || n.origin === "missing") labelsUsed.set(n.path, n); return n.zh; };
   const add = (id, label, status, detail = "") => checks.push({ id, label, status, detail });
   // 覆寫：使用者確認「數據正確」的不通過項目。為了不畫出與數字矛盾的圖，受影響的那一段會自動不畫。
   // 注意：overridden(id) 只能在該項檢查「已經加入 checks 之後」呼叫。
@@ -66,7 +88,7 @@ export function analyze(fs, ctx) {
       if (cogs.c === null) cogs = { c, p };
       continue; // 營業成本不放進營業費用，避免重複扣除
     }
-    items.push({ key: it.key, label: it.label_source, zh: zhLabel(it.label_source, ctx), c: Math.abs(c), p: p === null ? null : Math.abs(p) });
+    items.push({ key: it.key, label: it.label_source, nm: nameOf(it, `operating_expense_items[${it.key}]`, ctx), c: Math.abs(c), p: p === null ? null : Math.abs(p) });
   }
   if (cogs.c !== null) cogs = { c: Math.abs(cogs.c), p: cogs.p === null ? null : Math.abs(cogs.p) };
 
@@ -208,12 +230,12 @@ export function analyze(fs, ctx) {
   M.margin_8q_extreme = null; // 需要 7 季歷史存檔，目前工具尚未讀取 history/
 
   // 拆分指標
-  function breakdown(list) {
+  function breakdown(list, listName) {
     if (!list || !list.length) return null;
     const rows = list.filter((s) => s.revenue).map((s) => {
       const c = cur(s.revenue), p = pri(s.revenue);
       const meta = (company.geographies || []).concat(company.segments || []).find((x) => x.key === s.key);
-      return { key: s.key, name: meta?.label_zh || s.label_source, c, p, share: pctOf(c, rev.c), share_p: pctOf(p, rev.p), yoy: yoy(c, p), reconciling: meta?.reconciling };
+      return { key: s.key, nm: nameOf(s, `${listName}[${s.key}]`, ctx, meta?.label_zh), c, p, share: pctOf(c, rev.c), share_p: pctOf(p, rev.p), yoy: yoy(c, p), reconciling: meta?.reconciling };
     });
     const main = rows.filter((r) => !r.reconciling);
     if (!main.length) return null;
@@ -224,8 +246,8 @@ export function analyze(fs, ctx) {
     };
   }
   const sumOv = (n) => overridden(`${n}_sum_c`) || overridden(`${n}_sum_p`);
-  const seg = sumOv("segments") ? null : breakdown(fs.segments);
-  const geo = sumOv("geographies") ? null : breakdown(fs.geographies);
+  const seg = sumOv("segments") ? null : breakdown(fs.segments, "segments");
+  const geo = sumOv("geographies") ? null : breakdown(fs.geographies, "geographies");
   if (sumOv("segments") || sumOv("geographies")) dropped.push("營收拆解卡（拆分加總與營收不符，使用者確認原文如此）");
   M.segment_share_change_pp_yoy = seg ? seg.maxShareChange : null;
   M.segment_yoy_gap_pp = seg ? seg.maxYoyGap : null;
@@ -396,11 +418,11 @@ export function analyze(fs, ctx) {
       unit: unitText,
       revenue: disp(rev.c), cogs: cogs.c === null ? 0 : disp(cogs.c), grossProfit: gpShown.c === null ? null : disp(gpShown.c),
       stopAt: stopAtOI ? "operating_income" : undefined,
-      opex: items.map((it) => ({ name: it.zh, value: disp(it.c) })),
+      opex: items.map((it) => ({ name: useName(it.nm), value: disp(it.c) })),
       otherOperating: disp(other.c || 0), operatingIncome: disp(oi.c),
       nonOperating: disp(nonop.c || 0), tax: disp(tax.c ?? 0), netIncome: disp(niP.c),
       margins: { gross: gpShown.c !== null && cogs.c !== null ? M.gross_margin : undefined, operating: M.operating_margin, net: M.net_margin },
-      note: hl ? (fs.notable_items?.length ? fs.notable_items.map((x) => `${x.label_source} ${fmt2(disp(num(x.amount)))}`).join("；") : `業外收支淨額佔淨利 ${fmt1(M.non_operating_share_of_net_income * 100)}%`) : undefined,
+      note: hl ? (fs.notable_items?.length ? fs.notable_items.map((x, i) => `${useName(nameOf(x, `notable_items[${i}]`, ctx))} ${fmt2(disp(num(x.amount)))}`).join("；") : `業外收支淨額佔淨利 ${fmt1(M.non_operating_share_of_net_income * 100)}%`) : undefined,
     },
   });
 
@@ -431,7 +453,7 @@ export function analyze(fs, ctx) {
         id: "B", template: "T2", header: { ...header, label: src === seg ? "營收組成" : "各地區營收" }, source: `${baseSource}。`,
         body: {
           unit: unitText, kind: "amount", periods: [shiftYear(period, -1), period],
-          series: src.rows.map((r) => ({ name: r.name, values: [disp(r.p), disp(r.c)] })),
+          series: src.rows.map((r) => ({ name: useName(r.nm), values: [disp(r.p), disp(r.c)] })),
           yoy: src.rows.map((r) => r.yoy),
         },
       });
@@ -457,8 +479,8 @@ export function analyze(fs, ctx) {
   // K1：公司下季財測＋公司明確寫出的財測調整。兩者都沒有就不產出 K1（不顯示「未提供」）。
   const curShort = profile.defaults.display_currency;
   const STD_NAMES = { revenue: "營收", operating_income: "營業利益", operating_margin: "營益率", gross_margin: "毛利率", eps: "EPS", free_cash_flow: "自由現金流" };
-  const labelOf = (it) => {
-    let zh = STD_NAMES[it.metric] || zhLabel(it.label_source, ctx);
+  const labelOf = (it, path) => {
+    let zh = STD_NAMES[it.metric] || useName(nameOf(it, path, ctx));
     // 財測的 EPS 口徑依原文名稱（Diluted／Basic）；原文沒寫就只寫 EPS，不推定
     if (it.metric === "eps") zh = /dilut|稀釋/i.test(it.label_source) ? "稀釋 EPS" : /basic|基本/i.test(it.label_source) ? "基本 EPS" : "EPS";
     return it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${curShort}）` : zh;
@@ -482,7 +504,7 @@ export function analyze(fs, ctx) {
   const mid = (v) => (v.point !== null && v.point !== undefined ? v.point : (v.low + v.high) / 2);
 
   const gRows = [];
-  if (g && g.items.length) for (const it of g.items) gRows.push({ label: labelOf(it), value: showItem([it], it.unit, guidanceScale)[0] });
+  if (g && g.items.length) for (const it of g.items) gRows.push({ label: labelOf(it, `guidance_next.items[${it.metric}|${it.label_source}]`), value: showItem([it], it.unit, guidanceScale)[0] });
 
   const revRows = [];
   for (const r of fs.guidance_revisions || []) {
@@ -490,7 +512,7 @@ export function analyze(fs, ctx) {
     const diff = mid(r.current) - mid(r.previous);
     const period = /Q[1-4]$/.test(r.period_label) ? fiscalToCalendar(r.period_label, company.fiscal_year_end_month || 12) : r.period_label;
     const [previous, current] = showItem([r.previous, r.current], r.unit, scale);
-    revRows.push({ label: labelOf(r), period, previous, current, previousDate: r.previous_date || null, dir: diff > 0 ? "up" : diff < 0 ? "down" : "flat" });
+    revRows.push({ label: labelOf(r, `guidance_revisions[${r.metric}|${r.label_source}]`), period, previous, current, previousDate: r.previous_date || null, dir: diff > 0 ? "up" : diff < 0 ? "down" : "flat" });
   }
 
   if (gRows.length || revRows.length) {
@@ -518,7 +540,9 @@ export function analyze(fs, ctx) {
   if (overridden("gross_profit_identity")) dropped.push("毛利節點與毛利率（毛利勾稽不符，使用者確認原文如此）");
   selection.dropped = dropped;
   if (stopAtOI) for (let i = derived.length - 1; i >= 0; i--) if (derived[i].startsWith("業外")) derived.splice(i, 1);
-  return { checks, derived, derivable, metrics: M, selection, cards, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
+  // 圖卡上用到的 AI 譯名與缺少中文名稱的科目：由核對畫面列入第三層（origin：ai／missing）
+  const labels = [...labelsUsed.values()];
+  return { checks, derived, derivable, labels, metrics: M, selection, cards, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
 }
 
 // ───────── 選圖 ─────────
@@ -601,7 +625,7 @@ export function diffExtractions(a, b) {
       const idOf = (x, i) => x?.key ?? (x?.metric && x?.label_source ? `${x.metric}|${x.label_source}` : x?.metric !== undefined && x?.value !== undefined ? `${x.metric}|${x.value}` : i);
       if (Array.isArray(o)) o.forEach((x, i) => flat(x, `${p}[${idOf(x, i)}]`, out));
       else for (const [k, v] of Object.entries(o)) {
-        if (["src", "extraction", "ambiguities", "comment", "key", "label_source", "unit", "metric"].includes(k)) continue;
+        if (["src", "extraction", "ambiguities", "comment", "key", "label_source", "label_zh", "unit", "metric"].includes(k)) continue;
         flat(v, p ? `${p}.${k}` : k, out);
       }
     } else if (typeof o === "number" || typeof o === "string") out[p] = { value: o };

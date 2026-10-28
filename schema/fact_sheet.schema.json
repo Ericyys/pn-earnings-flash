@@ -22,9 +22,10 @@
         "1.0",
         "1.1",
         "1.2",
-        "1.3"
+        "1.3",
+        "1.4"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）"
     },
     "comment": {
       "type": "string",
@@ -308,6 +309,10 @@
             "type": "string",
             "description": "原文名稱，逐字照抄"
           },
+          "label_zh": {
+            "type": "string",
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+          },
           "amount": {
             "$ref": "#/$defs/pair"
           }
@@ -348,6 +353,10 @@
           "label_source": {
             "type": "string",
             "description": "原文名稱，逐字照抄"
+          },
+          "label_zh": {
+            "type": "string",
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
           },
           "unit": {
             "type": "string",
@@ -407,6 +416,10 @@
             },
             "label_source": {
               "type": "string"
+            },
+            "label_zh": {
+              "type": "string",
+              "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
             }
           },
           "description": "只有原文明確寫出「本季新核准／新增」的回購授權金額才填；「剩餘額度」「尚可回購金額」不是新授權，寫進 ambiguities。"
@@ -477,6 +490,10 @@
           "label_source": {
             "type": "string",
             "description": "原文名稱，逐字照抄"
+          },
+          "label_zh": {
+            "type": "string",
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
           },
           "period_label": {
             "type": "string",
@@ -555,6 +572,10 @@
           "label_source": {
             "type": "string",
             "description": "原文名稱，逐字照抄"
+          },
+          "label_zh": {
+            "type": "string",
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
           },
           "amount": {
             "$ref": "#/$defs/datapoint"
@@ -893,6 +914,10 @@
           "type": "string",
           "description": "原文名稱，逐字照抄"
         },
+        "label_zh": {
+          "type": "string",
+          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+        },
         "revenue": {
           "$ref": "#/$defs/pair"
         },
@@ -939,6 +964,10 @@
         },
         "label_source": {
           "type": "string"
+        },
+        "label_zh": {
+          "type": "string",
+          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
         },
         "basis": {
           "enum": [
@@ -1040,7 +1069,8 @@
             "enum": [
               "1.1",
               "1.2",
-              "1.3"
+              "1.3",
+              "1.4"
             ]
           }
         }
@@ -1061,7 +1091,10 @@
       "if": {
         "properties": {
           "schema_version": {
-            "const": "1.3"
+            "enum": [
+              "1.3",
+              "1.4"
+            ]
           }
         }
       },

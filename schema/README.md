@@ -31,6 +31,10 @@
 - `income_statement` 的 EPS 與股數只需填口徑對應的那一組（稀釋：`eps_diluted`＋`shares_diluted`；基本：`eps_basic`＋`shares_basic`）。
 - `guidance_revisions[].previous_date`：原文寫出前次財測發布日期（月、日）時填 `M/D`，圖卡欄名顯示為「前次財測（M/D）」。
 
+## 1.4 版新增
+
+- `label_zh`：每個有 `label_source`（原文名稱）的項目都可以附中文名稱，由 AI 用台灣常用的財報用語翻譯。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。
+
 ## 人工填寫的欄位
 
 `consensus`（市場預期）不在財報裡，需人工從外部來源填入 JSON，必須附來源名稱、網址與日期。出圖工具目前沒有輸入市場預期的畫面，要在貼上前直接加進 JSON。
