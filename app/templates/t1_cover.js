@@ -5,7 +5,9 @@
 //   headline: "一句事實描述（由標題公式產生）",
 //   kpis: [ // 最多 3 個
 //     { label: "營收", unit: "USD B", value: 35.08, kind: "amount",
-//       delta: { value: 18.4, kind: "pct", label: "年增" }, note: "去年同期 29.63" }
+//       delta: { value: 18.4, kind: "pct", label: "年增" }, note: "去年同期 29.63" },
+//     { label: "稀釋 EPS", unit: "USD", value: 1.2, kind: "perShare", decimals: 2,      // decimals：依原文位數（1.20）
+//       delta: { value: 49, kind: "pct", label: "年增", decimals: 0 }, ... }              // 採用公司公布的年增率時依原文位數
 //   ]
 // }
 
@@ -51,9 +53,11 @@ export function renderT1(box, ctx, spec) {
 
     const vy = ly + lineBox(small);
     const vb = baseline(vy, kpi);
-    svg += text(box.x, vb, fmt.byKind(k.kind)(k.value), kpi, { fill: c.text, num: true });
+    // decimals：原文直接抽取的數字（例如 EPS）依原文位數顯示；沒有指定時用該類數字的固定位數
+    const valueText = k.decimals !== undefined ? fmt.fixed(k.value, k.decimals) : fmt.byKind(k.kind)(k.value);
+    svg += text(box.x, vb, valueText, kpi, { fill: c.text, num: true });
     if (k.delta) {
-      const segs = deltaSegments(ctx, k.delta.value, k.delta.kind, k.delta.label);
+      const segs = deltaSegments(ctx, k.delta.value, k.delta.kind, k.delta.label, k.delta.decimals);
       svg += richLine(box.x + box.w, vb, segs.map((s) => ({ ...s, st: s.fill === c.muted ? small : num })), num, { anchor: "end" }, measure).svg;
     }
     ky += rowH;

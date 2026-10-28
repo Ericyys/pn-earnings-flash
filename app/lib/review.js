@@ -5,6 +5,8 @@
 //   2. 確認數據正確：對「不通過」選「數據正確」→ 由 analyze() 的 overrides 處理（自動少畫有矛盾的那一段）
 //   3. 交給 AI 修正：工具無法直接處理的（漏抽、整欄抓錯、期間抓錯）→ correctionPrompt() 產生修正要求
 //
+import { cloneWithDecimals, setDec, plainDecimals } from "./decimals.js";
+
 // 路徑格式與 diffExtractions() 相同，例如：
 //   income_statement.revenue.current
 //   geographies[apac].revenue.prior_year
@@ -73,17 +75,22 @@ export function setNode(obj, path, value) {
  *   kind="replace"   整個節點換成另一份（例如採用 B 的數字，連同出處）
  */
 export function applyEdits(fs, edits) {
-  const out = structuredClone(fs);
+  const out = cloneWithDecimals(fs);
   const failed = [];
   for (const e of edits) {
     let ok = true;
     if (e.kind === "field") ok = setNode(out, e.path, e.value);
-    else if (e.kind === "replace") ok = setNode(out, e.path, structuredClone(e.value));
-    else {
+    else if (e.kind === "replace") {
+      // 採用 B 的節點時沿用 B 的原文位數；手動輸入財測時用輸入文字的位數（e.dec）
+      const v = cloneWithDecimals(e.value);
+      if (e.dec && v && typeof v === "object") for (const [k, d] of Object.entries(e.dec)) setDec(v, k, d);
+      ok = setNode(out, e.path, v);
+    } else {
       const node = getNode(out, e.path);
       if (!node || typeof node !== "object") ok = false;
       else {
         node.value = e.value;
+        setDec(node, "value", e.dec ?? plainDecimals(e.value));
         if (e.period_type) node.period_type = e.period_type;
         if (e.column_label && node.src) node.src.column_label = e.column_label;
         if (e.column_label && node.src && node.src.quote && !node.src.row_label) node.src.quote = e.column_label;
@@ -127,7 +134,7 @@ export function periodColumnCheck(fs, periodEnd) {
  */
 export function correctionPrompt({ userDecisions = [], aiItems = [], edits = [], general = "" }) {
   const L = [];
-  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.2\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
+  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.3\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
   L.push("");
   if (userDecisions.length) {
     L.push("## 一、人工判斷（已由人對照原文決定，請直接照做）");

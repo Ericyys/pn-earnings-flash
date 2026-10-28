@@ -8,8 +8,10 @@
     "share_unit": "millions",
     "accounting_basis": "US GAAP",
     "display_unit": "billions",
-    "display_currency": "USD"
+    "display_currency": "USD",
+    "eps_basis": "diluted"
   },
+  "eps_rule": "美股抽稀釋 EPS（diluted）；其他市場以公司新聞稿標題使用的 EPS 為準。圖卡標籤依 meta.eps_basis 顯示，EPS 年增率用公布的 EPS 計算。",
   "extraction_prompt": "prompts/extract_us.md",
   "primary_sources": [
     {

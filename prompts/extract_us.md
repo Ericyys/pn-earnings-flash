@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.3）
+# PN 財報快報｜美股數據抽取指令（v0.4）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -10,7 +10,7 @@
 
 1. **只抄原文，不計算。** 不要自己算年增率、利潤率、毛利、合計。原文沒有寫出的數字，一律填 `null`，並在 `null_reason` 寫 `not_disclosed`（沒揭露）或 `not_applicable`（不適用）。
 2. **不准估計、不准補值、不准用外部資料。** 只能使用我上傳的文件。不要上網搜尋。
-3. **照抄單位與正負號。** 原文是百萬就填百萬的數字，不要換算。原文括號 `(1,234)` 代表負數，填 `-1234`。不要因為「這是費用」就自行改正負號。
+3. **照抄單位、正負號與小數位數。** 原文是百萬就填百萬的數字，不要換算。原文括號 `(1,234)` 代表負數，填 `-1234`。不要因為「這是費用」就自行改正負號。原文寫幾位小數就寫幾位，尾數的 0 也要寫（`1.20` 不要寫成 `1.2`）。
 4. **每個數字都要附出處 `src`。**
    - 表格數字：`doc`、`page`、`row_label`（列名，逐字照抄）、`column_label`（欄名，逐字照抄，**必須包含期間文字**，例如 `Three Months Ended September 30, 2026`）。
    - 內文數字：`doc`、`page`、`quote`（含該數字的原句，逐字照抄，300 字以內）。
@@ -28,7 +28,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.2"`。
+- 填 `"1.3"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -39,6 +39,7 @@
 - `period_end`：本季期末日，取自損益表欄名。`period_end_src` 附出處。
 - `monetary_unit`：看損益表上方的單位說明，例如 `(in millions, except per share data)` → `millions`。`monetary_unit_src` 附原句。
 - `share_unit`：股數單位，常與金額不同，看股數那幾列的說明。
+- `eps_basis`：美股一律填 `"diluted"`（抽稀釋 EPS）。圖卡的 EPS 標籤依這一欄顯示。
 - `source_docs`：列出我上傳的每份文件，`id` 用短代號（新聞稿用 `pr`、簡報用 `deck`）。
 
 ### income_statement
@@ -46,7 +47,9 @@
 - `revenue`：營收合計那一列（例如 Total net revenues、Total revenues、Net sales）。
 - `operating_expenses_total`：費用合計那一列（例如 Total operating expenses、Total costs and expenses）。
 - `net_income_to_parent`：如有「attributable to」那一列就用它；沒有就與 `net_income` 相同並附同一出處。
-- `eps_basic`、`eps_diluted`、`shares_diluted`：注意 EPS 區與股數區都有「Basic／Diluted」，看所在區塊。`row_label` 要連同區塊名稱一起寫，例如 `Earnings per share: Diluted`、`Weighted-average shares: Diluted`。
+- **EPS 抽稀釋（Diluted）**：填 `eps_diluted` 與 `shares_diluted`（稀釋加權平均股數，用來驗算）。`eps_basic`、`shares_basic` 不用填，省略即可。
+- 注意 EPS 區與股數區都有「Basic／Diluted」，看所在區塊。`row_label` 要連同區塊名稱一起寫，例如 `Earnings per share: Diluted`、`Weighted-average shares: Diluted`。
+- EPS 照抄原文的小數位數（例如原文 `$1.20` 就寫 `1.20`，不要寫成 `1.2`）。
 
 ### operating_expense_items（所有公司都要填）
 - 把損益表費用區塊的**每一列**依原文順序照抄，不合併、不改名、不含合計列。
@@ -73,10 +76,12 @@
 - 公司在本次文件中給出的**下一季**展望。只抄有數字的項目；全年展望不放這裡（有調整的放 `guidance_revisions`，其餘在 `notes` 註明存在）。公司沒給下一季財測就省略整區。
 - **`monetary_unit` 必填**：照抄財測表格或段落的單位說明（常與損益表不同，例如財測用百萬、損益表用仟元），並在 `monetary_unit_src` 附出處。
 - 每一項的 `metric` 盡量用標準代號（revenue、operating_income、operating_margin、gross_margin、eps）；淨利、年增率等沒有標準代號的用 `other`。
+- 數字照抄原文的小數位數（例如 `26.0%` 寫 `26.0`、`$0.70` 寫 `0.70`），圖卡會依原文位數顯示。
 
 ### guidance_revisions（財測上修／下修）
 - 只收公司在本次文件中**明確寫出調整前與調整後數字**的財測調整，例如「全年營收財測由 $49.5B 上調至 $51.1B」「2026 FCF 預估調整為約 $12.0B（先前為 $12.5B）」。
-- 全年寫 `period_label: "FY2026"`，單季寫 `"FY2026Q4"`。`previous` 是調整前、`current` 是調整後，區間填 `low`／`high`，單一數字填 `point`。
+- 全年寫 `period_label: "FY2026"`，單季寫 `"FY2026Q4"`。`previous` 是前次財測、`current` 是本次財測，區間填 `low`／`high`，單一數字填 `point`。
+- `previous_date`：原文寫出前次財測的發布日期（月、日都有）時才填，格式 `M/D`，例如「our July 17 letter」→ `"7/17"`；只寫月份或沒寫就省略。
 - 金額類（`unit: "monetary"`）必填 `monetary_unit`，照原文寫法（例如 `$12.0B` → `billions`，數字填 12.0）。
 - `metric`：營收 revenue、營業利益 operating_income、營益率 operating_margin、毛利率 gross_margin、EPS eps、自由現金流 free_cash_flow，其他用 other。
 - `src` 用含調整前與調整後數字的原句。
@@ -100,5 +105,6 @@
 - 每個非 null 數字都有 `src`；表格數字的 `column_label` 都含期間文字。
 - 本季與去年同期都是單季欄位；只有原文完全沒有單季欄時才用累計。
 - 所有金額與損益表同單位（財測例外，但財測要標 `monetary_unit`）。
-- 沒有任何自己算出來的數字。
+- 沒有任何自己算出來的數字；小數位數與原文相同（尾數的 0 也照寫）。
+- `meta.eps_basis` 填 `"diluted"`，`eps_diluted` 與 `shares_diluted` 都有填。
 - 需要人決定的寫進 `ambiguities`，依規則處理好的說明寫進 `notes`。

@@ -44,6 +44,7 @@ export function validate(schema, data) {
       const ok = s.anyOf.some((sub) => { const e = []; check(sub, v, path, e); return e.length === 0; });
       if (!ok) errs.push({ path, message: `需符合其中一種格式：${s.anyOf.map((x) => JSON.stringify(x.required || x.type || "")).join(" 或 ")}` });
     }
+    if (s.allOf) for (const sub of s.allOf) check(sub, v, path, errs);
     if (s.if) {
       const e = []; check(s.if, v, path, e);
       if (e.length === 0) { if (s.then) check(s.then, v, path, errs); }

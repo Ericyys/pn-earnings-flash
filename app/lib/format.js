@@ -2,6 +2,8 @@
 //
 // 規則摘要
 // - 千分位加逗號。金額 2 位小數，百分比 1 位，倍數 1 位（12.3x），百分點 1 位。
+//   以上固定位數用於經過換算或計算的數字。原文直接抽取、未經換算的數字（EPS、財測、財測調整）
+//   改用 fixed(v, d)：位數依原文，同一項目取位數最多的，不足補 0（位數由 lib/decimals.js 記錄）。
 // - 漲跌幅：「▲ 5.2%」，符號放數字前、空一格、不加 +／−。
 // - 一般負值（虧損等）：用 U+2212「−」，不加括號，不用 ▼。
 // - 單位放表頭或軸標，數字本身不帶單位。
@@ -32,6 +34,11 @@ function signed(v, decimals) {
 
 /** 一位小數、不加單位（標題句中的百分比數值用）：11.8、−3.0 */
 export const fixed1 = (v) => signed(v, 1);
+/**
+ * 指定小數位數（原文直接抽取、未經換算的數字用）：位數取原文位數，不足補 0。
+ * 位數不少於原文位數時不會改變數值，所以不會在產圖階段四捨五入。
+ */
+export const fixed = (v, d) => signed(v, d);
 /** 金額：35.08、1,234.50、−0.85 */
 export const amount = (v) => signed(v, 2);
 /** 每股金額（EPS、股利）：與金額同為 2 位小數 */
@@ -47,13 +54,14 @@ export const count = (v) => signed(v, 0);
  * 漲跌：回傳 { arrow, text, dir }。arrow 由底稿著色（漲藍跌橘），text 用主文字色。
  * kind: "pct"（年增率等，單位 %）或 "pp"（百分點）
  * 0 或四捨五入後為 0 → 不加箭頭，dir="flat"
+ * decimals：預設 1 位；採用公司公布的比率時（例如 EPS 年增 49%）依原文位數
  */
-export function delta(v, kind = "pct") {
+export function delta(v, kind = "pct", decimals = 1) {
   if (v === null || v === undefined || Number.isNaN(v)) return { arrow: "", text: "—", dir: "na" };
-  const r = round(v, 1);
-  const body = grouped(Math.abs(r), 1);
+  const r = round(v, decimals);
+  const body = grouped(Math.abs(r), decimals);
   const unit = kind === "pp" ? " pp" : "%";
-  if (r === 0) return { arrow: "", text: `0.0${unit}`, dir: "flat" };
+  if (r === 0) return { arrow: "", text: `${(0).toFixed(decimals)}${unit}`, dir: "flat" };
   return { arrow: r > 0 ? UP : DOWN, text: `${body}${unit}`, dir: r > 0 ? "up" : "down" };
 }
 

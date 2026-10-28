@@ -12,7 +12,8 @@
 // ctx: { profile, company, triggers, labels, history, overrides }
 //   overrides：使用者在第三層對「不通過」選了「數據正確」的檢查 id 清單
 
-import { amount as fmt2, fixed1 as fmt1 } from "./format.js";
+import { amount as fmt2, fixed1 as fmt1, fixed } from "./format.js";
+import { parseWithDecimals, itemDecimals, decOf } from "./decimals.js";
 
 // ───────── 小工具 ─────────
 const num = (dp) => (dp && typeof dp.value === "number" ? dp.value : null);
@@ -20,7 +21,6 @@ const cur = (pair) => num(pair?.current);
 const pri = (pair) => num(pair?.prior_year);
 const yoy = (a, b) => (a !== null && b !== null && b !== 0 ? (a / Math.abs(b) - Math.sign(b)) * 100 : null);
 const pctOf = (a, b) => (a !== null && b !== null && b !== 0 ? (a / b) * 100 : null);
-const decimalsOf = (v) => { const s = String(v); return s.includes(".") ? s.split(".")[1].length : 0; };
 
 const UNIT_POWER = { ones: 0, thousands: 3, millions: 6, billions: 9 };
 const DISPLAY_POWER = { billions: 9, hundred_millions: 8, millions: 6 };
@@ -130,17 +130,32 @@ export function analyze(fs, ctx) {
   add("net_income_identity", "淨利＝稅前淨利−所得稅", tax.c !== null ? "pass" : "fail",
     tax.c !== null && taxRaw.c < 0 ? "公司以負數（括號）列示所得稅費用，已自動轉換" : tax.c === null ? "兩種正負號解讀都對不上" : "");
 
-  // ── 7. EPS 勾稽（股數與金額單位可能不同）
+  // ── 7. EPS：口徑依市場規則（美股稀釋、台股基本；其他市場依新聞稿標題），AI 在 meta.eps_basis 標示
+  const ruleBasis = profile.defaults.eps_basis || null;
+  const epsBasis = m.eps_basis || ruleBasis || "diluted";
+  const EPS_ZH = { diluted: "稀釋", basic: "基本" };
+  const epsZh = `${EPS_ZH[epsBasis]} EPS`;
+  const epsPair = epsBasis === "basic" ? IS.eps_basic : IS.eps_diluted;
+  const shPair = epsBasis === "basic" ? IS.shares_basic : IS.shares_diluted;
+  if (!m.eps_basis) add("eps_basis", "EPS 口徑", "warn", `AI 沒有標示 meta.eps_basis，暫依市場規則視為${EPS_ZH[epsBasis]} EPS`);
+  else if (ruleBasis && m.eps_basis !== ruleBasis) add("eps_basis", "EPS 口徑符合市場規則", "fail", `市場規則抽${EPS_ZH[ruleBasis]} EPS，AI 標示為${EPS_ZH[m.eps_basis]} EPS`);
+  else add("eps_basis", "EPS 口徑", "pass", `${epsZh}${ruleBasis ? "" : "（依新聞稿標題）"}`);
+  const eps = { c: cur(epsPair), p: pri(epsPair) };
+  if (eps.c === null || eps.p === null) add("eps_present", `${epsZh}本季與去年同期都有數字`, "fail", `缺少${eps.c === null ? "本季" : ""}${eps.c === null && eps.p === null ? "與" : ""}${eps.p === null ? "去年同期" : ""}的 ${epsBasis === "basic" ? "eps_basic" : "eps_diluted"}`);
+  // 同一項目（本季、去年同期）用相同位數：依原文位數，取較多的
+  const epsDec = itemDecimals([[epsPair?.current, "value"], [epsPair?.prior_year, "value"]]);
+
+  // EPS 勾稽（股數與金額單位可能不同）：只用來檢查抽取是否正確，不用來算年增率
   const shPow = UNIT_POWER[m.share_unit] ?? srcPow;
+  const shZh = `${EPS_ZH[epsBasis]}股數`;
   const epsCalc = (k) => {
-    const sh = k === "c" ? cur(IS.shares_diluted) : pri(IS.shares_diluted);
+    const sh = k === "c" ? cur(shPair) : pri(shPair);
     return niP[k] !== null && sh ? (niP[k] * Math.pow(10, srcPow)) / (sh * Math.pow(10, shPow)) : null;
   };
-  const eps = { c: cur(IS.eps_diluted), p: pri(IS.eps_diluted) };
   for (const [k, lab] of [["c", "本季"], ["p", "去年同期"]]) {
     const e = epsCalc(k);
-    if (e === null || eps[k] === null) { add(`eps_identity_${k}`, `${lab}：EPS≈淨利÷稀釋股數`, "skip"); continue; }
-    add(`eps_identity_${k}`, `${lab}：EPS≈淨利÷稀釋股數`, Math.abs(e - eps[k]) <= 0.01 ? "pass" : "fail", `計算 ${e.toFixed(4)}，原文 ${eps[k]}`);
+    if (e === null || eps[k] === null) { add(`eps_identity_${k}`, `${lab}：EPS≈淨利÷${shZh}`, "skip"); continue; }
+    add(`eps_identity_${k}`, `${lab}：EPS≈淨利÷${shZh}`, Math.abs(e - eps[k]) <= 0.01 ? "pass" : "fail", `計算 ${e.toFixed(4)}，原文 ${eps[k]}`);
   }
 
   // ── 8. 營收拆分加總（同時偵測單位不一致）
@@ -171,11 +186,11 @@ export function analyze(fs, ctx) {
   M.gross_margin_change_pp_yoy = M.gross_margin !== null && M.gross_margin_p !== null ? M.gross_margin - M.gross_margin_p : null;
   M.operating_margin_change_pp_yoy = M.operating_margin !== null && M.operating_margin_p !== null ? M.operating_margin - M.operating_margin_p : null;
   M.net_margin_change_pp_yoy = M.net_margin !== null && M.net_margin_p !== null ? M.net_margin - M.net_margin_p : null;
-  // EPS 年增率：用未四捨五入的「淨利÷股數」，與公司自己的算法一致
-  const eu = { c: epsCalc("c"), p: epsCalc("p") };
-  M.eps_yoy = yoy(eu.c, eu.p);
-  if (overridden("eps_identity_c") || overridden("eps_identity_p")) M.eps_yoy = yoy(eps.c, eps.p);
-  M.eps_yoy_from_rounded = yoy(eps.c, eps.p);
+  // EPS 年增率（rules/derivations.json）：公司有寫、且與公布 EPS 一致時用公司的數字（見第 10 步）；
+  // 否則用公布的 EPS 計算，不用淨利 ÷ 股數重算
+  M.eps_yoy = yoy(eps.c, eps.p);
+  M.eps_yoy_decimals = 1;
+  M.eps_yoy_source = "computed";
   M.operating_income_yoy = yoy(oi.c, oi.p);
   M.net_income_yoy = yoy(niP.c, niP.p);
 
@@ -247,16 +262,33 @@ export function analyze(fs, ctx) {
 
   // ── 10. 公司自己寫出的比率 → 驗證 PN 的計算（容許值依原文精度）
   const statedMap = { revenue_yoy: M.revenue_yoy, operating_margin: M.operating_margin, gross_margin: M.gross_margin, net_margin: M.net_margin, eps_yoy: M.eps_yoy, revenue_qoq: M.revenue_qoq };
+  // 公布的 EPS 已四捨五入，公司自己寫的 EPS 年增率可能用未四捨五入的數字算：容許 EPS 尾數 ±0.5 個最小單位造成的差異
+  const epsYoyRange = () => {
+    if (eps.c === null || eps.p === null) return null;
+    const h = 0.5 * Math.pow(10, -epsDec);
+    const vs = [[eps.c - h, eps.p - h], [eps.c - h, eps.p + h], [eps.c + h, eps.p - h], [eps.c + h, eps.p + h]].map(([a, b]) => yoy(a, b)).filter((x) => x !== null);
+    return vs.length ? [Math.min(...vs), Math.max(...vs)] : null;
+  };
+  const epsStatedOk = []; // 通過檢查的公司公布 EPS 年增率
   for (const s of fs.stated_metrics || []) {
     if (!(s.metric in statedMap) || statedMap[s.metric] === null) continue;
     const calc = statedMap[s.metric];
-    const allow = 0.5 * Math.pow(10, -decimalsOf(s.value)) + 0.05;
-    const ok = Math.abs(calc - s.value) <= allow;
-    add(`stated_${s.metric}_${s.value}`, `原文寫 ${s.metric} ${s.value}${s.unit === "percent" ? "%" : ""}`, ok ? "pass" : "fail", `PN 計算 ${calc.toFixed(2)}`);
+    const allow = 0.5 * Math.pow(10, -decOf(s, "value")) + 0.05;
+    const rg = s.metric === "eps_yoy" ? epsYoyRange() : null;
+    const ok = rg ? s.value >= rg[0] - allow && s.value <= rg[1] + allow : Math.abs(calc - s.value) <= allow;
+    if (s.metric === "eps_yoy" && ok && s.unit === "percent") epsStatedOk.push(s);
+    add(`stated_${s.metric}_${s.value}`, `原文寫 ${s.metric} ${s.value}${s.unit === "percent" ? "%" : ""}`, ok ? "pass" : "fail",
+      `PN 計算 ${calc.toFixed(2)}${rg && ok && Math.abs(calc - s.value) > allow ? "（差異在公布 EPS 四捨五入的範圍內）" : ""}${rg && !ok ? "；不在公布 EPS 四捨五入可能的範圍內，可能抓到非 GAAP、其他口徑或累計期間的年增率。圖卡不採用這個數字，改用公布的 EPS 計算" : ""}`);
   }
-  if (M.eps_yoy !== null && M.eps_yoy_from_rounded !== null && Math.abs(M.eps_yoy - M.eps_yoy_from_rounded) >= 0.5) {
-    add("eps_yoy_rounding", "EPS 年增率的算法（依規則）", "skip", `依 rules/derivations.json 用「淨利 ÷ 稀釋股數」計算為 ${M.eps_yoy.toFixed(1)}%；若用四捨五入後的 EPS 相除則為 ${M.eps_yoy_from_rounded.toFixed(1)}%`);
+  // 公司有寫 EPS 年增率、且與公布 EPS 一致 → 圖卡用公司的數字（位數依原文；表格與內文各寫一次時用位數較多的）
+  if (epsStatedOk.length) {
+    const best = epsStatedOk.reduce((a, x) => (decOf(x, "value") > decOf(a, "value") ? x : a));
+    M.eps_yoy = best.value;
+    M.eps_yoy_decimals = decOf(best, "value");
+    M.eps_yoy_source = "stated";
   }
+  if (M.eps_yoy !== null) add("eps_yoy_source", "EPS 年增率的來源", "pass",
+    M.eps_yoy_source === "stated" ? `採用公司公布的 ${fixed(M.eps_yoy, M.eps_yoy_decimals)}%（與公布 EPS 一致）` : `公司未寫出可採用的 EPS 年增率，依公布 EPS 計算為 ${fmt1(M.eps_yoy)}%`);
 
   // ── 11. 合理範圍
   for (const [k, lab] of [["gross_margin", "毛利率"], ["operating_margin", "營益率"], ["net_margin", "淨利率"]]) {
@@ -345,7 +377,8 @@ export function analyze(fs, ctx) {
       kpis: [
         { label: "營收", unit: unitText, value: disp(rev.c), kind: "amount", delta: { value: M.revenue_yoy, kind: "pct", label: "年增" }, note: `去年同期 ${fmt2(disp(rev.p))}` },
         { label: "營益率", unit: "%", value: M.operating_margin, kind: "pct", delta: { value: M.operating_margin_change_pp_yoy, kind: "pp", label: "年變動" }, note: `去年同期 ${fmt1(M.operating_margin_p)}%` },
-        { label: "稀釋 EPS", unit: profile.defaults.display_currency, value: eps.c, kind: "perShare", delta: { value: M.eps_yoy, kind: "pct", label: "年增" }, note: `去年同期 ${eps.p?.toFixed(2)}` },
+        // EPS 是原文直接抽取、未經換算的數字：位數依原文（本季與去年同期取較多位，不足補 0）
+        { label: epsZh, unit: profile.defaults.display_currency, value: eps.c, kind: "perShare", decimals: epsDec, delta: { value: M.eps_yoy, kind: "pct", label: "年增", decimals: M.eps_yoy_decimals }, note: `去年同期 ${fixed(eps.p, epsDec)}` },
       ],
     },
   });
@@ -423,32 +456,41 @@ export function analyze(fs, ctx) {
 
   // K1：公司下季財測＋公司明確寫出的財測調整。兩者都沒有就不產出 K1（不顯示「未提供」）。
   const curShort = profile.defaults.display_currency;
-  const STD_NAMES = { revenue: "營收", operating_income: "營業利益", operating_margin: "營益率", gross_margin: "毛利率", eps: "稀釋 EPS", free_cash_flow: "自由現金流" };
+  const STD_NAMES = { revenue: "營收", operating_income: "營業利益", operating_margin: "營益率", gross_margin: "毛利率", eps: "EPS", free_cash_flow: "自由現金流" };
   const labelOf = (it) => {
-    const zh = STD_NAMES[it.metric] || zhLabel(it.label_source, ctx);
+    let zh = STD_NAMES[it.metric] || zhLabel(it.label_source, ctx);
+    // 財測的 EPS 口徑依原文名稱（Diluted／Basic）；原文沒寫就只寫 EPS，不推定
+    if (it.metric === "eps") zh = /dilut|稀釋/i.test(it.label_source) ? "稀釋 EPS" : /basic|基本/i.test(it.label_source) ? "基本 EPS" : "EPS";
     return it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${curShort}）` : zh;
   };
-  /** 財測數值 → 顯示文字；scale＝原文金額單位的 10 次方 */
-  const showValue = (v, unit, scale) => {
-    const one = (x) => (unit === "monetary" ? fmt2((x * scale) / Math.pow(10, dispPow)) : unit === "percent" ? `${fmt1(x)}%` : unit === "per_share" ? fmt2(x) : String(x));
-    return v.point !== null && v.point !== undefined ? one(v.point) : `${one(v.low)}–${one(v.high)}`;
+  /**
+   * 一個項目（一列）的數值 → 顯示文字。vals：這一列的財測數值物件（下季財測 1 個；財測調整為前次、本次 2 個）。
+   * - 金額需要換算單位時（例如 millions → B），換算後固定 2 位小數。
+   * - 未經換算的數字（百分比、每股、單位相同的金額）依原文位數；同一列取位數最多的，不足補 0，不四捨五入。
+   * scale＝原文金額單位的 10 次方。
+   */
+  const showItem = (vals, unit, scale) => {
+    const factor = unit === "monetary" ? scale / Math.pow(10, dispPow) : 1;
+    const converted = factor !== 1;
+    const d = converted ? 2 : itemDecimals(vals.flatMap((v) => [[v, "point"], [v, "low"], [v, "high"]]));
+    const one = (x) => {
+      const t = converted ? fmt2(x * factor) : fixed(x, d);
+      return unit === "percent" ? `${t}%` : t;
+    };
+    return vals.map((v) => (v.point !== null && v.point !== undefined ? one(v.point) : `${one(v.low)}–${one(v.high)}`));
   };
   const mid = (v) => (v.point !== null && v.point !== undefined ? v.point : (v.low + v.high) / 2);
 
   const gRows = [];
-  if (g && g.items.length) for (const it of g.items) gRows.push({ label: labelOf(it), value: showValue(it, it.unit, guidanceScale) });
+  if (g && g.items.length) for (const it of g.items) gRows.push({ label: labelOf(it), value: showItem([it], it.unit, guidanceScale)[0] });
 
   const revRows = [];
   for (const r of fs.guidance_revisions || []) {
     const scale = Math.pow(10, UNIT_POWER[r.monetary_unit] ?? srcPow);
     const diff = mid(r.current) - mid(r.previous);
     const period = /Q[1-4]$/.test(r.period_label) ? fiscalToCalendar(r.period_label, company.fiscal_year_end_month || 12) : r.period_label;
-    revRows.push({
-      label: labelOf(r), period,
-      previous: showValue(r.previous, r.unit, scale),
-      current: showValue(r.current, r.unit, scale),
-      dir: diff > 0 ? "up" : diff < 0 ? "down" : "flat",
-    });
+    const [previous, current] = showItem([r.previous, r.current], r.unit, scale);
+    revRows.push({ label: labelOf(r), period, previous, current, previousDate: r.previous_date || null, dir: diff > 0 ? "up" : diff < 0 ? "down" : "flat" });
   }
 
   if (gRows.length || revRows.length) {
@@ -456,9 +498,13 @@ export function analyze(fs, ctx) {
     // 財測調整：期間相同時寫在標題（例如「財測調整（FY2026）」），不同時才寫在每一列
     const periods = [...new Set(revRows.map((r) => r.period))];
     const revTitle = `財測調整${periods.length === 1 ? `（${periods[0]}）` : ""}`;
+    const dates = [...new Set(revRows.map((r) => r.previousDate))];
+    const prevDate = dates.length === 1 ? dates[0] : null;
     if (gRows.length) sections.push({ heading: "", columns: ["項目", "財測"], rows: gRows });
     if (revRows.length) sections.push({
-      heading: gRows.length ? revTitle : "", columns: ["項目", "調整前", "調整後"],
+      // 欄名固定為「前次財測／本次財測」（不用「調整前／調整後」，避免和 Adjusted 指標混淆）；
+      // 原文有前次財測的發布日期、且每一列都是同一天時，附在欄名後，例如「前次財測（7/17）」
+      heading: gRows.length ? revTitle : "", columns: ["項目", `前次財測${prevDate ? `（${prevDate}）` : ""}`, "本次財測"],
       rows: revRows.map((r) => ({ cells: [periods.length === 1 ? r.label : `${r.label}｜${r.period}`, r.previous, { arrow: r.dir, value: r.current }] })),
     });
     if (company.next_report_date) sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date, value: "下一季財報公布（公司公告）", text: true }] });
@@ -470,7 +516,6 @@ export function analyze(fs, ctx) {
   }
 
   if (overridden("gross_profit_identity")) dropped.push("毛利節點與毛利率（毛利勾稽不符，使用者確認原文如此）");
-  if (overridden("eps_identity_c") || overridden("eps_identity_p")) dropped.push("EPS 年增率改用公司公布的 EPS 相除（EPS 勾稽不符，使用者確認原文如此）");
   selection.dropped = dropped;
   if (stopAtOI) for (let i = derived.length - 1; i >= 0; i--) if (derived[i].startsWith("業外")) derived.splice(i, 1);
   return { checks, derived, derivable, metrics: M, selection, cards, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
@@ -593,13 +638,17 @@ export function diffForReview(a, b) {
 }
 
 /** 貼上的文字 → JSON：自動去掉 ```json 程式碼框，以及 AI 在 JSON 前後多寫的說明文字 */
+/** 同時記錄每個數字的原文小數位數（見 lib/decimals.js） */
 export function parseFactSheet(text) {
   const t = String(text).trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  let body = t;
   try {
-    return JSON.parse(t);
+    JSON.parse(t); // 先用內建解析確認格式（錯誤訊息較清楚）
   } catch (e) {
     const i = t.indexOf("{"), j = t.lastIndexOf("}");
-    if (i > 0 || (j >= 0 && j < t.length - 1)) return JSON.parse(t.slice(i, j + 1));
-    throw e;
+    if (!(i > 0 || (j >= 0 && j < t.length - 1))) throw e;
+    body = t.slice(i, j + 1);
+    JSON.parse(body);
   }
+  return parseWithDecimals(body);
 }

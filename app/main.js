@@ -2,7 +2,7 @@
 // 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（可修改、可交給 AI）→ 4 產出圖卡、下載 PNG 與本季存檔
 // 計算在 lib/compute.js、修改在 lib/review.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.1.0（2026-10-28）";
+export const APP_VERSION = "1.2.1（2026-10-28）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -11,6 +11,7 @@ import { createMeasurer } from "./lib/text.js";
 import { ensureFonts, installLocalAliases } from "./lib/fonts.js";
 import { svgToPng, download } from "./lib/export.js";
 import { applyEdits, getNode, periodColumnCheck, correctionPrompt } from "./lib/review.js";
+import { decimalsOfText, decOf } from "./lib/decimals.js";
 
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
@@ -124,20 +125,24 @@ function recompute() {
 const FIELD_ZH = {
   revenue: "營收", cost_of_revenue: "營業成本", gross_profit: "毛利", operating_income: "營業利益",
   pretax_income: "稅前淨利", income_tax: "所得稅", net_income: "淨利", net_income_to_parent: "歸屬母公司淨利",
-  eps_diluted: "稀釋 EPS", shares_diluted: "稀釋股數", non_operating_net: "業外收支淨額", operating_expenses_total: "營業費用合計",
+  eps_diluted: "稀釋 EPS", shares_diluted: "稀釋股數", eps_basic: "基本 EPS", shares_basic: "基本股數", non_operating_net: "業外收支淨額", operating_expenses_total: "營業費用合計",
   operating_cash_flow: "營業現金流", capex: "資本支出", free_cash_flow_stated: "自由現金流（公司公布）",
   buybacks: "庫藏股買回", dividends_paid: "現金股利",
 };
 const PERIOD_ZH = { current: "本季", prior_year: "去年同期", prior_quarter: "上季" };
 const PTYPE_ZH = { quarter: "單季", ytd: "累計", point_in_time: "時點" };
 const srcText = (s) => !s ? "（無出處）" : `p.${s.page}｜${s.row_label ? `${s.row_label}｜${s.column_label}` : `「${s.quote}」`}`;
+/** 依原文小數位數顯示（例如原文 1.20 就顯示 1.20），核對時才能逐字對照 */
+const rawNum = (obj, key) => (typeof obj?.[key] === "number" ? obj[key].toLocaleString("en-US", { minimumFractionDigits: decOf(obj, key), maximumFractionDigits: Math.max(decOf(obj, key), 0) }) : undefined);
 const fmtNum = (v) => (typeof v === "number" ? v.toLocaleString("en-US", { maximumFractionDigits: 6 }) : v === null ? "（空）" : v === undefined ? "（未標示）" : String(v));
 const editOf = (path) => state.edits.find((e) => e.path === path);
 const META_FIELDS = [
   ["company_name", "公司", "text"], ["ticker", "代號", "text"], ["fiscal_period", "會計期間（公司財年）", "text"], ["period_end", "期末日", "text"],
   ["monetary_unit", "金額單位", ["ones", "thousands", "millions", "billions"]], ["share_unit", "股數單位", ["ones", "thousands", "millions"]],
   ["currency", "幣別", "text"], ["accounting_basis", "會計準則", ["US GAAP", "IFRS", "other"]],
+  ["eps_basis", "EPS 口徑（圖卡標籤用）", ["diluted", "basic"]],
 ];
+const EPS_BASIS_ZH = { diluted: "稀釋 EPS", basic: "基本 EPS" };
 
 function layer2Items() {
   const A = state.Aeff;
@@ -148,19 +153,22 @@ function layer2Items() {
     for (const p of ["current", "prior_year", "prior_quarter"]) {
       const dp = pair[p];
       if (dp && (typeof dp.value === "number" || editOf(`${base}.${p}`))) {
-        items.push({ group, name: `${name}｜${PERIOD_ZH[p]}${dp.period_type && dp.period_type !== "quarter" ? `（${PTYPE_ZH[dp.period_type]}）` : ""}`, path: `${base}.${p}`, kind: "datapoint", value: dp.value, ptype: dp.period_type || "quarter", unit: u, src: dp.src });
+        items.push({ group, name: `${name}｜${PERIOD_ZH[p]}${dp.period_type && dp.period_type !== "quarter" ? `（${PTYPE_ZH[dp.period_type]}）` : ""}`, path: `${base}.${p}`, kind: "datapoint", value: dp.value, text: rawNum(dp, "value"), ptype: dp.period_type || "quarter", unit: u, src: dp.src });
       }
     }
   };
-  for (const k of ["revenue", "cost_of_revenue", "gross_profit", "operating_income", "non_operating_net", "pretax_income", "income_tax", "net_income", "net_income_to_parent", "eps_diluted", "shares_diluted"]) {
-    addPair("損益表", FIELD_ZH[k], `income_statement.${k}`, A.income_statement[k], k === "eps_diluted" ? "每股" : k === "shares_diluted" ? `股（${A.meta.share_unit}）` : unit);
+  // EPS 與股數只列口徑對應的那一組（美股稀釋、台股基本）
+  const basic = (A.meta.eps_basis || state.profile.defaults.eps_basis) === "basic";
+  const epsK = basic ? "eps_basic" : "eps_diluted", shK = basic ? "shares_basic" : "shares_diluted";
+  for (const k of ["revenue", "cost_of_revenue", "gross_profit", "operating_income", "non_operating_net", "pretax_income", "income_tax", "net_income", "net_income_to_parent", epsK, shK]) {
+    addPair("損益表", FIELD_ZH[k], `income_statement.${k}`, A.income_statement[k], k === epsK ? "每股" : k === shK ? `股（${A.meta.share_unit}）` : unit);
   }
   for (const it of A.operating_expense_items || []) addPair("費用逐列", it.label_source, `operating_expense_items[${it.key}].amount`, it.amount);
   for (const s of A.segments || []) { addPair("部門", s.label_source, `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const s of A.geographies || []) { addPair("地區", s.label_source, `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const k of A.kpis || []) {
     for (const p of ["current", "prior_year"]) if (k[p] && (typeof k[p].value === "number" || editOf(`kpis[${k.key}].${p}`)))
-      items.push({ group: "營運指標", name: `${k.label_source}｜${PERIOD_ZH[p]}`, path: `kpis[${k.key}].${p}`, kind: "datapoint", value: k[p].value, ptype: k[p].period_type || "quarter", unit: k.unit, src: k[p].src });
+      items.push({ group: "營運指標", name: `${k.label_source}｜${PERIOD_ZH[p]}`, path: `kpis[${k.key}].${p}`, kind: "datapoint", value: k[p].value, text: rawNum(k[p], "value"), ptype: k[p].period_type || "quarter", unit: k.unit, src: k[p].src });
   }
   for (const [k, v] of Object.entries(A.cash_flow || {})) addPair("現金流量", FIELD_ZH[k] || k, `cash_flow.${k}`, v);
   for (const [k, v] of Object.entries(A.capital_return || {})) if (k !== "new_buyback_authorization" && v) addPair("股東回饋", FIELD_ZH[k] || k, `capital_return.${k}`, v);
@@ -173,17 +181,17 @@ function layer2Items() {
   if (g) for (const it of g.items) {
     const id = `${it.metric}|${it.label_source}`;
     const range = it.point === null || it.point === undefined;
-    items.push({ group: `下季財測（${g.period_label}）`, name: it.label_source, path: `guidance_next.items[${id}]`, kind: "guidance", value: range ? `${it.low}–${it.high}` : it.point,
+    items.push({ group: `下季財測（${g.period_label}）`, name: it.label_source, path: `guidance_next.items[${id}]`, kind: "guidance", value: range ? `${rawNum(it, "low")}–${rawNum(it, "high")}` : rawNum(it, "point"),
       unit: it.unit === "monetary" ? (g.monetary_unit || "（未標單位）") : it.unit === "percent" ? "%" : it.unit === "per_share" ? "每股" : "", src: it.src });
   }
   // 財測調整：調整前、調整後各一列；金額類另有單位一列
   for (const r of A.guidance_revisions || []) {
     const id = `${r.metric}|${r.label_source}`, grp = `財測調整（${r.period_label}）`;
-    const show = (v) => (v.point !== null && v.point !== undefined ? v.point : `${v.low}–${v.high}`);
+    const show = (v) => (v.point !== null && v.point !== undefined ? rawNum(v, "point") : `${rawNum(v, "low")}–${rawNum(v, "high")}`);
     const u = r.unit === "monetary" ? (r.monetary_unit || "（未標單位）") : r.unit === "percent" ? "%" : r.unit === "per_share" ? "每股" : "";
     if (r.unit === "monetary") items.push({ group: grp, name: `${r.label_source}｜金額單位`, path: `guidance_revisions[${id}].monetary_unit`, kind: "unitfield", value: r.monetary_unit ?? "（未標示）", unit: "", src: r.src });
-    items.push({ group: grp, name: `${r.label_source}｜調整前`, path: `guidance_revisions[${id}].previous`, kind: "guidance", value: show(r.previous), unit: u, src: r.src });
-    items.push({ group: grp, name: `${r.label_source}｜調整後`, path: `guidance_revisions[${id}].current`, kind: "guidance", value: show(r.current), unit: u, src: r.src });
+    items.push({ group: grp, name: `${r.label_source}｜前次財測${r.previous_date ? `（原文日期 ${r.previous_date}）` : ""}`, path: `guidance_revisions[${id}].previous`, kind: "guidance", value: show(r.previous), unit: u, src: r.src });
+    items.push({ group: grp, name: `${r.label_source}｜本次財測`, path: `guidance_revisions[${id}].current`, kind: "guidance", value: show(r.current), unit: u, src: r.src });
   }
   return items;
 }
@@ -198,6 +206,8 @@ const AUTO_WARN = new Set(["yoy_outlier", "fcf_identity"]);
 const AI_REQUEST = {
   cash_flow_period: "現金流量請一律改抓單季（Three Months Ended）欄位；原文完全沒有單季欄位時才用累計，並標 period_type: ytd。",
   guidance_unit: "請依財測表格或段落的單位說明填入 guidance_next.monetary_unit，並附出處。",
+  eps_basis: "請依規則填 meta.eps_basis：美股 diluted、台股 basic；其他市場依新聞稿標題使用的 EPS，並在 meta.eps_basis_src 附標題原句。",
+  eps_present: "請補抽口徑對應的 EPS（本季與去年同期，美股 eps_diluted、台股 eps_basic）與同口徑的加權平均股數，附出處。",
 };
 const GENERIC_FAIL = "請回原文確認相關科目是否抓錯列、漏列或放錯欄位並修正；若原文確實如此，在 notes 說明原因。";
 const AMB_REQUEST = "請依原文自行判斷並處理：能從原文確定的，照規則修正數據並把說明移到 notes；只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。";
@@ -259,7 +269,6 @@ const OVERRIDE_EFFECT = {
   net_income_identity: "損益流向圖只畫到營業利益",
   segments_sum_c: "不產出營收拆解卡", segments_sum_p: "不產出營收拆解卡",
   geographies_sum_c: "不產出營收拆解卡", geographies_sum_p: "不產出營收拆解卡",
-  eps_identity_c: "EPS 年增率改用公司公布的 EPS 相除", eps_identity_p: "EPS 年增率改用公司公布的 EPS 相除",
 };
 const UNIT_RISK = /^(guidance_magnitude|revenue_amount_|eps_identity_)/;
 
@@ -274,7 +283,7 @@ function buildManual() {
   blocks.push(`<h3>第一層｜基本設定（錯一欄整份錯）</h3><div class="tablewrap pad"><table><thead><tr><th>✓</th><th>欄位</th><th>值</th><th></th></tr></thead><tbody>
     ${META_FIELDS.map(([f, name, type]) => {
       const path = `meta.${f}`, e = editOf(path), v = A.meta[f], key = `L1|${path}|${v}`;
-      const row = `<tr class="${e ? "edited" : ""}"><td>${tickBox(key)}</td><td>${name}</td><td>${esc(v)}${e ? ` <span class="ai-old">AI：${esc(e.ai)}</span>` : ""}${f === "monetary_unit" ? `<div class="note">${esc(unitInfo)}</div>` : ""}</td><td>${editBtn(path)}</td></tr>`;
+      const row = `<tr class="${e ? "edited" : ""}"><td>${tickBox(key)}</td><td>${name}</td><td>${esc(v === undefined ? "（未標示）" : f === "eps_basis" ? `${v}（${EPS_BASIS_ZH[v] || v}）` : v)}${e ? ` <span class="ai-old">AI：${esc(e.ai ?? "（未標示）")}</span>` : ""}${f === "monetary_unit" ? `<div class="note">${esc(unitInfo)}</div>` : ""}${f === "eps_basis" ? `<div class="note">規則：美股抽稀釋、台股抽基本；其他市場依新聞稿標題使用的 EPS</div>` : ""}</td><td>${editBtn(path)}</td></tr>`;
       return row + (state.editing === path ? editorL1(f, name, type, v) : "");
     }).join("")}</tbody></table></div>`);
 
@@ -286,10 +295,10 @@ function buildManual() {
     <div class="tablewrap pad"><table><thead><tr><th>✓</th><th>類別</th><th>項目</th><th>數值（原文單位）</th><th>出處：頁｜列名｜欄名</th><th></th></tr></thead><tbody>
     ${items.map((it) => {
       const e = editOf(it.removable) || editOf(it.path) || state.edits.find((x) => x.path.startsWith(it.path + "."));
-      const key = `L2|${it.path}|${JSON.stringify(it.value)}|${it.ptype || ""}`;
+      const key = `L2|${it.path}|${JSON.stringify(it.text ?? it.value)}|${it.ptype || ""}`;
       const removed = it.removable && editOf(it.removable);
       const row = `<tr class="${e ? "edited" : ""}"><td>${tickBox(key)}</td><td>${esc(it.group)}</td><td>${esc(it.name)}${removed ? "<br><b>（已移除，不使用）</b>" : ""}</td>
-        <td class="num">${esc(fmtNum(it.value))} <span class="note">${esc(it.unit)}</span>${e && !removed ? `<br><span class="ai-old">AI：${esc(fmtNum(e.ai?.value ?? e.ai))}</span>` : ""}</td>
+        <td class="num">${esc(it.text ?? fmtNum(it.value))} <span class="note">${esc(it.unit)}</span>${e && !removed ? `<br><span class="ai-old">AI：${esc(fmtNum(e.ai?.value ?? e.ai))}</span>` : ""}</td>
         <td class="src">${esc(srcText(it.src))}</td><td>${editBtn(it.path)}</td></tr>`;
       return row + (state.editing === it.path ? editorL2(it) : "");
     }).join("")}</tbody></table></div>`);
@@ -372,7 +381,7 @@ function editorL2(it) {
   return `<tr class="editor"><td></td><td colspan="5">
     <div>修改「${esc(it.group)}｜${esc(it.name)}」</div>
     <label class="block">原文數值（照抄原文單位；括號或負號表示負數${isG ? "；區間寫成 13300–13600" : ""}）</label>
-    <input type="text" id="edVal" value="${esc(it.value === null || it.value === undefined ? "" : it.value)}">
+    <input type="text" id="edVal" value="${esc(it.value === null || it.value === undefined ? "" : String(it.text ?? it.value).replace(/,/g, ""))}">
     ${!isG ? `<label class="block">期間類型</label><select id="edPtype">${["quarter", "ytd", "point_in_time"].map((p) => `<option value="${p}" ${p === it.ptype ? "selected" : ""}>${PTYPE_ZH[p]}</option>`).join("")}</select>
     <label class="block">出處欄名（數字所在那一欄的欄名；改抓別欄時一併修改）</label><input type="text" id="edCol" value="${esc(colLabel)}">` : ""}
     <input type="text" id="edNote" placeholder="備註（選填）：例如原文第 10 頁 Three Months Ended 欄">
@@ -489,11 +498,11 @@ function bindManual() {
       if (m.length === 2) {
         const lo = parseNum(m[0]), hi = parseNum(m[1]);
         if (lo === null || hi === null) return msg("區間格式不正確");
-        putEdit({ layer: 2, kind: "replace", path, ai: node, value: { ...node, point: undefined, low: lo, high: hi }, note: note() });
+        putEdit({ layer: 2, kind: "replace", path, ai: node, value: { ...node, point: undefined, low: lo, high: hi }, dec: { low: decimalsOfText(m[0]), high: decimalsOfText(m[1]) }, note: note() });
       } else {
         const v = parseNum(raw);
         if (v === null) return msg("請輸入數字");
-        putEdit({ layer: 2, kind: "replace", path, ai: node, value: { ...node, point: v, low: undefined, high: undefined }, note: note() });
+        putEdit({ layer: 2, kind: "replace", path, ai: node, value: { ...node, point: v, low: undefined, high: undefined }, dec: { point: decimalsOfText(raw) }, note: note() });
       }
       state.editing = null; recompute();
     };
@@ -518,8 +527,9 @@ function bindManual() {
     }
     const col = $("edCol").value.trim(), pt = $("edPtype").value;
     const colAi = aiNode?.src ? (aiNode.src.column_label || aiNode.src.quote || "") : "";
-    if (v === aiNode?.value && pt === (aiNode?.period_type || "quarter") && col === colAi) { state.edits = state.edits.filter((e) => e.path !== path); }
-    else putEdit({ layer: 2, kind: "datapoint", path, ai: { value: aiNode?.value, period_type: aiNode?.period_type, column_label: colAi }, value: v, period_type: pt, column_label: col !== colAi ? col : undefined, note: note() });
+    // 數值相同但小數位數不同（例如原文 1.20、AI 寫 1.2）也算修改：圖卡依原文位數顯示
+    if (v === aiNode?.value && decimalsOfText($("edVal").value) === decOf(aiNode, "value") && pt === (aiNode?.period_type || "quarter") && col === colAi) { state.edits = state.edits.filter((e) => e.path !== path); }
+    else putEdit({ layer: 2, kind: "datapoint", path, ai: { value: aiNode?.value, period_type: aiNode?.period_type, column_label: colAi }, value: v, dec: decimalsOfText($("edVal").value), period_type: pt, column_label: col !== colAi ? col : undefined, note: note() });
     state.editing = null; recompute();
   };
   if ($("edClear")) $("edClear").onclick = () => {

@@ -112,9 +112,9 @@ export function legend(ctx, x, top, maxW, items) {
   return { svg, height: cy - top + lineBox(s) };
 }
 
-/** 漲跌字串：箭頭用漲跌色，數字用主文字色 */
-export function deltaSegments(ctx, value, kind, suffix = "") {
-  const d = ctx.fmt.delta(value, kind);
+/** 漲跌字串：箭頭用漲跌色，數字用主文字色。decimals 省略時為 1 位 */
+export function deltaSegments(ctx, value, kind, suffix = "", decimals) {
+  const d = ctx.fmt.delta(value, kind, decimals);
   const segs = [];
   // 用不換行空格（U+00A0）：SVG 會吃掉一般空格
   if (d.arrow) segs.push({ str: d.arrow + "\u00A0", fill: ctx.dirColor(d.dir) });

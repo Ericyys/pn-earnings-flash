@@ -25,6 +25,12 @@
 - `notes`：AI 依規則處理時的說明（核對畫面列在「自動處理」）。
 - `guidance_revisions`：公司明確寫出調整前與調整後數字的財測上修／下修，K1 會列出。
 
+## 1.3 版新增
+
+- `meta.eps_basis`：抽取的 EPS 口徑（`diluted` 稀釋／`basic` 基本），圖卡標籤依此顯示。美股抽稀釋、台股抽基本；其他市場以新聞稿標題使用的 EPS 為準，並在 `meta.eps_basis_src` 附標題原句。
+- `income_statement` 的 EPS 與股數只需填口徑對應的那一組（稀釋：`eps_diluted`＋`shares_diluted`；基本：`eps_basic`＋`shares_basic`）。
+- `guidance_revisions[].previous_date`：原文寫出前次財測發布日期（月、日）時填 `M/D`，圖卡欄名顯示為「前次財測（M/D）」。
+
 ## 人工填寫的欄位
 
 `consensus`（市場預期）不在財報裡，需人工從外部來源填入 JSON，必須附來源名稱、網址與日期。出圖工具目前沒有輸入市場預期的畫面，要在貼上前直接加進 JSON。

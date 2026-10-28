@@ -113,7 +113,7 @@ export const DEMO_CARDS = [
           ],
         },
         {
-          heading: "財測調整（FY2026）", columns: ["項目", "調整前", "調整後"],
+          heading: "財測調整（FY2026）", columns: ["項目", "前次財測", "本次財測"],
           rows: [
             { cells: ["營收（USD B）", "136.00–138.00", { arrow: "up", value: "139.50–140.50" }] },
             { cells: ["營益率", "30.0%", { arrow: "down", value: "29.5%" }] },
@@ -131,10 +131,12 @@ export const DEMO_CARDS = [
     title: "公司財測調整（FY2026）",
     body: {
       sections: [{
-        heading: "", columns: ["項目", "調整前", "調整後"],
+        // 欄名附前次財測發布日期；第三列示範項目名稱過長時自動換行、數字欄不被擠壓
+        heading: "", columns: ["項目", "前次財測（7/17）", "本次財測"],
         rows: [
-          { cells: ["營收（USD B）", "136.00–138.00", { arrow: "up", value: "139.50–140.50" }] },
-          { cells: ["自由現金流（USD B）", "12.50", { arrow: "down", value: "12.00" }] },
+          { cells: ["營收（USD B）", "136.0–138.0", { arrow: "up", value: "139.5–140.5" }] },
+          { cells: ["自由現金流（USD B）", "12.5", { arrow: "down", value: "12.0" }] },
+          { cells: ["調整後 EBITDA（不含股權激勵費用）（USD B）", "41.25–42.00", { arrow: "up", value: "42.50–43.25" }] },
         ],
       }],
     },

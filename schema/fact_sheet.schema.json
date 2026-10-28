@@ -21,9 +21,10 @@
       "enum": [
         "1.0",
         "1.1",
-        "1.2"
+        "1.2",
+        "1.3"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date"
     },
     "comment": {
       "type": "string",
@@ -138,6 +139,17 @@
             "other"
           ]
         },
+        "eps_basis": {
+          "enum": [
+            "diluted",
+            "basic"
+          ],
+          "description": "抽取的 EPS 口徑，圖卡標籤依此顯示「稀釋 EPS」或「基本 EPS」。美股抽稀釋（diluted），台股抽基本（basic）；其他市場以公司新聞稿標題使用的 EPS 為準，並在 eps_basis_src 附標題原句。"
+        },
+        "eps_basis_src": {
+          "$ref": "#/$defs/source",
+          "description": "其他市場依新聞稿標題決定口徑時填寫：標題中提到 EPS 的原句"
+        },
         "source_docs": {
           "type": "array",
           "minItems": 1,
@@ -194,10 +206,7 @@
         "pretax_income",
         "income_tax",
         "net_income",
-        "net_income_to_parent",
-        "eps_basic",
-        "eps_diluted",
-        "shares_diluted"
+        "net_income_to_parent"
       ],
       "properties": {
         "revenue": {
@@ -262,15 +271,19 @@
         },
         "eps_basic": {
           "$ref": "#/$defs/pair",
-          "description": "基本每股盈餘"
+          "description": "基本每股盈餘。meta.eps_basis 為 basic 時必填（台股）"
         },
         "eps_diluted": {
           "$ref": "#/$defs/pair",
-          "description": "稀釋每股盈餘"
+          "description": "稀釋每股盈餘。meta.eps_basis 為 diluted 時必填（美股）"
         },
         "shares_diluted": {
           "$ref": "#/$defs/pair",
-          "description": "稀釋加權平均股數（單位見 meta.share_unit）"
+          "description": "稀釋加權平均股數（單位見 meta.share_unit）。eps_basis 為 diluted 時填，用來驗算 EPS"
+        },
+        "shares_basic": {
+          "$ref": "#/$defs/pair",
+          "description": "基本加權平均股數（單位見 meta.share_unit）。eps_basis 為 basic 時填，用來驗算 EPS"
         }
       }
     },
@@ -496,10 +509,17 @@
             "description": "unit 為 monetary 時必填，照抄原文（例如「$12.0B」→ billions）"
           },
           "previous": {
-            "$ref": "#/$defs/guidance_value"
+            "$ref": "#/$defs/guidance_value",
+            "description": "前次財測"
+          },
+          "previous_date": {
+            "type": "string",
+            "pattern": "^(1[0-2]|[1-9])/([1-9]|[12][0-9]|3[01])$",
+            "description": "原文寫出前次財測的發布日期（月、日都有）時才填，格式 M/D，例如 7/17；只寫月份或沒寫就省略。圖卡欄名會顯示為「前次財測（7/17）」"
           },
           "current": {
-            "$ref": "#/$defs/guidance_value"
+            "$ref": "#/$defs/guidance_value",
+            "description": "本次財測"
           },
           "src": {
             "$ref": "#/$defs/source",
@@ -1012,25 +1032,48 @@
       ]
     }
   },
-  "if": {
-    "properties": {
-      "schema_version": {
-        "enum": [
-          "1.1",
-          "1.2"
-        ]
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "1.1",
+              "1.2",
+              "1.3"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "guidance_next": {
+            "required": [
+              "period_label",
+              "monetary_unit",
+              "items"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.3"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "meta": {
+            "required": [
+              "eps_basis"
+            ]
+          }
+        }
       }
     }
-  },
-  "then": {
-    "properties": {
-      "guidance_next": {
-        "required": [
-          "period_label",
-          "monetary_unit",
-          "items"
-        ]
-      }
-    }
-  }
+  ]
 }
