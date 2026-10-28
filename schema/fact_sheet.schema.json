@@ -483,7 +483,7 @@
         "properties": {
           "metric": {
             "type": "string",
-            "pattern": "^(revenue_yoy|revenue_qoq|gross_margin|operating_margin|net_margin|eps_yoy|segment:[a-z0-9_]+:yoy|other:[a-z0-9_]+)$"
+            "pattern": "^(revenue_yoy|revenue_qoq|gross_margin|operating_margin|net_margin|eps_yoy|revenue_amount|segment:[a-z0-9_]+:yoy|other:[a-z0-9_]+)$"
           },
           "value": {
             "type": "number"
@@ -491,8 +491,13 @@
           "unit": {
             "enum": [
               "percent",
-              "pp"
-            ]
+              "pp",
+              "ones",
+              "thousands",
+              "millions",
+              "billions"
+            ],
+            "description": "比率用 percent／pp；revenue_amount（內文寫出的營收金額，例如「$12.9B」→ value 12.9、unit billions）用金額單位"
           },
           "src": {
             "$ref": "#/$defs/source"

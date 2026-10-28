@@ -229,7 +229,8 @@ $("btnCheck").onclick = async () => {
 function recompute() {
   const { fs: Aeff, failed } = applyEdits(state.A, state.edits);
   state.Aeff = Aeff;
-  state.out = analyze(Aeff, { profile: state.profile, company: state.company, triggers, labels, history: [], decisions: state.decisions });
+  const overrides = Object.entries(state.choices).filter(([id, ch]) => id.startsWith("check:") && ch.choice === "ok").map(([id]) => id.slice(6));
+  state.out = analyze(Aeff, { profile: state.profile, company: state.company, triggers, labels, history: [], decisions: state.decisions, overrides });
   state.diffs = state.B ? diffForReview(Aeff, state.B) : [];
   const lab = { pass: "通過", fail: "不通過", warn: "需確認", skip: "略過" };
   $("checks").querySelector("tbody").innerHTML = state.out.checks.map((c) =>
@@ -336,8 +337,21 @@ const HINT = {
 /** 第三層某項是否已處理完：選了「正確」或「已改正」且寫了判斷 */
 function resolved(it) {
   const ch = state.choices[it.id];
+  if (it.kind === "fail" && ch?.choice === "fixed") return false; // 真的改對了，這項會自動消失
   return !!(ch && (ch.choice === "ok" || ch.choice === "fixed") && ch.text && ch.text.trim());
 }
+
+// 對「不通過」選「數據正確」時，工具為了不畫出與數字矛盾的圖，會自動少畫的部分
+const OVERRIDE_EFFECT = {
+  gross_profit_identity: "損益流向圖不畫毛利節點，也不顯示毛利率",
+  operating_income_identity_c: "不產出損益流向卡（營業利益與各項費用對不起來，畫出來會互相矛盾）",
+  pretax_identity: "損益流向圖只畫到營業利益",
+  net_income_identity: "損益流向圖只畫到營業利益",
+  segments_sum_c: "不產出營收拆解卡", segments_sum_p: "不產出營收拆解卡",
+  geographies_sum_c: "不產出營收拆解卡", geographies_sum_p: "不產出營收拆解卡",
+  eps_identity_c: "EPS 年增率改用公司公布的 EPS 相除", eps_identity_p: "EPS 年增率改用公司公布的 EPS 相除",
+};
+const UNIT_RISK = /^(guidance_magnitude|revenue_amount_|eps_identity_)/;
 
 function buildManual() {
   const A = state.Aeff, aiA = state.A;
@@ -387,6 +401,10 @@ function buildManual() {
       if (it.kind === "diff" && it.adoptable) body += `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>`;
       body += OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
       const oc = OUTCOMES.find((o) => o[0] === ch.choice);
+      const cid = it.id.startsWith("check:") ? it.id.slice(6) : "";
+      if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「數據正確」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
+      if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次損益表上方的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。</div>`;
+      if (it.kind === "fail" && ch.choice === "fixed") body += `<div class="note fail">這項仍然不通過，代表還沒改對：改對之後這一項會自動消失。</div>`;
       if (oc) body += `<textarea data-text="${esc(it.id)}" placeholder="${esc(oc[2])}">${esc(ch.text || "")}</textarea>`;
       const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">待 AI 修正</span>` : `<span class="pending">未處理</span>`;
       return `<tr><td>${st}</td><td>${body}</td></tr>`;
@@ -415,7 +433,7 @@ function editorL1(f, name, type, v) {
     : `<input type="text" id="edVal" value="${esc(v)}">`;
   const hint = f === "period_end" ? "改期末日時，工具會檢查數字出處的欄名是不是同一期；不是同一期代表 AI 抓錯整欄，只能請 AI 重新抽取。"
     : f === "fiscal_period" ? "格式：FY年份Q季，例如 FY2026Q3（用公司自己的財年）。"
-    : f === "monetary_unit" ? "數字是照抄原文，所以改單位只會改變換算方式。存檔後請看下方「圖卡上營收顯示為」是否合理。" : "";
+    : f === "monetary_unit" || f === "share_unit" ? "改單位會同時改變每一個金額（或股數）的換算，影響所有圖卡。只有在確認原文表頭的單位說明與 AI 填的不同時才改；改完看「圖卡上營收顯示為」是否合理，自動檢查也會用 EPS、內文營收、財測三個獨立數字交叉驗證。" : "";
   return `<tr class="editor"><td></td><td colspan="3">
     <div>修改「${esc(name)}」：${input}</div>${hint ? `<div class="note">${esc(hint)}</div>` : ""}
     <input type="text" id="edNote" placeholder="備註（選填）：例如原文第 8 頁表頭寫 in millions">
@@ -471,12 +489,22 @@ function bindManual() {
   box.querySelectorAll("[data-choice]").forEach((r) => r.addEventListener("change", () => {
     const id = r.dataset.choice;
     state.choices[id] = { choice: r.value, text: state.choices[id]?.text || "" };
-    buildManual();
+    recompute();
     const t = document.querySelector(`textarea[data-text="${CSS.escape(id)}"]`);
     if (t) t.focus();
   }));
   box.querySelectorAll("[data-adopt]").forEach((btn) => (btn.onclick = () => {
     const it = state.l3.find((x) => x.id === btn.dataset.adopt);
+    const valOf = (n) => (n && typeof n === "object" ? n.value : n);
+    const bad = it.d.paths.find((p) => {
+      const a = valOf(getNode(state.A, p)), bv = valOf(getNode(state.B, p));
+      return typeof a === "number" && typeof bv === "number" && a !== 0 && (Math.abs(bv / a) > 3 || Math.abs(bv / a) < 1 / 3);
+    });
+    if (bad || state.B.meta.monetary_unit !== state.A.meta.monetary_unit) {
+      btn.insertAdjacentHTML("afterend", `<span class="note fail">　不能直接採用：B 的數字與 A 差 3 倍以上，或 B 的金額單位與 A 不同，可能單位不一致。請對照原文，到第二層手動輸入。</span>`);
+      btn.disabled = true;
+      return;
+    }
     for (const p of it.d.paths) putEdit({ layer: 3, kind: "replace", path: p, ai: getNode(state.A, p), value: getNode(state.B, p), note: "A／B 比對：改用 B 的值" });
     recompute();
   }));
@@ -555,6 +583,19 @@ function bindManual() {
     const v = parseNum($("edVal").value);
     if (v === null) return msg("請輸入數字；原文沒有這個數字請按「清空」");
     const aiNode = getNode(state.A, path);
+    const old = aiNode?.value;
+    if (typeof old === "number" && old !== 0 && v !== 0) {
+      const r = Math.abs(v / old);
+      const warnKey = `${path}|${v}`;
+      if ((r > 3 || r < 1 / 3) && state.magWarned !== warnKey) {
+        state.magWarned = warnKey;
+        return msg(`你輸入的數字是 AI 原值的 ${r >= 1 ? r.toFixed(r >= 100 ? 0 : 1) + " 倍" : "1/" + (1 / r).toFixed(1 / r >= 100 ? 0 : 1)}。${r > 500 || r < 1 / 500 ? "差距接近 1,000 倍，很可能用了不同單位：這一欄的單位是 " + state.Aeff.meta.monetary_unit + "，請照原文表格的數字輸入（不要自己換算）。" : "請再確認一次原文。"}確定無誤請再按一次「儲存」。`);
+      }
+      if (Math.sign(v) !== Math.sign(old) && state.magWarned !== warnKey + "|sign") {
+        state.magWarned = warnKey + "|sign";
+        return msg("正負號和 AI 原值相反。原文括號代表負數；確定無誤請再按一次「儲存」。");
+      }
+    }
     const col = $("edCol").value.trim(), pt = $("edPtype").value;
     const colAi = aiNode?.src ? (aiNode.src.column_label || aiNode.src.quote || "") : "";
     if (v === aiNode?.value && pt === (aiNode?.period_type || "quarter") && col === colAi) { state.edits = state.edits.filter((e) => e.path !== path); }
@@ -621,7 +662,9 @@ function selectionHtml() {
   const s = state.out.selection;
   const fired = Object.entries(s.fired).map(([k, v]) => `${k}（${v.join("、")}）`).join("；") || "無";
   const skipped = Object.entries(s.skipped).map(([k, v]) => `${k}（缺 ${v.join("、")}）`).join("；") || "無";
-  return `<p>這次的張次：<b>${s.deck.join(" → ")}</b></p><p class="note">觸發：${esc(fired)}<br>因資料不足略過：${esc(skipped)}<br>PN 計算的數字：${esc(state.out.derived.join("；") || "無")}</p>`;
+  const drop = (s.dropped || []).length ? `<div class="banner">因為你在第三層確認「數據正確」而自動不畫：${esc(s.dropped.join("；"))}</div>` : "";
+  const ed = state.edits.length ? `<p class="note">本次人工修改 ${state.edits.length} 處（第一層 ${state.edits.filter((e) => e.layer === 1).length}、第二層 ${state.edits.filter((e) => e.layer === 2).length}、採用 B ${state.edits.filter((e) => e.layer === 3).length}），明細寫在本季存檔。</p>` : "";
+  return `<p>這次的張次：<b>${s.deck.filter((c) => state.cards.some((x) => x.id === c)).join(" → ")}</b></p>${drop}${ed}<p class="note">觸發：${esc(fired)}<br>因資料不足略過：${esc(skipped)}<br>PN 計算的數字：${esc(state.out.derived.join("；") || "無")}</p>`;
 }
 
 async function drawCards() {

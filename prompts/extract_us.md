@@ -77,6 +77,7 @@
 ### stated_metrics
 - 公司原文自己寫出的比率，例如「revenue up 100% year-over-year」→ `{ "metric": "revenue_yoy", "value": 100, "unit": "percent" }`。只抄原文明確寫出的。
 - 以公司整體的比率為主（營收年增率、各項利潤率、EPS 年增率）；同一比率在表格和內文各寫一次（例如 11.8% 與 12%），兩筆都列。
+- **內文寫出的營收金額也要列一筆**：例如「revenue of $12.9 billion」→ `{ "metric": "revenue_amount", "value": 12.9, "unit": "billions" }`，附原句出處。這筆用來獨立驗證金額單位。
 
 ### market_specific.us
 - 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `ambiguities` 註明即可。

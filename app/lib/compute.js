@@ -41,6 +41,11 @@ export function analyze(fs, ctx) {
   //   guidance_unit: "ones" | "thousands" | "millions" | "billions"
   //   cash_flow: "use"（預設）| "exclude"
   const D = ctx.decisions || {};
+  // 使用者在第三層對「不通過」選了「數據正確」的檢查 id。覆寫不會讓工具畫出與數字矛盾的圖：
+  // 受影響的那一段圖會自動不畫（見 OVERRIDE_EFFECTS）。
+  const OV = new Set(ctx.overrides || []);
+  const overridden = (id) => OV.has(id) && checks.some((c) => c.id === id && c.status === "fail");
+  const dropped = [];
   const checks = [];
   const derived = [];
   const derivable = []; // 可由 PN 計算的數字（不論使用者是否採用），核對畫面用來列出選項
@@ -100,7 +105,7 @@ export function analyze(fs, ctx) {
   }
 
   // 圖上使用的毛利：原文有就用；PN 計算的只有使用者同意才顯示
-  const gpDerivedHidden = cur(IS.gross_profit) === null && D.derived_gross_profit === "hide";
+  const gpDerivedHidden = (cur(IS.gross_profit) === null && D.derived_gross_profit === "hide") || overridden("gross_profit_identity");
   const gpShown = gpDerivedHidden ? { c: null, p: null } : gp;
 
   // ── 4. 營業利益勾稽
@@ -187,7 +192,7 @@ export function analyze(fs, ctx) {
   // EPS 年增率：用未四捨五入的「淨利÷股數」，與公司自己的算法一致
   const eu = { c: epsCalc("c"), p: epsCalc("p") };
   M.eps_yoy = yoy(eu.c, eu.p);
-  if (D.eps_yoy_method === "rounded") M.eps_yoy = yoy(eps.c, eps.p);
+  if (D.eps_yoy_method === "rounded" || overridden("eps_identity_c") || overridden("eps_identity_p")) M.eps_yoy = yoy(eps.c, eps.p);
   M.eps_yoy_from_rounded = yoy(eps.c, eps.p);
   M.operating_income_yoy = yoy(oi.c, oi.p);
   M.net_income_yoy = yoy(niP.c, niP.p);
@@ -220,7 +225,10 @@ export function analyze(fs, ctx) {
       maxYoyGap: Math.max(...main.map((r) => Math.abs((r.yoy ?? 0) - (M.revenue_yoy ?? 0)))),
     };
   }
-  const seg = breakdown(fs.segments), geo = breakdown(fs.geographies);
+  const sumOv = (n) => overridden(`${n}_sum_c`) || overridden(`${n}_sum_p`);
+  const seg = sumOv("segments") ? null : breakdown(fs.segments);
+  const geo = sumOv("geographies") ? null : breakdown(fs.geographies);
+  if (sumOv("segments") || sumOv("geographies")) dropped.push("營收拆解卡（拆分加總與營收不符，使用者確認原文如此）");
   M.segment_share_change_pp_yoy = seg ? seg.maxShareChange : null;
   M.segment_yoy_gap_pp = seg ? seg.maxYoyGap : null;
   M.geo_share_change_pp_yoy = geo ? geo.maxShareChange : null;
@@ -298,6 +306,35 @@ export function analyze(fs, ctx) {
     }
   }
 
+  // ── 12a. 內文寫出的營收金額（例如「$12.9B」）與報表營收換算後一致：獨立驗證金額單位
+  for (const sm of (fs.stated_metrics || []).filter((x) => x.metric === "revenue_amount" && UNIT_POWER[x.unit] !== undefined)) {
+    const ratio = (sm.value * Math.pow(10, UNIT_POWER[sm.unit])) / (rev.c * Math.pow(10, srcPow));
+    add(`revenue_amount_${sm.value}`, `內文營收金額 ${sm.value} ${sm.unit} 與報表一致`, Math.abs(ratio - 1) <= 0.05 ? "pass" : "fail",
+      Math.abs(ratio - 1) <= 0.05 ? "" : `報表營收換算後為內文的 ${(1 / ratio).toPrecision(3)} 倍：金額單位可能有誤`);
+  }
+
+  // ── 12b. 會計期間與期末日一致（依公司財年；沒有公司設定時視為 12 月底結束）
+  {
+    const pe = /^(\d{4})-(\d{2})-\d{2}$/.exec(m.period_end || "");
+    const cal = fiscalToCalendar(m.fiscal_period, company.fiscal_year_end_month || 12);
+    if (pe) {
+      const expect = `${pe[1]}Q${Math.ceil(+pe[2] / 3)}`;
+      const okP = cal === expect;
+      add("fiscal_period_vs_end", "會計期間與期末日一致", okP ? "pass" : company.fiscal_year_end_month ? "fail" : "warn",
+        okP ? `${m.fiscal_period}＝${expect}` : `${m.fiscal_period} 換算為 ${cal}，但期末日 ${m.period_end} 屬於 ${expect}${company.fiscal_year_end_month ? "" : "（沒有公司設定檔，以 12 月底為財年結束推算）"}`);
+    }
+  }
+  // ── 12c. 財測營收與本季營收量級一致：兩個獨立標示的單位互相驗證，抓「單位整批改錯」
+  if (g && g.items.length) {
+    const gRev = g.items.find((x) => x.metric === "revenue");
+    const gv = gRev ? (gRev.point ?? (gRev.low + gRev.high) / 2) : null;
+    if (gv && rev.c) {
+      const ratio = (gv * guidanceScale) / (rev.c * Math.pow(10, srcPow));
+      add("guidance_magnitude", "下季財測營收與本季營收量級一致", ratio > 0.5 && ratio < 2 ? "pass" : "fail",
+        `財測營收為本季營收的 ${ratio >= 10 || ratio < 0.1 ? ratio.toExponential(0) : ratio.toFixed(2)} 倍${ratio > 0.5 && ratio < 2 ? "" : "：報表或財測的金額單位可能有誤"}`);
+    }
+  }
+
   // ── 13. AI 提出的疑慮：每一條都要人工處理
   if ((fs.ambiguities || []).length) {
     add("ambiguities", "AI 提出的疑慮", "warn", `${fs.ambiguities.length} 條，需逐條確認`);
@@ -334,13 +371,16 @@ export function analyze(fs, ctx) {
   // C
   const highlight = triggers.modules.C.annotations[0];
   const hl = evalCond(highlight.when, M).value;
-  cards.push({
+  const stopAtOI = (nonopDerived && D.derived_non_operating === "hide") || overridden("pretax_identity") || overridden("net_income_identity");
+  if (overridden("pretax_identity") || overridden("net_income_identity")) dropped.push("損益流向圖的業外、所得稅、淨利段（勾稽不符，使用者確認原文如此）");
+  if (overridden("operating_income_identity_c")) dropped.push("損益流向卡（營業利益與各項費用對不起來，使用者確認原文如此）");
+  if (!overridden("operating_income_identity_c")) cards.push({
     id: "C", template: "T4", header: { ...header, label: "損益流向" },
-    source: withDerived(derived),
+    source: withDerived(stopAtOI ? derived.filter((d) => !d.startsWith("業外")) : derived),
     body: {
       unit: unitText,
       revenue: disp(rev.c), cogs: cogs.c === null ? 0 : disp(cogs.c), grossProfit: gpShown.c === null ? null : disp(gpShown.c),
-      stopAt: nonopDerived && D.derived_non_operating === "hide" ? "operating_income" : undefined,
+      stopAt: stopAtOI ? "operating_income" : undefined,
       opex: items.map((it) => ({ name: it.zh, value: disp(it.c) })),
       otherOperating: disp(other.c || 0), operatingIncome: disp(oi.c),
       nonOperating: disp(nonop.c || 0), tax: disp(tax.c ?? 0), netIncome: disp(niP.c),
@@ -440,6 +480,10 @@ export function analyze(fs, ctx) {
     },
   });
 
+  if (overridden("gross_profit_identity")) dropped.push("毛利節點與毛利率（毛利勾稽不符，使用者確認原文如此）");
+  if (overridden("eps_identity_c") || overridden("eps_identity_p")) dropped.push("EPS 年增率改用公司公布的 EPS 相除（EPS 勾稽不符，使用者確認原文如此）");
+  selection.dropped = dropped;
+  if (stopAtOI) for (let i = derived.length - 1; i >= 0; i--) if (derived[i].startsWith("業外")) derived.splice(i, 1);
   return { checks, derived, derivable, metrics: M, selection, cards, confirm, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
 }
 
