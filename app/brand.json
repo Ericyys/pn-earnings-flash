@@ -1,0 +1,202 @@
+{
+  "brand_version": "1.0",
+  "comment": "PN 品牌規範的機器可讀版本。所有底稿只從這裡讀顏色、字型、字級、間距，不在程式裡寫死任何品牌數值。",
+  "canvas": {
+    "width": 1080,
+    "height": 1350,
+    "safe": 64
+  },
+  "identity": {
+    "signature": "Ryan L.",
+    "handle": "@pathfindernote",
+    "disclaimer": "資料整理自公司公開財報，僅供資訊分享，不構成投資建議。",
+    "disclaimer_with_source": "僅供資訊分享，不構成投資建議。",
+    "footer_note": "圖卡底部：有資料來源時顯示「資料來源：…。僅供資訊分享，不構成投資建議。」；沒有資料來源時顯示完整免責。"
+  },
+  "colors": {
+    "light": {
+      "bg": "#FFFFFF",
+      "paper": "#F7F9FB",
+      "band": "#EEF2F6",
+      "text": "#0A1628",
+      "text2": "#3E4C5E",
+      "muted": "#5F6B7D",
+      "rule": "#D5DCE4",
+      "up": "#0A6E99",
+      "down": "#C2410C",
+      "categorical": [
+        "#1D60BC",
+        "#059488",
+        "#7E46BD",
+        "#B2860A",
+        "#BF427C",
+        "#4E943E"
+      ],
+      "other": "#9AA6B6"
+    },
+    "brand_primary": "#0A1628"
+  },
+  "fonts": {
+    "title": "\"Source Serif 4\", \"Noto Serif TC\", serif",
+    "body": "Inter, \"Noto Sans TC\", sans-serif",
+    "web_source": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Noto+Sans+TC:wght@400&family=Noto+Serif+TC:wght@300;400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap",
+    "numeric_feature": "tabular-nums"
+  },
+  "type": {
+    "display": {
+      "size": 135,
+      "weight": 300,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h1": {
+      "size": 76,
+      "weight": 300,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h2": {
+      "size": 57,
+      "weight": 400,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h3": {
+      "size": 43,
+      "weight": 400,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "body": {
+      "size": 32,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "small": {
+      "size": 24,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "footnote": {
+      "size": 18,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "number": {
+      "size": 32,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    },
+    "kpi": {
+      "size": 76,
+      "weight": 300,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    },
+    "label": {
+      "size": 24,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    }
+  },
+  "type_note": "kpi＝KPI 大數字（H1 字級，數字用 Inter）；label＝圖上標值與軸標（小字字級，數字行高）。英文內文行高 1.55 用於純英文段落。",
+  "space": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48,
+    64,
+    96
+  ],
+  "lines": {
+    "width": 1,
+    "data_width": 2
+  },
+  "radius": {
+    "default": 0,
+    "round": "50%"
+  },
+  "chart": {
+    "category_gap": 1,
+    "label_gap_min": 4,
+    "max_categories": 6,
+    "legend_marker": {
+      "shape": "square",
+      "size": 8,
+      "radius": 0,
+      "gap_to_text": 12,
+      "note": "圖例與標籤符號。折線端點（半徑 6）與對比預期實際值（半徑 10）仍為圓點"
+    },
+    "color_rules": {
+      "results": "正負色（pn-up／pn-down）只用在結果項：利潤（毛利、營業利益、淨利）依數值正負上色、虧損、業外損益",
+      "deductions": "扣減項（成本、費用、資本支出、股東回饋等）一律 pn-chart-other，不因負值改用 pn-down",
+      "peer_focal": "同業圖本公司長條 pn-text-1，其他公司 pn-chart-other"
+    }
+  },
+  "format": {
+    "decimals": {
+      "amount": 2,
+      "percent": 1,
+      "multiple": 1,
+      "pp": 1
+    },
+    "minus": "−",
+    "up": "▲",
+    "down": "▼",
+    "date": "YYYY-MM-DD",
+    "quarter": "YYYYQn",
+    "year": "FYYYYY",
+    "units_zh": {
+      "hundred_millions": "億",
+      "ten_thousands": "萬"
+    },
+    "units_en": {
+      "billions": "B",
+      "millions": "M"
+    }
+  },
+  "footer": {
+    "disclaimer_gap_above_rule": 48,
+    "disclaimer_gap_below_rule": 12
+  },
+  "theme_note": "只使用淺底（業主決定，2026-10-28）；colors 只保留 light。",
+  "token_names": {
+    "comment": "brand.colors.light 每個鍵對應的 v5.3 token；null＝尚待提供",
+    "bg": null,
+    "paper": null,
+    "band": "pn-band",
+    "text": "pn-text-1",
+    "text2": "pn-text-2",
+    "muted": null,
+    "rule": null,
+    "up": "pn-up",
+    "down": "pn-down",
+    "categorical": [
+      "pn-chart-1",
+      "pn-chart-2",
+      "pn-chart-3",
+      "pn-chart-4",
+      "pn-chart-5",
+      "pn-chart-6"
+    ],
+    "other": "pn-chart-other"
+  }
+}

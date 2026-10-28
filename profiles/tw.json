@@ -1,0 +1,208 @@
+{
+  "profile_version": "1.0",
+  "market": "tw",
+  "label": "台股",
+  "defaults": {
+    "currency": "TWD",
+    "monetary_unit": "thousands",
+    "share_unit": "thousands",
+    "accounting_basis": "IFRS",
+    "display_unit": "hundred_millions",
+    "display_currency": "TWD"
+  },
+  "display_note": "台股圖卡以「億」顯示（原文仟元 ÷ 100,000），貨幣標示為 TWD。換算一律由網頁執行，AI 只照抄原文單位。",
+  "extraction_prompt": null,
+  "primary_sources": [
+    {
+      "type": "investor_deck",
+      "note": "法說會簡報，部門或產品別比重常只給百分比"
+    },
+    {
+      "type": "press_release",
+      "note": "公司新聞稿或重大訊息"
+    },
+    {
+      "type": "financial_statements",
+      "note": "合併財務報告；部分公司法說會當天即公告，部分較晚"
+    },
+    {
+      "type": "mops",
+      "note": "公開資訊觀測站，月營收與財報的官方來源，可作為第二來源交叉驗證"
+    }
+  ],
+  "line_item_aliases": {
+    "revenue": [
+      "營業收入合計",
+      "營業收入淨額",
+      "營業收入",
+      "Net Revenue"
+    ],
+    "cost_of_revenue": [
+      "營業成本合計",
+      "營業成本",
+      "Cost of Revenue"
+    ],
+    "gross_profit": [
+      "營業毛利（毛損）",
+      "營業毛利",
+      "營業毛利淨額",
+      "Gross Profit"
+    ],
+    "sm_expense": [
+      "推銷費用"
+    ],
+    "ga_expense": [
+      "管理費用"
+    ],
+    "rd_expense": [
+      "研究發展費用",
+      "研發費用"
+    ],
+    "operating_expenses_total": [
+      "營業費用合計"
+    ],
+    "operating_income": [
+      "營業利益（損失）",
+      "營業淨利（淨損）",
+      "營業利益",
+      "Income from Operations"
+    ],
+    "non_operating_net": [
+      "營業外收入及支出合計",
+      "營業外收入及支出"
+    ],
+    "pretax_income": [
+      "稅前淨利（淨損）",
+      "繼續營業單位稅前淨利（淨損）"
+    ],
+    "income_tax": [
+      "所得稅費用（利益）",
+      "所得稅費用"
+    ],
+    "net_income": [
+      "本期淨利（淨損）",
+      "本期淨利"
+    ],
+    "net_income_to_parent": [
+      "母公司業主",
+      "歸屬於母公司業主"
+    ],
+    "eps_basic": [
+      "基本每股盈餘"
+    ],
+    "eps_diluted": [
+      "稀釋每股盈餘"
+    ],
+    "shares_diluted": [
+      "稀釋每股盈餘之加權平均流通在外股數"
+    ],
+    "other_operating_net": [
+      "其他收益及費損淨額",
+      "其他營業收益及費損淨額"
+    ]
+  },
+  "alias_warnings": [
+    "IFRS 損益表常有「未實現銷貨（損）益」等調整列，毛利可能分「營業毛利」與「營業毛利淨額」兩列，必須用「淨額」",
+    "「其他收益及費損淨額」在 IFRS 下列在營業費用之後、營業利益之前，屬於營業內",
+    "「本期淨利」含非控制權益；EPS 以「歸屬於母公司業主」計算",
+    "法說會簡報的數字可能已四捨五入到億元或百萬元，與財報仟元數字並存時以財報為準，並在 ambiguities 註記差異",
+    "「預期信用減損損失（利益）」屬於營業費用的一部分，已含在「營業費用合計」內，不要另外填"
+  ],
+  "sign_conventions": {
+    "rule": "AI 一律照抄原文正負號；這裡定義各科目「原文正數代表什麼」，供網頁計算時使用",
+    "positive_means": {
+      "revenue": "收入",
+      "cost_of_revenue": "成本",
+      "gross_profit": "毛利",
+      "rd_expense": "費用",
+      "sm_expense": "費用",
+      "ga_expense": "費用",
+      "sga_expense": "費用",
+      "operating_expenses_total": "費用",
+      "other_operating_net": "收益（負數＝費損）",
+      "operating_income": "利益",
+      "non_operating_net": "收益（負數＝損失）",
+      "pretax_income": "利益",
+      "income_tax": "費用（負數＝所得稅利益）",
+      "net_income": "利益",
+      "capex": "現金流入（原文通常為負數，計算時取絕對值）",
+      "buybacks": "現金流入（原文通常為負數，計算時取絕對值）",
+      "dividends_paid": "現金流入（原文通常為負數，計算時取絕對值）"
+    },
+    "identities": [
+      "gross_profit = revenue − cost_of_revenue",
+      "operating_income = gross_profit − operating_expenses_total + other_operating_net（沒有該列視為 0）",
+      "pretax_income = operating_income + non_operating_net",
+      "net_income = pretax_income − income_tax"
+    ]
+  },
+  "required_fields": [
+    "income_statement.revenue",
+    "income_statement.cost_of_revenue",
+    "income_statement.gross_profit",
+    "income_statement.operating_income",
+    "income_statement.non_operating_net",
+    "income_statement.net_income_to_parent",
+    "income_statement.eps_basic"
+  ],
+  "qc_checks": {
+    "segment_sum_vs_revenue": {
+      "enabled": true
+    },
+    "segment_share_sum_100": {
+      "enabled": true,
+      "tolerance_pp": 0.1,
+      "note": "只有百分比時，加總應約為 100%"
+    },
+    "geography_sum_vs_revenue": {
+      "enabled": true
+    },
+    "gross_profit_identity": {
+      "enabled": true
+    },
+    "operating_income_identity": {
+      "enabled": true
+    },
+    "pretax_identity": {
+      "enabled": true,
+      "note": "IFRS 下稅前淨利＝營業利益＋營業外收入及支出，應完全相等"
+    },
+    "net_income_identity": {
+      "enabled": true
+    },
+    "eps_identity": {
+      "enabled": true,
+      "tolerance_per_share": 0.01,
+      "note": "以歸屬母公司淨利 ÷ 加權平均股數驗證"
+    },
+    "margin_range": {
+      "enabled": true
+    },
+    "yoy_outlier": {
+      "enabled": true,
+      "abs_percent": 100
+    },
+    "stated_metrics_match": {
+      "enabled": true,
+      "tolerance_pp": 0.1
+    },
+    "prior_year_vs_history": {
+      "enabled": true
+    },
+    "monthly_revenue_sum": {
+      "enabled": true,
+      "note": "本季三個月月營收加總應約等於季營收；月營收為自結數，與財報可能有小差異，差異超過 0.5% 標紅並人工確認"
+    }
+  },
+  "rounding_tolerance": {
+    "rule": "原文最小顯示位數的 1 個單位",
+    "note": "財報以仟元列示時容許 ±1 仟元；簡報以億元列示時容許 ±0.1 億元，但簡報數字只用於交叉驗證"
+  },
+  "module_overrides": {
+    "E": {
+      "enabled": "company_opt_in",
+      "note": "多數台股公司不提供財測。只有 company.json 標示 gives_guidance: true 的公司才啟用 E 模組"
+    }
+  },
+  "extraction_prompt_note": "台股抽取指令尚未建立；建立後放在 prompts/extract_tw.md 並把這裡改成該路徑。"
+}

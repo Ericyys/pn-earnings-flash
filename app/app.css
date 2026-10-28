@@ -1,0 +1,53 @@
+/* 出圖工具的介面樣式（不影響圖卡本身；圖卡樣式在 brand.json 與 templates/） */
+:root {
+  --bg: #FFFFFF; --paper: #F7F9FB; --band: #EEF2F6; --text: #0A1628; --text2: #3E4C5E; --muted: #5F6B7D;
+  --rule: #D5DCE4; --up: #0A6E99; --down: #C2410C; --warn: #8A6A08;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--text); font: 16px/1.7 Inter, "Noto Sans TC", sans-serif; }
+header { background: var(--bg); border-bottom: 1px solid var(--text); padding: 16px; }
+header h1 { margin: 0; font: 400 24px/1.25 "Source Serif 4", "Noto Serif TC", serif; }
+header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+main { max-width: 1120px; margin: 0 auto; padding: 16px; }
+section { background: var(--bg); border-top: 1px solid var(--text); margin: 24px 0; padding: 16px 0 24px; }
+section[hidden] { display: none; }
+h2 { font: 400 22px/1.25 "Source Serif 4", "Noto Serif TC", serif; margin: 0 16px 8px; }
+h3 { font-weight: 400; font-size: 17px; margin: 24px 16px 8px; }
+.pad { padding: 0 16px; }
+.note { color: var(--muted); font-size: 14px; }
+label.block { display: block; margin: 16px 0 4px; color: var(--text2); font-size: 14px; }
+textarea { width: 100%; min-height: 160px; font: 13px/1.5 ui-monospace, Menlo, monospace; border: 1px solid var(--rule); padding: 8px; border-radius: 0; }
+select, input[type=text] { font: inherit; border: 1px solid var(--rule); padding: 8px; border-radius: 0; background: var(--bg); max-width: 100%; }
+button { font: inherit; padding: 8px 16px; border: 1px solid var(--text); background: var(--text); color: var(--bg); border-radius: 0; cursor: pointer; }
+button.ghost { background: var(--bg); color: var(--text); }
+button:disabled { background: var(--rule); border-color: var(--rule); color: var(--muted); cursor: not-allowed; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+th { background: var(--band); font-weight: 400; color: var(--text2); border-top: 1px solid var(--text); }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.src { color: var(--muted); font-size: 13px; }
+.pass { color: var(--up); } .fail { color: var(--down); } .warn { color: var(--warn); } .skip { color: var(--muted); }
+.banner { margin: 8px 16px; padding: 12px 16px; border-left: 4px solid var(--down); background: var(--paper); }
+.banner.ok { border-left-color: var(--up); }
+.progress { height: 4px; background: var(--rule); margin: 8px 16px; }
+.progress > div { height: 100%; background: var(--up); width: 0; transition: width .2s; }
+input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--text); }
+#grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; padding: 0 16px; }
+figure { margin: 0; } figure svg { width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; font-size: 14px; color: var(--text2); }
+details summary { cursor: pointer; color: var(--text2); }
+.reason { width: 100%; margin-top: 4px; }
+.edited { background: #FFF8E6; }
+.ai-old { color: var(--muted); text-decoration: line-through; font-size: 13px; }
+.editor { background: var(--paper); }
+.editor input[type=text] { width: 100%; margin: 4px 0; }
+.editor .row { margin-top: 8px; }
+button.small { padding: 4px 10px; font-size: 13px; }
+.choice { display: block; margin: 4px 0; }
+.choice input { margin-right: 6px; vertical-align: middle; }
+.t3 textarea, .t3 input[type=text] { width: 100%; margin-top: 4px; }
+.t3 .item { font-size: 14px; margin-bottom: 4px; }
+.resolved { color: var(--up); font-size: 13px; }
+.pending { color: var(--down); font-size: 13px; }
