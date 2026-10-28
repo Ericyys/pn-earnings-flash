@@ -35,8 +35,15 @@ function zhLabel(src, ctx) {
 // ───────── 主函式 ─────────
 export function analyze(fs, ctx) {
   const { profile, company = {}, triggers, history = [] } = ctx;
+  // 使用者在人工核對第三層的判斷（見 app/index.html）。沒有判斷時一律用預設值。
+  //   derived_gross_profit / derived_non_operating: "use"（預設）| "hide"
+  //   eps_yoy_method: "net_income_shares"（預設）| "rounded"
+  //   guidance_unit: "ones" | "thousands" | "millions" | "billions"
+  //   cash_flow: "use"（預設）| "exclude"
+  const D = ctx.decisions || {};
   const checks = [];
   const derived = [];
+  const derivable = []; // 可由 PN 計算的數字（不論使用者是否採用），核對畫面用來列出選項
   const confirm = [];
   const add = (id, label, status, detail = "") => checks.push({ id, label, status, detail });
 
@@ -81,11 +88,20 @@ export function analyze(fs, ctx) {
     add("gross_profit_identity", "毛利＝營收−營業成本", Math.abs(d) <= tol(2) ? "pass" : "fail", `差 ${d}`);
   } else if (gp.c === null && cogs.c !== null) {
     gp = { c: rev.c - cogs.c, p: rev.p !== null && cogs.p !== null ? rev.p - cogs.p : null };
-    derived.push("毛利（營收−營業成本）");
-    add("gross_profit_identity", "毛利＝營收−營業成本", "skip", "原文未列毛利，由 PN 計算");
+    derivable.push({ id: "derived_gross_profit", name: "毛利", formula: "營收 − 營業成本", hideEffect: "毛利與毛利率不顯示；損益流向圖由營收直接分流" });
+    if (D.derived_gross_profit === "hide") {
+      add("gross_profit_identity", "毛利＝營收−營業成本", "skip", "原文未列毛利；使用者選擇不採用 PN 計算的毛利，圖上不顯示毛利");
+    } else {
+      derived.push("毛利（營收−營業成本）");
+      add("gross_profit_identity", "毛利＝營收−營業成本", "skip", "原文未列毛利，由 PN 計算");
+    }
   } else {
     add("gross_profit_identity", "毛利＝營收−營業成本", "skip", "公司沒有營業成本／毛利（例如金融業）");
   }
+
+  // 圖上使用的毛利：原文有就用；PN 計算的只有使用者同意才顯示
+  const gpDerivedHidden = cur(IS.gross_profit) === null && D.derived_gross_profit === "hide";
+  const gpShown = gpDerivedHidden ? { c: null, p: null } : gp;
 
   // ── 4. 營業利益勾稽
   const sumItems = (k) => items.reduce((a, it) => a + (it[k] ?? 0), 0);
@@ -100,10 +116,17 @@ export function analyze(fs, ctx) {
 
   // ── 5. 業外：原文沒有合計 → 稅前−營業利益，由 PN 計算並註明
   let nonop = { c: cur(IS.non_operating_net), p: pri(IS.non_operating_net) };
+  let nonopDerived = false;
   if (nonop.c === null && pretax.c !== null && oi.c !== null) {
     nonop = { c: pretax.c - oi.c, p: pretax.p !== null && oi.p !== null ? pretax.p - oi.p : null };
-    derived.push("業外收支淨額（稅前淨利−營業利益）");
-    add("pretax_identity", "稅前淨利＝營業利益＋業外", "skip", "原文未列業外合計，由 PN 計算");
+    nonopDerived = true;
+    derivable.push({ id: "derived_non_operating", name: "業外收支淨額", formula: "稅前淨利 − 營業利益", hideEffect: "損益流向圖只畫到營業利益（淨利、所得稅不畫）" });
+    if (D.derived_non_operating === "hide") {
+      add("pretax_identity", "稅前淨利＝營業利益＋業外", "skip", "原文未列業外合計；使用者選擇不採用 PN 計算，損益流向圖只畫到營業利益");
+    } else {
+      derived.push("業外收支淨額（稅前淨利−營業利益）");
+      add("pretax_identity", "稅前淨利＝營業利益＋業外", "skip", "原文未列業外合計，由 PN 計算");
+    }
   } else if (nonop.c !== null) {
     const d = oi.c + nonop.c - pretax.c;
     add("pretax_identity", "稅前淨利＝營業利益＋業外", Math.abs(d) <= tol(2) ? "pass" : "fail", `差 ${d}`);
@@ -155,7 +178,7 @@ export function analyze(fs, ctx) {
   // ── 9. 指標
   const M = {};
   M.revenue_yoy = yoy(rev.c, rev.p);
-  M.gross_margin = pctOf(gp.c, rev.c); M.gross_margin_p = pctOf(gp.p, rev.p);
+  M.gross_margin = pctOf(gpShown.c, rev.c); M.gross_margin_p = pctOf(gpShown.p, rev.p);
   M.operating_margin = pctOf(oi.c, rev.c); M.operating_margin_p = pctOf(oi.p, rev.p);
   M.net_margin = pctOf(niP.c, rev.c); M.net_margin_p = pctOf(niP.p, rev.p);
   M.gross_margin_change_pp_yoy = M.gross_margin !== null && M.gross_margin_p !== null ? M.gross_margin - M.gross_margin_p : null;
@@ -164,6 +187,7 @@ export function analyze(fs, ctx) {
   // EPS 年增率：用未四捨五入的「淨利÷股數」，與公司自己的算法一致
   const eu = { c: epsCalc("c"), p: epsCalc("p") };
   M.eps_yoy = yoy(eu.c, eu.p);
+  if (D.eps_yoy_method === "rounded") M.eps_yoy = yoy(eps.c, eps.p);
   M.eps_yoy_from_rounded = yoy(eps.c, eps.p);
   M.operating_income_yoy = yoy(oi.c, oi.p);
   M.net_income_yoy = yoy(niP.c, niP.p);
@@ -173,7 +197,7 @@ export function analyze(fs, ctx) {
   const pq = (pair) => num(pair?.prior_quarter);
   const revQ = pq(IS.revenue), oiQ = pq(IS.operating_income), niQ = pq(IS.net_income_to_parent) ?? pq(IS.net_income);
   const cogsQ = pq(IS.cost_of_revenue) ?? (fs.operating_expense_items || []).filter((it) => cogsAliases.includes(norm(it.label_source))).map((it) => pq(it.amount))[0] ?? null;
-  const gpQ = pq(IS.gross_profit) ?? (revQ !== null && cogsQ !== null ? revQ - Math.abs(cogsQ) : null);
+  const gpQ = gpDerivedHidden ? null : pq(IS.gross_profit) ?? (revQ !== null && cogsQ !== null ? revQ - Math.abs(cogsQ) : null);
   M.gross_margin_q = pctOf(gpQ, revQ); M.operating_margin_q = pctOf(oiQ, revQ); M.net_margin_q = pctOf(niQ, revQ);
   M.gross_margin_change_pp_qoq = M.gross_margin !== null && M.gross_margin_q !== null ? M.gross_margin - M.gross_margin_q : null;
   M.operating_margin_change_pp_qoq = M.operating_margin !== null && M.operating_margin_q !== null ? M.operating_margin - M.operating_margin_q : null;
@@ -219,10 +243,11 @@ export function analyze(fs, ctx) {
   if (ocf.c !== null || capex.c !== null) {
     add("cash_flow_period", "現金流量為單季數字", cfIsQuarter ? "pass" : "warn", cfIsQuarter ? "" : "含年初至今累計數；若原文有單季欄位，應改抽單季");
   }
-  M.capex_yoy = cfIsQuarter ? yoy(capex.c, capex.p) : null;
-  M.capital_return_yoy = cfIsQuarter && (buy.c !== null || div.c !== null) ? yoy((buy.c || 0) + (div.c || 0), (buy.p || 0) + (div.p || 0)) : null;
-  M.buybacks_yoy = cfIsQuarter ? yoy(buy.c, buy.p) : null;
-  M.new_buyback_authorization = !!cr.new_buyback_authorization;
+  const cfUse = cfIsQuarter && D.cash_flow !== "exclude";
+  M.capex_yoy = cfUse ? yoy(capex.c, capex.p) : null;
+  M.capital_return_yoy = cfUse && (buy.c !== null || div.c !== null) ? yoy((buy.c || 0) + (div.c || 0), (buy.p || 0) + (div.p || 0)) : null;
+  M.buybacks_yoy = cfUse ? yoy(buy.c, buy.p) : null;
+  M.new_buyback_authorization = D.cash_flow !== "exclude" && !!cr.new_buyback_authorization;
   if (cr.new_buyback_authorization) confirm.push({ level: 2, items: [{ field: "capital_return.new_buyback_authorization", value: cr.new_buyback_authorization.amount?.value, note: "確認原文是「新授權」而非「剩餘額度」，並確認單位" }] });
   const fcfStated = cur(cf.free_cash_flow_stated);
   if (fcfStated !== null && ocf.c !== null && capex.c !== null) {
@@ -240,7 +265,7 @@ export function analyze(fs, ctx) {
     add(`stated_${s.metric}_${s.value}`, `原文寫 ${s.metric} ${s.value}${s.unit === "percent" ? "%" : ""}`, ok ? "pass" : "fail", `PN 計算 ${calc.toFixed(2)}`);
   }
   if (M.eps_yoy !== null && M.eps_yoy_from_rounded !== null && Math.abs(M.eps_yoy - M.eps_yoy_from_rounded) >= 0.5) {
-    add("eps_yoy_rounding", "EPS 年增率的算法", "warn", `用四捨五入後的 EPS 算是 ${M.eps_yoy_from_rounded.toFixed(1)}%，用淨利÷股數算是 ${M.eps_yoy.toFixed(1)}%；圖卡採後者（與公司一致）`);
+    add("eps_yoy_rounding", "EPS 年增率的算法（依規則）", "skip", `依 rules/derivations.json 用「淨利 ÷ 稀釋股數」計算為 ${M.eps_yoy.toFixed(1)}%；若用四捨五入後的 EPS 相除則為 ${M.eps_yoy_from_rounded.toFixed(1)}%`);
   }
 
   // ── 11. 合理範圍
@@ -254,9 +279,12 @@ export function analyze(fs, ctx) {
   // ── 12. 財測單位：與報表單位比對量級
   const g = fs.guidance_next;
   let guidanceScale = Math.pow(10, srcPow);
-  if (g && g.monetary_unit) {
+  if (g && D.guidance_unit) {
+    guidanceScale = Math.pow(10, UNIT_POWER[D.guidance_unit]);
+    add("guidance_unit", "財測金額單位", "pass", `使用者確認財測單位為 ${D.guidance_unit}`);
+  } else if (g && g.monetary_unit) {
     guidanceScale = Math.pow(10, UNIT_POWER[g.monetary_unit]);
-    add("guidance_unit", "財測金額單位", g.monetary_unit === m.monetary_unit ? "pass" : "warn", `財測單位 ${g.monetary_unit}，報表單位 ${m.monetary_unit}，已換算；請人工確認`);
+    add("guidance_unit", "財測金額單位", "pass", g.monetary_unit === m.monetary_unit ? `與報表相同（${g.monetary_unit}）` : `財測單位 ${g.monetary_unit}、報表單位 ${m.monetary_unit}，已換算（單位本身在第二層核對）`);
   } else if (g && g.items.length) {
     const gRev = g.items.find((x) => x.metric === "revenue");
     const gv = gRev ? (gRev.point ?? (gRev.low + gRev.high) / 2) : null;
@@ -265,7 +293,7 @@ export function analyze(fs, ctx) {
       const powDiff = Math.round(Math.log10(ratio) / 3) * 3;
       if (powDiff !== 0) {
         guidanceScale = Math.pow(10, srcPow + powDiff);
-        add("guidance_unit", "財測金額單位與報表一致", "warn", `財測金額約為報表的 1/${Math.pow(10, powDiff)}，推定單位為 ${Object.keys(UNIT_POWER).find((u) => UNIT_POWER[u] === srcPow + powDiff)}；請人工確認`);
+        add("guidance_unit", "財測金額單位與報表一致", "warn", `AI 沒有標示財測單位；財測金額約為報表的 1/${Math.pow(10, powDiff)}，推定為 ${Object.keys(UNIT_POWER).find((u) => UNIT_POWER[u] === srcPow + powDiff)}。請在第二層「財測金額單位」照原文填入`);
       } else add("guidance_unit", "財測金額單位與報表一致", "pass");
     }
   }
@@ -311,11 +339,12 @@ export function analyze(fs, ctx) {
     source: withDerived(derived),
     body: {
       unit: unitText,
-      revenue: disp(rev.c), cogs: disp(cogs.c ?? 0), grossProfit: disp(gp.c ?? rev.c),
+      revenue: disp(rev.c), cogs: cogs.c === null ? 0 : disp(cogs.c), grossProfit: gpShown.c === null ? null : disp(gpShown.c),
+      stopAt: nonopDerived && D.derived_non_operating === "hide" ? "operating_income" : undefined,
       opex: items.map((it) => ({ name: it.zh, value: disp(it.c) })),
       otherOperating: disp(other.c || 0), operatingIncome: disp(oi.c),
       nonOperating: disp(nonop.c || 0), tax: disp(tax.c ?? 0), netIncome: disp(niP.c),
-      margins: { gross: gp.c !== null && cogs.c !== null ? M.gross_margin : undefined, operating: M.operating_margin, net: M.net_margin },
+      margins: { gross: gpShown.c !== null && cogs.c !== null ? M.gross_margin : undefined, operating: M.operating_margin, net: M.net_margin },
       note: hl ? (fs.notable_items?.length ? fs.notable_items.map((x) => `${x.label_source} ${fmt2(disp(num(x.amount)))}`).join("；") : `業外收支淨額佔淨利 ${fmt1(M.non_operating_share_of_net_income * 100)}%`) : undefined,
     },
   });
@@ -411,7 +440,7 @@ export function analyze(fs, ctx) {
     },
   });
 
-  return { checks, derived, metrics: M, selection, cards, confirm, units: { source: m.monetary_unit, display: unitText } };
+  return { checks, derived, derivable, metrics: M, selection, cards, confirm, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
 }
 
 // ───────── 選圖 ─────────
@@ -521,8 +550,9 @@ export function diffForReview(a, b) {
     const key = d.path.replace(/\.(current|prior_year|prior_quarter|point|low|high|basis)$/, "");
     const tag = (d.path.match(/\.(current|prior_year|prior_quarter|point|low|high|basis)$/) || [])[1];
     const tagZh = { current: "本季", prior_year: "去年", prior_quarter: "上季", point: "數值", low: "下緣", high: "上緣", basis: "基準" }[tag] || "";
-    if (!groups.has(key)) groups.set(key, { path: key, a: [], b: [], type: d.type });
+    if (!groups.has(key)) groups.set(key, { path: key, a: [], b: [], type: d.type, paths: [] });
     const g = groups.get(key);
+    g.paths.push(d.path);
     g.a.push(tagZh ? `${tagZh} ${d.a}` : d.a);
     g.b.push(tagZh ? `${tagZh} ${d.b}` : d.b);
   }

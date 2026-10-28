@@ -103,16 +103,17 @@ export function renderT5(box, ctx, spec) {
 
 /** C 卡無法畫流向圖時（虧損），改成損益瀑布 */
 export function incomeWaterfall(b) {
-  const steps = [
-    { label: "營收", value: b.revenue, type: "total" },
-    { label: "營業成本", value: b.cogs, type: "use" },
-    { label: "毛利", value: b.grossProfit, type: "total" },
-    { label: "營業費用", value: b.opex.reduce((a, o) => a + o.value, 0), type: "use" },
-  ];
+  const hasGP = b.grossProfit !== null && b.grossProfit !== undefined && b.cogs > 0;
+  const steps = [{ label: "營收", value: b.revenue, type: "total" }];
+  if (b.cogs > 0) steps.push({ label: "營業成本", value: b.cogs, type: "use" });
+  if (hasGP) steps.push({ label: "毛利", value: b.grossProfit, type: "total" });
+  steps.push({ label: "營業費用", value: b.opex.reduce((a, o) => a + o.value, 0), type: "use" });
   if (b.otherOperating) steps.push({ label: "其他營業收支", value: b.otherOperating, type: "delta" });
   steps.push({ label: "營業利益", value: b.operatingIncome, type: "total" });
-  if (b.nonOperating) steps.push({ label: "業外收支", value: b.nonOperating, type: "delta" });
-  if (b.tax) steps.push({ label: "所得稅", value: b.tax, type: "use" });
-  steps.push({ label: "淨利", value: b.netIncome, type: "total" });
+  if (b.stopAt !== "operating_income") {
+    if (b.nonOperating) steps.push({ label: "業外收支", value: b.nonOperating, type: "delta" });
+    if (b.tax) steps.push({ label: "所得稅", value: b.tax, type: "use" });
+    steps.push({ label: "淨利", value: b.netIncome, type: "total" });
+  }
   return { unit: b.unit, kind: "amount", steps };
 }

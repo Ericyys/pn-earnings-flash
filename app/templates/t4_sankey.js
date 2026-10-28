@@ -13,6 +13,11 @@
 //   note: "業外含處分投資利益 0.85（原文：Gain on sale of investments）"   // 選填，觸發 C 的標註規則時由網頁填入
 // }
 //
+//   stopAt: "operating_income"                     // 選填：只畫到營業利益（不採用 PN 計算的業外數字時）
+//
+// 沒有營業成本（例如券商），或使用者不採用 PN 計算的毛利時，grossProfit 給 null：
+// 營收直接分流到營業成本／各項費用／營業利益，圖少一欄。
+//
 // 所有金額都用公司報告值，底稿不自行計算毛利、營業利益、淨利。
 // 只要毛利、營業利益或淨利 ≤ 0，或流量出現負值，流向圖無法正確表達，
 // 回傳 null，由 templates/index.js 改用 T5 瀑布圖。
@@ -21,41 +26,58 @@ export function sankeyFlows(b) {
   const pos = (v) => Math.max(v || 0, 0);
   const neg = (v) => Math.max(-(v || 0), 0);
   const other = b.otherOperating || 0, nonop = b.nonOperating || 0, tax = b.tax || 0;
-  if (!(b.grossProfit > 0 && b.operatingIncome > 0 && b.netIncome > 0)) return null;
+  // 有毛利節點：原文有營業成本，且毛利有數字（原文列出或使用者同意由 PN 計算）
+  const hasGP = b.grossProfit !== null && b.grossProfit !== undefined && b.cogs > 0;
+  // stopAt="operating_income"：使用者不採用 PN 計算的業外數字時，圖只畫到營業利益
+  const toNI = b.stopAt !== "operating_income";
+  if (hasGP && !(b.grossProfit > 0)) return null;
+  if (!(b.operatingIncome > 0)) return null;
+  if (toNI && !(b.netIncome > 0)) return null;
 
-  const N = {}; // id → { col, name, kind }
+  const N = {};
   const add = (id, col, name, kind, extra = {}) => (N[id] = { id, col, name, kind, ...extra });
+  const o = hasGP ? 0 : -1;          // 沒有毛利節點時，後面各欄往左移一欄
+  const src = hasGP ? "gp" : "rev";  // 費用從哪個節點流出
   add("rev", 0, "營收", "total");
-  add("gp", 1, "毛利", "profit", { margin: ["毛利率", b.margins?.gross] });
-  add("cogs", 1, "營業成本", "cost");
-  if (pos(other)) add("othGain", 1, "其他營業收益", "gain");
+  if (hasGP) add("gp", 1, "毛利", "profit", { margin: ["毛利率", b.margins?.gross] });
+  if (pos(other)) add("othGain", hasGP ? 1 : 0, "其他營業收益", "gain");
   const star = b.note ? "＊" : "";
   // 流入淨利的收益節點放在營業利益上方：流向帶水平進入淨利頂端，不與其他帶交錯
-  if (pos(nonop)) add("nonGain", 2, "業外收益" + star, "gain");
-  if (neg(tax)) add("taxBen", 2, "所得稅利益", "gain");
-  add("oi", 2, "營業利益", "profit", { margin: ["營益率", b.margins?.operating] });
-  b.opex.forEach((o, i) => add(`opex${i}`, 2, o.name, "cost"));
-  if (neg(other)) add("othLoss", 2, "其他營業費損", "cost");
-  add("ni", 3, "淨利", "profit", { margin: ["淨利率", b.margins?.net] });
-  if (neg(nonop)) add("nonLoss", 3, "業外損失" + star, "loss");
-  if (pos(tax)) add("tax", 3, "所得稅", "cost");
+  if (toNI && pos(nonop)) add("nonGain", 2 + o, "業外收益" + star, "gain");
+  if (toNI && neg(tax)) add("taxBen", 2 + o, "所得稅利益", "gain");
+  add("oi", 2 + o, "營業利益", "profit", { margin: ["營益率", b.margins?.operating] });
+  if (!hasGP && b.cogs > 0) add("cogs", 2 + o, "營業成本", "cost");
+  b.opex.forEach((x, i) => add(`opex${i}`, 2 + o, x.name, "cost"));
+  if (neg(other)) add("othLoss", 2 + o, "其他營業費損", "cost");
+  if (hasGP) add("cogs", 1, "營業成本", "cost");
+  if (toNI) {
+    add("ni", 3 + o, "淨利", "profit", { margin: ["淨利率", b.margins?.net] });
+    if (neg(nonop)) add("nonLoss", 3 + o, "業外損失" + star, "loss");
+    if (pos(tax)) add("tax", 3 + o, "所得稅", "cost");
+  }
 
-  const L = [
-    ["rev", "gp", b.grossProfit],
-    ["rev", "cogs", b.cogs],
-    ["gp", "oi", b.operatingIncome - pos(other)],
-    ...b.opex.map((o, i) => ["gp", `opex${i}`, o.value]),
-  ];
+  const L = [];
+  if (hasGP) L.push(["rev", "gp", b.grossProfit], ["rev", "cogs", b.cogs]);
+  else if (b.cogs > 0) L.push(["rev", "cogs", b.cogs]);
+  L.push([src, "oi", b.operatingIncome - pos(other)]);
+  b.opex.forEach((x, i) => L.push([src, `opex${i}`, x.value]));
   if (pos(other)) L.push(["othGain", "oi", pos(other)]);
-  if (neg(other)) L.push(["gp", "othLoss", neg(other)]);
-  L.push(["oi", "ni", b.netIncome - pos(nonop) - neg(tax)]);
-  if (pos(tax)) L.push(["oi", "tax", pos(tax)]);
-  if (neg(nonop)) L.push(["oi", "nonLoss", neg(nonop)]);
-  if (pos(nonop)) L.push(["nonGain", "ni", pos(nonop)]);
-  if (neg(tax)) L.push(["taxBen", "ni", neg(tax)]);
+  if (neg(other)) L.push([src, "othLoss", neg(other)]);
+  if (toNI) {
+    L.push(["oi", "ni", b.netIncome - pos(nonop) - neg(tax)]);
+    if (pos(tax)) L.push(["oi", "tax", pos(tax)]);
+    if (neg(nonop)) L.push(["oi", "nonLoss", neg(nonop)]);
+    if (pos(nonop)) L.push(["nonGain", "ni", pos(nonop)]);
+    if (neg(tax)) L.push(["taxBen", "ni", neg(tax)]);
+  }
 
   if (L.some((l) => !(l[2] >= 0))) return null;
-  return { nodes: N, links: L.map(([s, t, v]) => ({ s, t, v })) };
+  // 沒有毛利節點時，營收直接分流：檢查流出合計＝營收（四捨五入容許 0.5%）
+  if (!hasGP) {
+    const out = L.filter((l) => l[0] === "rev").reduce((a, l) => a + l[2], 0);
+    if (Math.abs(out - b.revenue) > Math.abs(b.revenue) * 0.005) return null;
+  }
+  return { nodes: N, links: L.map(([s2, t, v]) => ({ s: s2, t, v })) };
 }
 
 export function renderT4(box, ctx, spec) {
@@ -88,7 +110,8 @@ export function renderT4(box, ctx, spec) {
     nodes[id].value = Math.max(inV, outV);
     nodes[id].display = { rev: b.revenue, gp: b.grossProfit, cogs: b.cogs, oi: b.operatingIncome, ni: b.netIncome }[id] ?? nodes[id].value;
   }
-  const cols = [0, 1, 2, 3].map((ci) => ids.filter((id) => nodes[id].col === ci));
+  const nCols = Math.max(...ids.map((id) => nodes[id].col)) + 1;
+  const cols = [...Array(nCols).keys()].map((ci) => ids.filter((id) => nodes[id].col === ci));
 
   // 標籤內容與高度
   const labelLines = (n) => {
@@ -99,8 +122,9 @@ export function renderT4(box, ctx, spec) {
     return lines;
   };
   const nodeW = 14;
-  const labelW3 = Math.max(...cols[3].map((id) => Math.max(...labelLines(nodes[id]).map((l) => measure(l.str, lab, l.num)))));
-  const colGap = (box.w - nodeW - labelW3 - 12) / 3;
+  const lastCol = cols[nCols - 1];
+  const labelW3 = Math.max(...lastCol.map((id) => Math.max(...labelLines(nodes[id]).map((l) => measure(l.str, lab, l.num)))));
+  const colGap = (box.w - nodeW - labelW3 - 12) / (nCols - 1);
   const colX = (ci) => box.x + ci * colGap;
 
   // 垂直比例：所有欄位都要放得下
