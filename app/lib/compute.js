@@ -350,7 +350,8 @@ export function analyze(fs, ctx) {
   const header = { ticker: m.ticker, period, label: "財報快報" };
   const docName = company.source_doc_name_zh || "財報新聞稿";
   const baseSource = `資料來源：${company.company_name_zh || m.company_name} ${period} ${docName}（${m.report_date}）`;
-  const withDerived = (list) => (list.length ? `${baseSource}。${list.join("、")}為 PN 依損益表科目計算。` : `${baseSource}。`);
+  // 圖卡底部只寫名稱，不寫主詞（帳號署名已在右下角），例如「毛利、業外收支淨額依損益表科目計算」；公式寫在 rules/derivations.json 與核對畫面
+  const withDerived = (list) => (list.length ? `${baseSource}。${list.map((d) => d.replace(/（.*）$/, "")).join("、")}依損益表科目計算。` : `${baseSource}。`);
 
   const cards = [];
   const name = company.company_name_zh || m.company_name;

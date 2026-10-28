@@ -50,26 +50,20 @@ export function card(spec, brand, measure, body) {
   const ruleY = S + lineBox(small) + 12;
   svg += hline(S, W - S, ruleY, c.text);
 
-  // ── 頁尾：免責（上方 1px 弱線，線上 48、線下 12），右側署名
-  const discLines = wrap(brand.identity.disclaimer, small, innerW - measure(brand.identity.signature, small) - 32, measure);
-  const discTop = H - S - discLines.length * lineBox(small);
-  const discRuleY = discTop - brand.footer.disclaimer_gap_below_rule - 1;
-  svg += hline(S, W - S, discRuleY, c.rule);
-  svg += textBlock(S, discTop, discLines, small, { fill: c.muted }).svg;
-  svg += text(W - S, baseline(discTop + (discLines.length - 1) * lineBox(small), small), brand.identity.signature, small, { fill: c.muted, anchor: "end" });
-  const contentBottom = discRuleY - brand.footer.disclaimer_gap_above_rule;
+  // ── 頁尾：資料來源與免責合併成一段，放在弱線下方；署名在最後一行右側
+  //    有資料來源時：「資料來源：…。」＋ 免責的後半段（避免「資料整理自公司公開財報」與來源重複）
+  const footText = spec.source ? `${spec.source.trim()}${brand.identity.disclaimer_with_source}` : brand.identity.disclaimer;
+  const sigW = measure(brand.identity.signature, small) + 32;
+  const footLines = wrap(footText, small, innerW - sigW, measure);
+  const footTop = H - S - footLines.length * lineBox(small);
+  const footRuleY = footTop - brand.footer.disclaimer_gap_below_rule - 1;
+  svg += hline(S, W - S, footRuleY, c.rule);
+  svg += textBlock(S, footTop, footLines, small, { fill: c.muted }).svg;
+  svg += text(W - S, baseline(footTop + (footLines.length - 1) * lineBox(small), small), brand.identity.signature, small, { fill: c.muted, anchor: "end" });
+  const bottom = footRuleY - brand.footer.disclaimer_gap_above_rule;
 
-  // ── 來源行（內容區最下方）
-  let bottom = contentBottom;
-  if (spec.source) {
-    const srcLines = wrap(spec.source, small, innerW, measure);
-    const srcTop = contentBottom - srcLines.length * lineBox(small);
-    svg += textBlock(S, srcTop, srcLines, small, { fill: c.muted }).svg;
-    bottom = srcTop - 24;
-  }
-
-  // ── 標題與副標（封面自己排版；圖卡 layout="chart" 不放標題，只放圖）
-  let top = ruleY + 48;
+  // ── 標題與副標（封面自己排版；圖卡 layout="chart" 不放標題，只放圖，圖從頁首線下 32px 開始）
+  let top = ruleY + (spec.layout === "chart" ? 32 : 48);
   if (spec.layout !== "cover" && spec.layout !== "chart") {
     const h2 = st("h2");
     const tl = wrap(spec.title || "", h2, innerW, measure, { balance: true });

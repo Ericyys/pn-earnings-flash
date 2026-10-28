@@ -129,7 +129,6 @@
     <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示）</label>
     <input type="text" id="nextDate" placeholder="YYYY-MM-DD">
     <div class="row">
-      <button class="ghost" id="btnLight">淺底</button><button class="ghost" id="btnDark">深底</button>
       <button id="btnApply" class="ghost">套用日期</button>
       <button id="btnAll">下載全部 PNG</button>
       <button id="btnArchive" class="ghost">下載本季存檔</button>
@@ -166,7 +165,7 @@ for (const c of companyList) $("company").insertAdjacentHTML("beforeend", `<opti
 
 let state = { ticks: new Set(), choices: {}, edits: [], decisions: {}, rounds: 0 };
 let measure = null;
-let theme = "light";
+const theme = "light"; // 業主決定只用淺底
 
 // 檔案上傳 → 填入文字框
 for (const k of ["A", "B"]) {
@@ -688,7 +687,7 @@ async function drawCards() {
   state.rendered = [];
   cards.forEach((spec, i) => {
     const r = renderCard({ ...spec, theme }, brand, measure);
-    const fname = `${state.Aeff.meta.ticker}_${spec.header.period}_${String(i + 1).padStart(2, "0")}_${spec.id}_${theme}.png`;
+    const fname = `${state.Aeff.meta.ticker}_${spec.header.period}_${String(i + 1).padStart(2, "0")}_${spec.id}.png`;
     state.rendered.push({ svg: r.svg, fname });
     const fig = document.createElement("figure");
     fig.innerHTML = r.svg + `<figcaption><span>${i + 1}｜${spec.id}${r.fallback ? "（" + r.fallback + "）" : ""}</span><button class="ghost" data-i="${state.rendered.length - 1}">下載 PNG</button></figcaption>`;
@@ -712,8 +711,6 @@ $("btnAll").onclick = async () => {
   for (let i = 0; i < state.rendered.length; i++) { await exportOne(i); await new Promise((r) => setTimeout(r, 400)); }
   $("exportMsg").textContent += `｜全部 ${state.rendered.length} 張完成`;
 };
-$("btnLight").onclick = () => { theme = "light"; drawCards(); };
-$("btnDark").onclick = () => { theme = "dark"; drawCards(); };
 $("btnApply").onclick = () => drawCards();
 
 $("btnArchive").onclick = () => {

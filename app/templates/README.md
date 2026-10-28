@@ -8,7 +8,7 @@
 - 本機：在 repo 根目錄執行 `python3 -m http.server`，開啟 `http://localhost:8000/app/demo/preview.html`
 - GitHub Pages 開啟後：`https://<帳號>.github.io/pn-earnings-flash/app/demo/preview.html`
 
-預覽頁使用 `demo/demo_cards.js` 的示範數據（虛構公司 Demo Corp），可切換淺底與深底。
+預覽頁使用 `demo/demo_cards.js` 的示範數據（虛構公司 Demo Corp）。圖卡只使用淺底（業主決定）。
 
 ## 底稿與模組對照
 
@@ -30,7 +30,7 @@
 ```js
 {
   template: "T2",
-  theme: "light",                      // light 或 dark
+  theme: "light",                      // 只使用淺底
   header: { ticker: "DEMO", period: "2026Q3", label: "財報快報" },
   title: "雲端營收佔比升至 50.2%，年增 6.0 個百分點",   // 由標題公式產生（第 5 步）
   source: "資料來源：Demo Corp 2026Q3 財報新聞稿（2026-10-26）",

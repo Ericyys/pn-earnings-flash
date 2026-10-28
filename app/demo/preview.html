@@ -26,8 +26,6 @@
 <body>
 <header>
   <h1>PN 財報快報｜底稿預覽（示範數據）</h1>
-  <button id="light" aria-pressed="true">淺底</button>
-  <button id="dark" aria-pressed="false">深底</button>
 </header>
 <div id="grid"></div>
 <script type="module">
@@ -55,13 +53,9 @@
       fig.innerHTML = out.svg + `<figcaption>${spec.id}｜${out.template}${out.fallback ? "｜" + out.fallback : ""}</figcaption>`;
       grid.appendChild(fig);
     }
-    document.getElementById("light").setAttribute("aria-pressed", theme === "light");
-    document.getElementById("dark").setAttribute("aria-pressed", theme === "dark");
     window.__rendered = theme;
   }
-  document.getElementById("light").onclick = () => draw("light");
-  document.getElementById("dark").onclick = () => draw("dark");
-  draw(params.get("theme") || "light");
+  draw("light");
 </script>
 </body>
 </html>

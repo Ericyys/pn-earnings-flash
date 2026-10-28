@@ -1,15 +1,18 @@
 {
   "brand_version": "1.0",
   "comment": "PN 品牌規範的機器可讀版本。所有底稿只從這裡讀顏色、字型、字級、間距，不在程式裡寫死任何品牌數值。",
-
-  "canvas": { "width": 1080, "height": 1350, "safe": 64 },
-
+  "canvas": {
+    "width": 1080,
+    "height": 1350,
+    "safe": 64
+  },
   "identity": {
     "signature": "Ryan L.",
     "handle": "@pathfindernote",
-    "disclaimer": "資料整理自公司公開財報，僅供資訊分享，不構成投資建議。"
+    "disclaimer": "資料整理自公司公開財報，僅供資訊分享，不構成投資建議。",
+    "disclaimer_with_source": "僅供資訊分享，不構成投資建議。",
+    "footer_note": "圖卡底部：有資料來源時顯示「資料來源：…。僅供資訊分享，不構成投資建議。」；沒有資料來源時顯示完整免責。"
   },
-
   "colors": {
     "light": {
       "bg": "#FFFFFF",
@@ -21,70 +24,147 @@
       "rule": "#D5DCE4",
       "up": "#0A6E99",
       "down": "#C2410C",
-      "categorical": ["#1D60BC", "#059488", "#7E46BD", "#B2860A", "#BF427C", "#4E943E"],
+      "categorical": [
+        "#1D60BC",
+        "#059488",
+        "#7E46BD",
+        "#B2860A",
+        "#BF427C",
+        "#4E943E"
+      ],
       "other": "#9AA6B6"
-    },
-    "dark": {
-      "bg": "#0A1220",
-      "paper": "#101A2A",
-      "band": "#16223A",
-      "text": "#E6EBF2",
-      "text2": "#B8C2D0",
-      "muted": "#8A97AA",
-      "rule": "#24324A",
-      "up": "#49C4D8",
-      "down": "#FDA05C",
-      "categorical": ["#4885DF", "#12A195", "#9364CE", "#B48C2B", "#C95A8B", "#5AA04A"],
-      "other": "#5C6A80"
     },
     "brand_primary": "#0A1628"
   },
-
   "fonts": {
     "title": "\"Source Serif 4\", \"Noto Serif TC\", serif",
     "body": "Inter, \"Noto Sans TC\", sans-serif",
     "web_source": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Noto+Sans+TC:wght@400&family=Noto+Serif+TC:wght@300;400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap",
     "numeric_feature": "tabular-nums"
   },
-
   "type": {
-    "display":  { "size": 135, "weight": 300, "family": "title", "lineHeight": 1.25, "tracking": 0 },
-    "h1":       { "size": 76,  "weight": 300, "family": "title", "lineHeight": 1.25, "tracking": 0 },
-    "h2":       { "size": 57,  "weight": 400, "family": "title", "lineHeight": 1.25, "tracking": 0 },
-    "h3":       { "size": 43,  "weight": 400, "family": "title", "lineHeight": 1.25, "tracking": 0 },
-    "body":     { "size": 32,  "weight": 400, "family": "body",  "lineHeight": 1.7,  "tracking": 0.02 },
-    "small":    { "size": 24,  "weight": 400, "family": "body",  "lineHeight": 1.7,  "tracking": 0.02 },
-    "footnote": { "size": 18,  "weight": 400, "family": "body",  "lineHeight": 1.7,  "tracking": 0.02 },
-    "number":   { "size": 32,  "weight": 400, "family": "body",  "lineHeight": 1.4,  "tracking": 0 },
-    "kpi":      { "size": 76,  "weight": 300, "family": "body",  "lineHeight": 1.4,  "tracking": 0 },
-    "label":    { "size": 24,  "weight": 400, "family": "body",  "lineHeight": 1.4,  "tracking": 0 }
+    "display": {
+      "size": 135,
+      "weight": 300,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h1": {
+      "size": 76,
+      "weight": 300,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h2": {
+      "size": 57,
+      "weight": 400,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "h3": {
+      "size": 43,
+      "weight": 400,
+      "family": "title",
+      "lineHeight": 1.25,
+      "tracking": 0
+    },
+    "body": {
+      "size": 32,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "small": {
+      "size": 24,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "footnote": {
+      "size": 18,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.7,
+      "tracking": 0.02
+    },
+    "number": {
+      "size": 32,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    },
+    "kpi": {
+      "size": 76,
+      "weight": 300,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    },
+    "label": {
+      "size": 24,
+      "weight": 400,
+      "family": "body",
+      "lineHeight": 1.4,
+      "tracking": 0
+    }
   },
   "type_note": "kpi＝KPI 大數字（H1 字級，數字用 Inter）；label＝圖上標值與軸標（小字字級，數字行高）。英文內文行高 1.55 用於純英文段落。",
-
-  "space": [4, 8, 12, 16, 24, 32, 48, 64, 96],
-
-  "lines": { "width": 1, "data_width": 2 },
-  "radius": { "default": 0, "round": "50%" },
+  "space": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48,
+    64,
+    96
+  ],
+  "lines": {
+    "width": 1,
+    "data_width": 2
+  },
+  "radius": {
+    "default": 0,
+    "round": "50%"
+  },
   "chart": {
     "category_gap": 1,
     "label_gap_min": 4,
     "max_categories": 6
   },
-
   "format": {
-    "decimals": { "amount": 2, "percent": 1, "multiple": 1, "pp": 1 },
+    "decimals": {
+      "amount": 2,
+      "percent": 1,
+      "multiple": 1,
+      "pp": 1
+    },
     "minus": "−",
     "up": "▲",
     "down": "▼",
     "date": "YYYY-MM-DD",
     "quarter": "YYYYQn",
     "year": "FYYYYY",
-    "units_zh": { "hundred_millions": "億", "ten_thousands": "萬" },
-    "units_en": { "billions": "B", "millions": "M" }
+    "units_zh": {
+      "hundred_millions": "億",
+      "ten_thousands": "萬"
+    },
+    "units_en": {
+      "billions": "B",
+      "millions": "M"
+    }
   },
-
   "footer": {
     "disclaimer_gap_above_rule": 48,
     "disclaimer_gap_below_rule": 12
-  }
+  },
+  "theme": "light",
+  "theme_note": "業主決定只使用淺底（2026-10-28）。"
 }
