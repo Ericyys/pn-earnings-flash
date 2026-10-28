@@ -100,8 +100,7 @@
     <p>打開 PDF，用 Ctrl＋F（Mac 是 ⌘F）搜尋「列名」，確認那一列、那一欄的數字與這裡一致再打勾。<b>發現錯誤可以直接修改</b>：</p>
     <ul>
       <li><b>第一層、第二層</b>：按「修改」輸入原文的正確值。改過的項目要重新打勾，自動檢查會立刻重算。</li>
-      <li><b>第三層</b>：每一項寫下你的判斷，再選結果：「數據正確」「我已在第一／二層改正」「交給 AI 修正」。</li>
-      <li>工具改不了的（漏抽、整欄抓錯期間、要改單位或欄位），選「交給 AI 修正」，你寫的判斷會整理成修正要求，貼回同一個 AI 對話。</li>
+      <li><b>第三層</b>：每一項選一個結果：「數據正確」「我已在第一／二層改正」「交給 AI 修正」。只有交給 AI 時需要寫下要求，工具會整理成修正要求，貼回同一個 AI 對話。</li>
     </ul>
     <p>規則說明：<a href="../rules/review_rules.md" target="_blank">哪些錯誤可以直接改、哪些必須請 AI 重抽</a></p>
   </div>
@@ -320,25 +319,15 @@ function layer3Items() {
 
 // 三種結果對所有公司都一樣；判斷內容由使用者自己寫
 const OUTCOMES = [
-  ["ok", "數據正確，不需要修改", "判斷理由（必填）：例如「原文第 8 頁確實沒有毛利列」「公司以括號表示所得稅費用」"],
-  ["fixed", "我已在第一／二層改正", "改了什麼（必填）：例如「營收本季改成原文 12,874,176」"],
+  ["ok", "數據正確，不需要修改", ""],
+  ["fixed", "我已在第一／二層改正", ""],
   ["ai", "交給 AI 修正", "給 AI 的要求（必填）：例如「單位應為 millions」「請改抓單季欄位」「請補抽地區營收」"],
 ];
-// 依類別給的處理建議（自己改還是交給 AI）
-const HINT = {
-  fail: "通常是某一個數字抄錯：先找出是哪一個，在第二層按「修改」改正，這項就會自動消失。找不出是哪個數字，或很多項同時不通過，交給 AI。",
-  warn: "看說明判斷原文是否就是如此。是 → 寫下理由；是 AI 抓錯 → 少數數字自己改，整欄或整段交給 AI。",
-  derived: "到原文確認真的沒有這一列。沒有 → 寫「原文無此列」；其實有 → 交給 AI 補抽這一列。",
-  amb: "AI 自己不確定的地方。不影響圖上數字 → 寫理由；影響且只有一兩個數字 → 自己改；需要改抓欄位、補抽或改單位 → 交給 AI。",
-  diff: "回原文看哪一邊對。A 對 → 寫理由；B 對 → 按「把 A 改成 B 的值」或自己改；A 漏抽整項 → 交給 AI 補抽。",
-  period: "期末日不是標籤錯，是整欄數字抓錯期，只能交給 AI 重抽；或確認期末日其實沒錯，寫下理由。",
-};
-
 /** 第三層某項是否已處理完：選了「正確」或「已改正」且寫了判斷 */
 function resolved(it) {
   const ch = state.choices[it.id];
   if (it.kind === "fail" && ch?.choice === "fixed") return false; // 真的改對了，這項會自動消失
-  return !!(ch && (ch.choice === "ok" || ch.choice === "fixed") && ch.text && ch.text.trim());
+  return !!ch && (ch.choice === "ok" || ch.choice === "fixed");
 }
 
 // 對「不通過」選「數據正確」時，工具為了不畫出與數字矛盾的圖，會自動少畫的部分
@@ -393,11 +382,11 @@ function buildManual() {
   const l3 = layer3Items();
   state.l3 = l3;
   blocks.push(`<h3>第三層｜不通過、需確認、PN 計算、AI 疑慮、A／B 差異（${l3.length} 項）</h3>
-    <p class="pad note">每一項寫下你的判斷，並選擇結果。數字要改的話，到第一或第二層按「修改」；工具改不了的（漏抽、整欄抓錯、要改單位或欄位），選「交給 AI 修正」，你寫的判斷會原文送給 AI。</p>
+    <p class="pad note">每一項選一個結果。<b>數據正確</b>：原文就是如此。<b>我已改正</b>：錯誤範圍明確（一兩個數字、單位或欄位），自己在第一或第二層按「修改」改好；「不通過」改對之後會自動消失。<b>交給 AI 修正</b>：工具改不了或找不出錯在哪（漏抽、整欄抓錯期間、很多項同時不通過），寫下要求，會原文送給 AI。A／B 不同時，B 對可以按「把 A 改成 B 的值」。</p>
     <div class="tablewrap pad t3"><table><thead><tr><th style="width:90px">狀態</th><th>項目與處理方式</th></tr></thead><tbody>
     ${l3.map((it) => {
       const ch = state.choices[it.id] || {};
-      let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div><div class="note">建議：${esc(HINT[it.kind] || HINT.warn)}</div>`;
+      let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>`;
       if (it.kind === "diff" && it.adoptable) body += `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>`;
       body += OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
       const oc = OUTCOMES.find((o) => o[0] === ch.choice);
@@ -405,7 +394,7 @@ function buildManual() {
       if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「數據正確」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
       if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次損益表上方的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。</div>`;
       if (it.kind === "fail" && ch.choice === "fixed") body += `<div class="note fail">這項仍然不通過，代表還沒改對：改對之後這一項會自動消失。</div>`;
-      if (oc) body += `<textarea data-text="${esc(it.id)}" placeholder="${esc(oc[2])}">${esc(ch.text || "")}</textarea>`;
+      if (ch.choice === "ai") body += `<textarea data-text="${esc(it.id)}" placeholder="${esc(oc[2])}">${esc(ch.text || "")}</textarea>`;
       const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">待 AI 修正</span>` : `<span class="pending">未處理</span>`;
       return `<tr><td>${st}</td><td>${body}</td></tr>`;
     }).join("")}</tbody></table></div>`);
@@ -643,7 +632,24 @@ function updateGate() {
   }
   const ready = done === total && !needAI;
   $("btnRender").disabled = !ready;
-  $("renderMsg").textContent = ready ? "" : needAI ? "有項目需要 AI 修正" : "還有項目沒打勾或沒處理";
+  const missing = [];
+  if (ticked < boxes.length) missing.push(`第一、二層還有 ${boxes.length - ticked} 項沒打勾`);
+  if (l3done < l3.length) {
+    const nAI = l3.filter((it) => state.choices[it.id]?.choice === "ai").length;
+    const nFix = l3.filter((it) => it.kind === "fail" && state.choices[it.id]?.choice === "fixed").length;
+    const nNone = l3.filter((it) => !state.choices[it.id]).length;
+    if (nNone) missing.push(`第三層還有 ${nNone} 項沒選結果`);
+    if (nFix) missing.push(`第三層有 ${nFix} 項選了「已改正」但仍不通過`);
+    if (nAI) missing.push(`第三層有 ${nAI} 項交給 AI 修正`);
+  }
+  if (general) missing.push("「其他要求」有內容，需要先交給 AI");
+  $("renderMsg").innerHTML = ready ? "" : `${esc(missing.join("；"))}　<button class="ghost small" id="btnNext">跳到下一個未完成項目</button>`;
+  if ($("btnNext")) $("btnNext").onclick = () => {
+    const box = [...document.querySelectorAll(".mc")].find((b) => !b.checked);
+    const row = box ? box.closest("tr") : [...document.querySelectorAll("#manualBox .t3 tr")].find((tr) => tr.querySelector(".pending"));
+    if (row) { row.scrollIntoView({ behavior: "smooth", block: "center" }); row.style.outline = "2px solid #C2410C"; setTimeout(() => (row.style.outline = ""), 2000); }
+    else $("general").scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 }
 $("general").addEventListener("input", updateGate);
 $("btnCopy").onclick = async () => {
