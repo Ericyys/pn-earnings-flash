@@ -46,10 +46,10 @@
 <section id="s3" hidden>
   <h2>3｜人工核對</h2>
   <div class="pad note">
-    <p>打開 PDF，用 Ctrl＋F（Mac 是 ⌘F）搜尋「列名」，確認那一列、那一欄的數字與這裡一致再打勾。<b>發現錯誤可以直接修改</b>：</p>
+    <p>依序完成三層：先第一層、第二層對照 PDF 打勾（用 Ctrl＋F／⌘F 搜尋「列名」），再處理第三層。<b>數字錯了可以直接修改</b>：</p>
     <ul>
       <li><b>第一層、第二層</b>：按「修改」輸入原文的正確值。改過的項目要重新打勾，自動檢查會立刻重算。</li>
-      <li><b>第三層</b>：每一項選一個結果：「數據正確」「我已在第一／二層改正」「交給 AI 修正」。只有交給 AI 時需要寫下要求，工具會整理成修正要求，貼回同一個 AI 對話。</li>
+      <li><b>第三層</b>：工具自動分成「需要你判斷」「交給 AI」「自動處理」。你只要處理「需要你判斷」，其餘整理成一段文字交給 AI 重新抽取。</li>
     </ul>
     <p>規則說明：<a href="../rules/review_rules.md" target="_blank">哪些錯誤可以直接改、哪些必須請 AI 重抽</a></p>
   </div>
@@ -60,12 +60,14 @@
   <h3>其他要求（選填，會加入給 AI 的修正要求）</h3>
   <div class="pad"><textarea id="general" style="min-height:80px" placeholder="例如：請補抽第 5 頁的營運指標表"></textarea></div>
   <div id="promptBox" class="pad" hidden>
-    <div class="banner"><b>還有交給 AI 修正的項目，暫時不能產出圖卡。</b><br>
-      1. 按「複製修正要求」，貼回<b>原本那個 AI 對話</b>（不要開新對話）。<br>
+    <h3 style="margin-left:0">給 AI 的整理（你的判斷＋交給 AI 的問題）</h3>
+    <div class="banner"><b>還有交給 AI 的項目，貼回新的 JSON 後才能出圖。</b><br>
+      1. 按「複製給 AI 的整理」，貼回<b>原本那個 AI 對話</b>（不要開新對話，AI 才看得到原文）。<br>
       2. 把 AI 重新輸出的 JSON 貼到步驟 1 的 A 欄，按「檢查」。<br>
-      3. 已打勾且數值沒有變的項目、你的修改與判斷都會保留；只有被 AI 改過的地方需要重新核對。</div>
-    <textarea id="promptText" readonly style="min-height:200px"></textarea>
-    <div class="row"><button id="btnCopy" class="ghost">複製修正要求</button><span id="copyMsg" class="note"></span></div>
+      3. 數值沒變的勾選、你的修改與判斷都會保留；AI 改過的數字要重新打勾。這次交給 AI 的問題若仍存在，下一輪會改列「需要你判斷」，不會一直循環。</div>
+    <p class="note fail" id="promptWait"></p>
+    <textarea id="promptText" readonly style="min-height:200px" hidden></textarea>
+    <div class="row"><button id="btnCopy" class="ghost" disabled>複製給 AI 的整理</button><span id="copyMsg" class="note"></span></div>
   </div>
   <div class="row pad"><button id="btnRender" disabled>產出圖卡</button><span id="renderMsg" class="note"></span></div>
 </section>
@@ -75,8 +77,8 @@
   <h2>4｜圖卡</h2>
   <div class="pad" id="selBox"></div>
   <div class="pad">
-    <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示）</label>
-    <input type="text" id="nextDate" placeholder="YYYY-MM-DD">
+    <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示；顯示在 K1）</label>
+    <input type="text" id="nextDate" placeholder="YYYY-MM-DD"> <span class="note" id="nextDateNote"></span>
     <div class="row">
       <button id="btnApply" class="ghost">套用日期</button>
       <button id="btnAll">下載全部 PNG</button>

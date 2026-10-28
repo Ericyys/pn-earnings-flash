@@ -119,33 +119,51 @@ export function periodColumnCheck(fs, periodEnd) {
 }
 
 // ───── 修正要求：交給同一個 AI 對話
-export function correctionPrompt({ requests, edits, general }) {
-  const lines = [];
-  lines.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則，修正後**重新輸出完整的 JSON**（同樣格式；只輸出一個 JSON 程式碼區塊）。");
-  lines.push("");
-  if (requests.length) {
-    lines.push("## 需要你回原文確認並修正的項目");
-    requests.forEach((r, i) => {
-      lines.push(`${i + 1}. 欄位：\`${r.path || "（未指定）"}\``);
-      if (r.current !== undefined) lines.push(`   目前的值：${r.current}`);
-      if (r.issue) lines.push(`   問題：${r.issue}`);
-      if (r.request) lines.push(`   要求：${r.request}`);
+/**
+ * 給 AI 的整理：使用者的判斷＋交給 AI 的問題＋已人工確認的值＋其他要求，合成一段可直接貼上的文字。
+ * userDecisions: [{ path, issue, decision }]   使用者的判斷，AI 必須照做
+ * aiItems:       [{ path, issue, request }]    交給 AI 依原文重新判斷的問題
+ * edits:         [{ path, value, period_type?, column_label? }]  已人工對照原文確認的值
+ */
+export function correctionPrompt({ userDecisions = [], aiItems = [], edits = [], general = "" }) {
+  const L = [];
+  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.2\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
+  L.push("");
+  if (userDecisions.length) {
+    L.push("## 一、人工判斷（已由人對照原文決定，請直接照做）");
+    userDecisions.forEach((r, i) => {
+      L.push(`${i + 1}. 欄位：\`${r.path || "（未指定）"}\``);
+      L.push(`   問題：${r.issue}`);
+      L.push(`   判斷：${r.decision}`);
     });
-    lines.push("");
+    L.push("");
+  }
+  if (aiItems.length) {
+    L.push(`## ${userDecisions.length ? "二" : "一"}、請你回原文重新判斷並處理`);
+    aiItems.forEach((r, i) => {
+      L.push(`${i + 1}. 欄位：\`${r.path || "（未指定）"}\``);
+      L.push(`   問題：${r.issue}`);
+      L.push(`   要求：${r.request}`);
+    });
+    L.push("");
   }
   if (edits.length) {
-    lines.push("## 已由人工對照原文確認的值（請直接採用，不要更改）");
+    L.push("## 已由人工對照原文確認的值（請直接採用，不要更改）");
     for (const e of edits) {
       const v = typeof e.value === "object" ? JSON.stringify(e.value) : e.value;
-      lines.push(`- \`${e.path}\` ＝ ${v}${e.period_type ? `（period_type: ${e.period_type}）` : ""}${e.column_label ? `（欄名：${e.column_label}）` : ""}`);
+      L.push(`- \`${e.path}\` ＝ ${v}${e.period_type ? `（period_type: ${e.period_type}）` : ""}${e.column_label ? `（欄名：${e.column_label}）` : ""}`);
     }
-    lines.push("");
+    L.push("");
   }
   if (general && general.trim()) {
-    lines.push("## 其他要求");
-    lines.push(general.trim());
-    lines.push("");
+    L.push("## 其他要求");
+    L.push(general.trim());
+    L.push("");
   }
-  lines.push("規則提醒：只抄原文、不計算、不估計；每個數字附出處；不確定就寫進 ambiguities。");
-  return lines.join("\n");
+  L.push("## 處理原則");
+  L.push("- 只抄原文、不計算、不估計；每個數字附出處。");
+  L.push("- 能從原文確定的問題：直接修正數據，並在 notes 用一句話說明怎麼處理的。");
+  L.push("- 只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。");
+  L.push("- 上面沒有提到的欄位維持原樣，不要重新抽取或改動。");
+  return L.join("\n");
 }

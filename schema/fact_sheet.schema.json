@@ -20,9 +20,10 @@
     "schema_version": {
       "enum": [
         "1.0",
-        "1.1"
+        "1.1",
+        "1.2"
       ],
-      "description": "1.1 起財測必須標單位"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions"
     },
     "comment": {
       "type": "string",
@@ -432,6 +433,93 @@
         }
       }
     },
+    "guidance_revisions": {
+      "description": "公司在本次文件中明確寫出的財測調整（上修或下修）：必須原文同時寫出調整前與調整後的數字，例如「全年營收財測由 49.5B 上調至 51.1B」。只寫「上調」但沒有調整前數字的不要放這裡，寫進 notes。沒有就省略此區。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metric",
+          "label_source",
+          "period_label",
+          "basis",
+          "unit",
+          "previous",
+          "current",
+          "src"
+        ],
+        "properties": {
+          "metric": {
+            "enum": [
+              "revenue",
+              "gross_margin",
+              "operating_margin",
+              "operating_income",
+              "eps",
+              "free_cash_flow",
+              "other"
+            ]
+          },
+          "label_source": {
+            "type": "string",
+            "description": "原文名稱，逐字照抄"
+          },
+          "period_label": {
+            "type": "string",
+            "pattern": "^FY\\d{4}(Q[1-4])?$",
+            "description": "財測涵蓋的期間：全年寫 FY2026，單季寫 FY2026Q4"
+          },
+          "basis": {
+            "enum": [
+              "GAAP",
+              "non-GAAP",
+              "IFRS",
+              "unspecified"
+            ]
+          },
+          "unit": {
+            "enum": [
+              "monetary",
+              "percent",
+              "per_share",
+              "other"
+            ]
+          },
+          "monetary_unit": {
+            "enum": [
+              "ones",
+              "thousands",
+              "millions",
+              "billions"
+            ],
+            "description": "unit 為 monetary 時必填，照抄原文（例如「$12.0B」→ billions）"
+          },
+          "previous": {
+            "$ref": "#/$defs/guidance_value"
+          },
+          "current": {
+            "$ref": "#/$defs/guidance_value"
+          },
+          "src": {
+            "$ref": "#/$defs/source",
+            "description": "同時含調整前與調整後數字的原句"
+          }
+        },
+        "if": {
+          "properties": {
+            "unit": {
+              "const": "monetary"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "monetary_unit"
+          ]
+        }
+      }
+    },
     "notable_items": {
       "description": "只列公司自己標示為一次性、非經常性或特殊的項目（例如 restructuring、impairment、處分利益）。AI 不自行判斷什麼算重要。沒有就給空陣列。",
       "type": "array",
@@ -604,7 +692,7 @@
       }
     },
     "ambiguities": {
-      "description": "原文有矛盾、看不清楚、或不確定該用哪一欄時，寫在這裡，不要自行選擇。沒有就給空陣列。每一項都必須人工處理。",
+      "description": "只放「原文無法確定、需要人決定」的問題（例如原文兩處數字矛盾、不確定該用哪一欄）。依規則已經處理好的說明（例如照規則填了 null、幣別原文只寫 $）放 notes，不要放這裡。沒有就給空陣列。",
       "type": "array",
       "items": {
         "type": "object",
@@ -626,6 +714,25 @@
             "items": {
               "$ref": "#/$defs/source"
             }
+          }
+        }
+      }
+    },
+    "notes": {
+      "description": "AI 依規則處理時的說明，不需要人工決定（例如照規則填 null 的原因、單位取自哪一頁）。沒有就省略。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "note"
+        ],
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "related_field": {
+            "type": "string"
           }
         }
       }
@@ -865,12 +972,53 @@
           ]
         }
       ]
+    },
+    "guidance_value": {
+      "description": "財測數值：區間填 low／high，單一數字填 point",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "low",
+            "high"
+          ]
+        },
+        {
+          "required": [
+            "point"
+          ]
+        }
+      ]
     }
   },
   "if": {
     "properties": {
       "schema_version": {
-        "const": "1.1"
+        "enum": [
+          "1.1",
+          "1.2"
+        ]
       }
     }
   },

@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.2）
+# PN 財報快報｜美股數據抽取指令（v0.3）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -17,22 +17,25 @@
 5. **一律用「單季」欄位。** 損益表、現金流量表通常同時有「Three Months Ended」（單季）和「Six/Nine Months Ended」（累計）欄位，本季與去年同期都必須取單季欄。只有在原文**完全沒有**單季欄位時，才改抄累計數並把 `period_type` 標為 `ytd`。
 5-1. **表格有上一季欄位時，一併抄進 `prior_quarter`。** 例如損益表同時列出 September 30, 2026、June 30, 2026、September 30, 2025 三欄，June 30 那欄就是上一季。沒有就省略，不要去其他頁找。
 5-2. **同一組數字在不同頁有不同單位時（例如摘要表用百萬、財務報表用仟元），一律抄與損益表同單位的那一份。** 不要混用。
-6. **不確定就寫進 `ambiguities`，不要自己選。** 例如同一數字在兩處不一致、看不出是單季還是累計、列名無法對應到欄位。
+6. **分清楚 `ambiguities` 和 `notes`。**
+   - `ambiguities`：**原文無法確定、需要人決定**的問題，不要自己選。例如同一數字在兩處不一致、看不出是單季還是累計、列名無法對應到欄位。每一條都要寫清楚需要人決定什麼。
+   - `notes`：你**依規則已經處理好**的說明，不需要人決定。例如「原文沒有毛利列，依規則填 null」「幣別原文只寫 $，填 USD」「財測單位取自第 1 頁表頭」。
+   - 判斷原則：照這份指令的規則就能決定的，放 `notes`；規則也無法決定的，才放 `ambiguities`。
 7. **標準欄位只在明確對應時才填。** `cost_of_revenue`、`gross_profit`、`rd_expense`、`sm_expense`、`ga_expense` 等，只有原文列名明確就是該科目時才填；否則填 `null`（`not_applicable`）。
 8. **輸出格式。** 只輸出一個 JSON 程式碼區塊，不要加任何解說。內容太長被截斷時，我會說「繼續」，請從中斷處接著輸出。
-9. **不要推定。** 原文沒寫的屬性一律不填或填 `unspecified`，例如財測沒寫 GAAP 就不要填 GAAP；文件沒出現股票代號，`ticker` 仍可依公司名稱填寫，但要在 `ambiguities` 註明。
+9. **不要推定。** 原文沒寫的屬性一律不填或填 `unspecified`，例如財測沒寫 GAAP 就不要填 GAAP；文件沒出現股票代號，`ticker` 仍可依公司名稱填寫，但要在 `notes` 註明。
 
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.1"`。
+- 填 `"1.2"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
 - `run_id`：依本指令最後一行的說明填寫；沒有說明就填 `"A"`。`extracted_at`：目前時間（ISO 8601，含時區），不確定就填日期。
 
 ### meta（最重要，錯一欄整份錯）
-- `fiscal_period`：用**公司自己的財年**寫法 `FY2026Q3`。公司財年與日曆年不同時，照公司寫法，並在 `ambiguities` 註明。
+- `fiscal_period`：用**公司自己的財年**寫法 `FY2026Q3`。公司財年與日曆年不同時，照公司寫法，並在 `notes` 註明。
 - `period_end`：本季期末日，取自損益表欄名。`period_end_src` 附出處。
 - `monetary_unit`：看損益表上方的單位說明，例如 `(in millions, except per share data)` → `millions`。`monetary_unit_src` 附原句。
 - `share_unit`：股數單位，常與金額不同，看股數那幾列的說明。
@@ -53,7 +56,7 @@
 ### segments 與 geographies
 - **地區**拆分（例如 UCAN、EMEA、Americas、Asia Pacific）放 `geographies`；**部門、產品線或收入類型**（例如雲端、廣告、交易收入、利息收入）放 `segments`。兩種都有就兩邊都填。
 - 金額單位必須與損益表相同（見規則 5-2）。
-- 只放「加總起來等於某個合計」的拆分項目；如果有多層（例如交易收入合計＋其下各項），**放最細的那一層**，並在 `ambiguities` 說明層級結構。
+- 只放「加總起來等於某個合計」的拆分項目；如果有多層（例如交易收入合計＋其下各項），**放最細的那一層**，並在 `notes` 說明層級結構。
 - 只揭露百分比時填 `share_percent`。
 
 ### kpis
@@ -64,12 +67,20 @@
 ### cash_flow、capital_return
 - 有就填，沒有就省略整區（不要填 0）。資本支出、回購、股利照抄原文正負號。
 - `free_cash_flow_stated` 放在 `cash_flow` 底下，與 `operating_cash_flow`、`capex` 同一層。
-- `new_buyback_authorization`：只有原文明確寫「新核准／新增」回購授權才填。「剩餘額度（remaining authorization / capacity left）」不是新授權，寫進 `ambiguities`。
+- `new_buyback_authorization`：只有原文明確寫「新核准／新增」回購授權才填。「剩餘額度（remaining authorization / capacity left）」不是新授權，不要填，在 `notes` 註明。
 
 ### guidance_next
-- 公司在本次文件中給出的**下一季**展望。只抄有數字的項目；全年展望不放這裡，可寫進 `ambiguities` 註明存在。
+- 公司在本次文件中給出的**下一季**展望。只抄有數字的項目；全年展望不放這裡（有調整的放 `guidance_revisions`，其餘在 `notes` 註明存在）。公司沒給下一季財測就省略整區。
 - **`monetary_unit` 必填**：照抄財測表格或段落的單位說明（常與損益表不同，例如財測用百萬、損益表用仟元），並在 `monetary_unit_src` 附出處。
 - 每一項的 `metric` 盡量用標準代號（revenue、operating_income、operating_margin、gross_margin、eps）；淨利、年增率等沒有標準代號的用 `other`。
+
+### guidance_revisions（財測上修／下修）
+- 只收公司在本次文件中**明確寫出調整前與調整後數字**的財測調整，例如「全年營收財測由 $49.5B 上調至 $51.1B」「2026 FCF 預估調整為約 $12.0B（先前為 $12.5B）」。
+- 全年寫 `period_label: "FY2026"`，單季寫 `"FY2026Q4"`。`previous` 是調整前、`current` 是調整後，區間填 `low`／`high`，單一數字填 `point`。
+- 金額類（`unit: "monetary"`）必填 `monetary_unit`，照原文寫法（例如 `$12.0B` → `billions`，數字填 12.0）。
+- `metric`：營收 revenue、營業利益 operating_income、營益率 operating_margin、毛利率 gross_margin、EPS eps、自由現金流 free_cash_flow，其他用 other。
+- `src` 用含調整前與調整後數字的原句。
+- 只寫「上調」「維持」但沒有調整前數字的，**不要放這裡**，在 `notes` 註明。沒有就省略整區。
 
 ### notable_items
 - 只列公司自己標示為一次性、非經常性或特殊的項目。你不判斷什麼算重要。
@@ -80,7 +91,7 @@
 - **內文寫出的營收金額也要列一筆**：例如「revenue of $12.9 billion」→ `{ "metric": "revenue_amount", "value": 12.9, "unit": "billions" }`，附原句出處。這筆用來獨立驗證金額單位。
 
 ### market_specific.us
-- 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `ambiguities` 註明即可。
+- 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `notes` 註明即可。
 
 ### consensus
 - **不要填。** 這一區由人工填寫。
@@ -90,4 +101,4 @@
 - 本季與去年同期都是單季欄位；只有原文完全沒有單季欄時才用累計。
 - 所有金額與損益表同單位（財測例外，但財測要標 `monetary_unit`）。
 - 沒有任何自己算出來的數字。
-- 所有不確定都寫進了 `ambiguities`。
+- 需要人決定的寫進 `ambiguities`，依規則處理好的說明寫進 `notes`。

@@ -421,38 +421,53 @@ export function analyze(fs, ctx) {
     }
   }
 
-  // K1
+  // K1：公司下季財測＋公司明確寫出的財測調整。兩者都沒有就不產出 K1（不顯示「未提供」）。
+  const curShort = profile.defaults.display_currency;
+  const STD_NAMES = { revenue: "營收", operating_income: "營業利益", operating_margin: "營益率", gross_margin: "毛利率", eps: "稀釋 EPS", free_cash_flow: "自由現金流" };
+  const labelOf = (it) => {
+    const zh = STD_NAMES[it.metric] || zhLabel(it.label_source, ctx);
+    return it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${curShort}）` : zh;
+  };
+  /** 財測數值 → 顯示文字；scale＝原文金額單位的 10 次方 */
+  const showValue = (v, unit, scale) => {
+    const one = (x) => (unit === "monetary" ? fmt2((x * scale) / Math.pow(10, dispPow)) : unit === "percent" ? `${fmt1(x)}%` : unit === "per_share" ? fmt2(x) : String(x));
+    return v.point !== null && v.point !== undefined ? one(v.point) : `${one(v.low)}–${one(v.high)}`;
+  };
+  const mid = (v) => (v.point !== null && v.point !== undefined ? v.point : (v.low + v.high) / 2);
+
   const gRows = [];
-  if (g && g.items.length) {
-    const toD = (v) => (v === null || v === undefined ? null : (v * guidanceScale) / Math.pow(10, dispPow));
-    const show = (it) => {
-      const v = (x) => (it.unit === "monetary" ? fmt2(toD(x)) : it.unit === "percent" ? `${fmt1(x)}%` : it.unit === "per_share" ? Number(x).toFixed(2) : String(x));
-      return it.point !== null && it.point !== undefined ? v(it.point) : `${v(it.low)}–${v(it.high)}`;
-    };
-    const names = { revenue: `營收（${unitText}）`, operating_income: `營業利益（${unitText}）`, operating_margin: "營益率", gross_margin: "毛利率", eps: `稀釋 EPS（${profile.defaults.display_currency}）` };
-    // 公司給的每一項都列出（忠實呈現），沒有標準代號的用中文對照或原文名稱
-    for (const it of g.items) {
-      let label = names[it.metric];
-      if (!label) {
-        const zh = zhLabel(it.label_source, ctx);
-        label = it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${profile.defaults.display_currency}）` : zh;
-      }
-      gRows.push({ label, value: show(it) });
-    }
+  if (g && g.items.length) for (const it of g.items) gRows.push({ label: labelOf(it), value: showValue(it, it.unit, guidanceScale) });
+
+  const revRows = [];
+  for (const r of fs.guidance_revisions || []) {
+    const scale = Math.pow(10, UNIT_POWER[r.monetary_unit] ?? srcPow);
+    const diff = mid(r.current) - mid(r.previous);
+    const period = /Q[1-4]$/.test(r.period_label) ? fiscalToCalendar(r.period_label, company.fiscal_year_end_month || 12) : r.period_label;
+    revRows.push({
+      label: labelOf(r), period,
+      previous: showValue(r.previous, r.unit, scale),
+      current: showValue(r.current, r.unit, scale),
+      dir: diff > 0 ? "up" : diff < 0 ? "down" : "flat",
+    });
   }
-  cards.push({
-    id: "K1", template: "T8", header: { ...header, label: "下季財測" }, source: `${baseSource}。`,
-    title: gRows.length ? `公司下季財測（${fiscalToCalendar(g.period_label, company.fiscal_year_end_month || 12)}）` : "公司下季財測",
-    body: {
-      // 只放公司公布的內容，不加預告或其他資訊（小組決定，2026-10-27）
-      sections: [
-        gRows.length
-          ? { heading: "", columns: ["項目", "財測"], rows: gRows }
-          : { heading: "", columns: ["項目", "內容"], rows: [{ label: "下季財測", value: "公司本次未提供", text: true }] },
-        ...(company.next_report_date ? [{ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date, value: "下一季財報公布（公司公告）", text: true }] }] : []),
-      ],
-    },
-  });
+
+  if (gRows.length || revRows.length) {
+    const sections = [];
+    // 財測調整：期間相同時寫在標題（例如「財測調整（FY2026）」），不同時才寫在每一列
+    const periods = [...new Set(revRows.map((r) => r.period))];
+    const revTitle = `財測調整${periods.length === 1 ? `（${periods[0]}）` : ""}`;
+    if (gRows.length) sections.push({ heading: "", columns: ["項目", "財測"], rows: gRows });
+    if (revRows.length) sections.push({
+      heading: gRows.length ? revTitle : "", columns: ["項目", "調整前", "調整後"],
+      rows: revRows.map((r) => ({ cells: [periods.length === 1 ? r.label : `${r.label}｜${r.period}`, r.previous, { arrow: r.dir, value: r.current }] })),
+    });
+    if (company.next_report_date) sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date, value: "下一季財報公布（公司公告）", text: true }] });
+    cards.push({
+      id: "K1", template: "T8", header: { ...header, label: gRows.length ? "下季財測" : "財測調整" }, source: `${baseSource}。`,
+      title: gRows.length ? `公司下季財測（${fiscalToCalendar(g.period_label, company.fiscal_year_end_month || 12)}）` : `公司${revTitle}`,
+      body: { sections },
+    });
+  }
 
   if (overridden("gross_profit_identity")) dropped.push("毛利節點與毛利率（毛利勾稽不符，使用者確認原文如此）");
   if (overridden("eps_identity_c") || overridden("eps_identity_p")) dropped.push("EPS 年增率改用公司公布的 EPS 相除（EPS 勾稽不符，使用者確認原文如此）");

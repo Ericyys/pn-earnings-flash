@@ -22,7 +22,7 @@
 | T5 | 瀑布圖 | G 現金流量與股東回饋、C 虧損替代版 | `t5_waterfall.js` |
 | T6 | 區間圖 | E 對比預期 | `t6_range.js` |
 | T7 | 橫條圖 | I 同業對比 | `t7_hbar.js` |
-| T8 | 清單卡 | K1 下季財測 | `t8_checklist.js` |
+| T8 | 清單卡（兩欄或三欄表格） | K1 下季財測／財測調整 | `t8_checklist.js` |
 
 每個檔案開頭都有該底稿的輸入格式說明，`demo/demo_cards.js` 有完整範例。
 

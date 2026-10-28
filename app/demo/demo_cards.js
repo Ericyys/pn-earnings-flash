@@ -113,10 +113,30 @@ export const DEMO_CARDS = [
           ],
         },
         {
+          heading: "財測調整（FY2026）", columns: ["項目", "調整前", "調整後"],
+          rows: [
+            { cells: ["營收（USD B）", "136.00–138.00", { arrow: "up", value: "139.50–140.50" }] },
+            { cells: ["營益率", "30.0%", { arrow: "down", value: "29.5%" }] },
+          ],
+        },
+        {
           heading: "下次財報日期", columns: ["日期", "事件"],
           rows: [{ label: "2027-01-28", value: "下一季財報公布（公司公告）", text: true }],
         },
       ],
+    },
+  },
+  {
+    id: "K1-rev", template: "T8", header: { ...header, label: "財測調整" }, source,
+    title: "公司財測調整（FY2026）",
+    body: {
+      sections: [{
+        heading: "", columns: ["項目", "調整前", "調整後"],
+        rows: [
+          { cells: ["營收（USD B）", "136.00–138.00", { arrow: "up", value: "139.50–140.50" }] },
+          { cells: ["自由現金流（USD B）", "12.50", { arrow: "down", value: "12.00" }] },
+        ],
+      }],
     },
   },
   {

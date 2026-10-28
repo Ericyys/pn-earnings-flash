@@ -2,7 +2,7 @@
 // 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（可修改、可交給 AI）→ 4 產出圖卡、下載 PNG 與本季存檔
 // 計算在 lib/compute.js、修改在 lib/review.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.0.0（2026-10-28）";
+export const APP_VERSION = "1.1.0（2026-10-28）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -67,7 +67,8 @@ async function runCheck() {
 
   // 同一家公司、同一季重新貼上（例如 AI 依修正要求重新輸出）→ 沿用上一輪的核對紀錄
   const prev = state.A && state.A.meta?.ticker === A.meta?.ticker && state.A.meta?.fiscal_period === A.meta?.fiscal_period ? state : null;
-  state = { A, B, company, errA, errB, ticks: new Set(), choices: {}, edits: [], rounds: prev ? prev.rounds + 1 : 0, editing: null };
+  state = { A, B, company, errA, errB, ticks: new Set(), choices: {}, edits: [], rounds: prev ? prev.rounds + 1 : 0, editing: null,
+    sentToAI: new Set(prev ? [...prev.sentToAI, ...(prev.aiIds || [])] : []) };
   let carry = "";
   if (prev) {
     // 修改：AI 已照修正要求改好 → 不必再套用；AI 沒改 → 繼續套用；AI 改成別的值 → 丟棄，該項需重新核對
@@ -82,7 +83,7 @@ async function runCheck() {
     }
     state.ticks = new Set(prev.ticks);
     for (const [id, ch] of Object.entries(prev.choices)) if (ch.choice !== "ai") state.choices[id] = ch;
-    carry = `沿用上一輪的核對紀錄：勾選 ${prev.ticks.size} 項（數值有變的會自動取消）、修改 ${kept} 項仍需套用、${absorbed} 項 AI 已照改、${dropped} 項 AI 改成其他值（需重新核對）、判斷 ${Object.keys(state.choices).length} 項。`;
+    carry = `沿用上一輪的核對紀錄：勾選 ${prev.ticks.size} 項（數值有變的會自動取消）、修改 ${kept} 項仍需套用、${absorbed} 項 AI 已照改、${dropped} 項 AI 改成其他值（需重新核對）、你的判斷 ${Object.keys(state.choices).length} 項。上一輪交給 AI 的問題若仍存在，這一輪會改列在「需要你判斷」。`;
   }
   $("carryMsg").innerHTML = carry ? `<div class="banner ok">${esc(carry)}</div>` : "";
   $("general").value = "";
@@ -114,7 +115,7 @@ function recompute() {
   $("checks").querySelector("tbody").innerHTML = state.out.checks.map((c) =>
     `<tr><td class="${c.status}">${lab[c.status]}</td><td>${esc(c.label)}</td><td>${esc(c.detail)}</td></tr>`).join("");
   $("diffBox").innerHTML = state.B ? `<h3>A／B 比對：${state.diffs.length} 處不同</h3>
-    <p class="pad note">差異列在步驟 3 第三層，每一處選擇採用哪一邊。只用於驗算的欄位不列入。</p>` : "";
+    <p class="pad note">差異列在步驟 3 第三層：A 有數字的，第二層對照原文核對即可（自動處理）；A 沒有、B 有的，交給 AI 判斷是否補抽。只用於驗算的欄位不列入。</p>` : "";
   if (failed.length) $("diffBox").insertAdjacentHTML("beforeend", `<div class="banner">有 ${failed.length} 筆修改找不到對應欄位，未套用：${esc(failed.map((f) => f.path).join("、"))}</div>`);
   buildManual();
 }
@@ -175,39 +176,80 @@ function layer2Items() {
     items.push({ group: `下季財測（${g.period_label}）`, name: it.label_source, path: `guidance_next.items[${id}]`, kind: "guidance", value: range ? `${it.low}–${it.high}` : it.point,
       unit: it.unit === "monetary" ? (g.monetary_unit || "（未標單位）") : it.unit === "percent" ? "%" : it.unit === "per_share" ? "每股" : "", src: it.src });
   }
+  // 財測調整：調整前、調整後各一列；金額類另有單位一列
+  for (const r of A.guidance_revisions || []) {
+    const id = `${r.metric}|${r.label_source}`, grp = `財測調整（${r.period_label}）`;
+    const show = (v) => (v.point !== null && v.point !== undefined ? v.point : `${v.low}–${v.high}`);
+    const u = r.unit === "monetary" ? (r.monetary_unit || "（未標單位）") : r.unit === "percent" ? "%" : r.unit === "per_share" ? "每股" : "";
+    if (r.unit === "monetary") items.push({ group: grp, name: `${r.label_source}｜金額單位`, path: `guidance_revisions[${id}].monetary_unit`, kind: "unitfield", value: r.monetary_unit ?? "（未標示）", unit: "", src: r.src });
+    items.push({ group: grp, name: `${r.label_source}｜調整前`, path: `guidance_revisions[${id}].previous`, kind: "guidance", value: show(r.previous), unit: u, src: r.src });
+    items.push({ group: grp, name: `${r.label_source}｜調整後`, path: `guidance_revisions[${id}].current`, kind: "guidance", value: show(r.current), unit: u, src: r.src });
+  }
   return items;
 }
 
-/** 第三層的項目：每一項有固定 id，判斷會跨重算保留 */
+// ───── 第三層：自動分類
+// 第一、二層已經把數字對過原文，第三層剩下的是「數字以外」的問題：算法、AI 的抓取邏輯、重大風險。工具依規則分成三類：
+//   user  需要你判斷：重大風險（單位、期間、超出合理範圍），或已交給 AI 一次仍未解決的問題
+//   ai    交給 AI：第一次出現的勾稽不通過、需確認、AI 疑慮、A 沒有而 B 有的項目 → 整理成一段文字貼回 AI
+//   auto  自動處理：依規則計算的數字、資訊性提示、A 的數字已在第二層核對的 A／B 差異、AI 的說明（notes）
+const USER_RISK = /^(guidance_magnitude|revenue_amount_|eps_identity_|fiscal_period_vs_end|range_)/;
+const AUTO_WARN = new Set(["yoy_outlier", "fcf_identity"]);
+const AI_REQUEST = {
+  cash_flow_period: "現金流量請一律改抓單季（Three Months Ended）欄位；原文完全沒有單季欄位時才用累計，並標 period_type: ytd。",
+  guidance_unit: "請依財測表格或段落的單位說明填入 guidance_next.monetary_unit，並附出處。",
+};
+const GENERIC_FAIL = "請回原文確認相關科目是否抓錯列、漏列或放錯欄位並修正；若原文確實如此，在 notes 說明原因。";
+const AMB_REQUEST = "請依原文自行判斷並處理：能從原文確定的，照規則修正數據並把說明移到 notes；只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。";
+
 function layer3Items() {
-  const out = state.out, A = state.Aeff;
+  const out = state.out, A = state.Aeff, sent = state.sentToAI || new Set();
   const list = [];
-  if (state.choices["meta:period"]) list.push({ id: "meta:period", kind: "period", text: "第一層：期末日與本季數字的出處欄名不是同一期（AI 可能抓錯整欄），工具不允許直接修改" });
+  const push = (it) => {
+    // 交給 AI 的項目若使用者標記「原文如此」，改列在「需要你判斷」並視為已處理
+    if (it.group === "ai" && state.choices[it.id]?.choice === "ok") it.group = "user";
+    list.push(it);
+  };
+  if (state.choices["meta:period"]) push({ id: "meta:period", group: "user", kind: "period", path: "meta.period_end", text: "期末日與本季數字的出處欄名不是同一期（AI 可能抓錯整欄），工具不允許直接修改" });
   for (const c of out.checks) {
-    if (c.status === "fail") list.push({ id: `check:${c.id}`, kind: "fail", text: `不通過：${c.label}｜${c.detail}` });
-    if (c.status === "warn" && c.id !== "ambiguities") list.push({ id: `check:${c.id}`, kind: "warn", text: `需確認：${c.label}｜${c.detail}` });
+    const id = `check:${c.id}`;
+    if (c.status === "fail") {
+      const group = USER_RISK.test(c.id) || sent.has(id) ? "user" : "ai";
+      push({ id, group, kind: "fail", text: `不通過：${c.label}｜${c.detail}`, escalated: group === "user" && sent.has(id), request: AI_REQUEST[c.id] || GENERIC_FAIL });
+    } else if (c.status === "warn" && c.id !== "ambiguities") {
+      const group = AUTO_WARN.has(c.id) ? "auto" : c.id === "fiscal_period_vs_end" || sent.has(id) ? "user" : "ai";
+      push({ id, group, kind: "warn", text: `需確認：${c.label}｜${c.detail}`, escalated: group === "user" && sent.has(id), request: AI_REQUEST[c.id] || GENERIC_FAIL,
+        reason: group === "auto" ? "數字已在第二層對照原文核對，這是資訊性提示" : "" });
+    }
   }
-  for (const d of out.derivable) list.push({ id: `derived:${d.id}`, kind: "derived", text: `計算得出的數字：${d.name}＝${d.formula}。原文沒有這一列，依 rules/derivations.json 計算並在圖卡底部註明；請確認原文確實沒有這一列` });
-  (A.ambiguities || []).forEach((a, i) => list.push({ id: `amb:${i}:${(a.issue || "").slice(0, 24)}`, kind: "amb", text: `AI 疑慮（${a.related_field || "—"}）：${a.issue}`, path: a.related_field }));
+  for (const d of out.derivable) push({ id: `derived:${d.id}`, group: "auto", kind: "derived", text: `計算得出的數字：${d.name}＝${d.formula}`, reason: "原文沒有這一列；依 rules/derivations.json 計算，結果與原文科目恆等，圖卡底部已註明" });
+  (A.ambiguities || []).forEach((a, i) => {
+    const group = sent.has("amb") ? "user" : "ai";
+    push({ id: `amb:${i}:${(a.issue || "").slice(0, 24)}`, group, kind: "amb", text: `AI 疑慮（${a.related_field || "—"}）：${a.issue}`, path: a.related_field, escalated: group === "user", request: AMB_REQUEST });
+  });
   for (const d of state.diffs) {
+    const id = `diff:${d.path}`;
     const adoptable = d.paths.every((p) => getNode(A, p) !== undefined && getNode(state.B, p) !== undefined);
-    list.push({ id: `diff:${d.path}`, kind: "diff", text: `A／B 不同｜${d.path}｜A＝${d.a}｜B＝${d.b}`, d, adoptable, path: d.path });
+    if (d.type === "只有 B 有") {
+      const group = sent.has(id) ? "user" : "ai";
+      push({ id, group, kind: "diff", path: d.path, text: `A 沒有、B 有：${d.path}｜B＝${d.b}`, escalated: group === "user",
+        request: `另一個 AI 抽到 ${d.path}＝${d.b}，你的版本沒有。請回原文確認：該抽就補上（附出處），不該抽（例如不符合規則）就不要加，並在 notes 說明。` });
+    } else {
+      push({ id, group: "auto", kind: "diff", path: d.path, d, adoptable, text: `A／B 不同｜${d.path}｜A＝${d.a}｜B＝${d.b}`,
+        reason: d.type === "只有 A 有" ? "B 漏抽，以 A 為準" : "A 的數字已在第二層對照原文核對；若 B 才對，可按「把 A 改成 B 的值」" });
+    }
   }
+  (A.notes || []).forEach((n, i) => push({ id: `note:${i}`, group: "auto", kind: "note", text: `AI 說明（${n.related_field || "—"}）：${n.note}`, reason: "AI 依規則處理的說明，不需決定" }));
   return list;
 }
 
-// 三種結果對所有公司都一樣；判斷內容由使用者自己寫
-const OUTCOMES = [
-  ["ok", "數據正確，不需要修改", ""],
-  ["fixed", "我已在第一／二層改正", ""],
-  ["ai", "交給 AI 修正", "給 AI 的要求（必填）：例如「單位應為 millions」「請改抓單季欄位」「請補抽地區營收」"],
+// 「需要你判斷」的兩種結果
+const USER_OUTCOMES = [
+  ["ok", "原文如此，維持現狀"],
+  ["ai", "需要修正：寫下你的判斷，連同其他問題一起交給 AI"],
 ];
-/** 第三層某項是否已處理完：選了「數據正確」或「已改正」（「不通過」選已改正但仍不通過，不算） */
-function resolved(it) {
-  const ch = state.choices[it.id];
-  if (it.kind === "fail" && ch?.choice === "fixed") return false; // 真的改對了，這項會自動消失
-  return !!ch && (ch.choice === "ok" || ch.choice === "fixed");
-}
+/** 「需要你判斷」的項目是否已處理完（選「原文如此」才算；「需要修正」要等 AI 回來） */
+const resolved = (it) => state.choices[it.id]?.choice === "ok";
 
 // 對「不通過」選「數據正確」時，工具為了不畫出與數字矛盾的圖，會自動少畫的部分
 const OVERRIDE_EFFECT = {
@@ -260,23 +302,32 @@ function buildManual() {
   // 第三層
   const l3 = layer3Items();
   state.l3 = l3;
-  blocks.push(`<h3>第三層｜不通過、需確認、PN 計算、AI 疑慮、A／B 差異（${l3.length} 項）</h3>
-    <p class="pad note">每一項選一個結果。<b>數據正確</b>：原文就是如此。<b>我已改正</b>：錯誤範圍明確（一兩個數字、單位或欄位），自己在第一或第二層按「修改」改好；「不通過」改對之後會自動消失。<b>交給 AI 修正</b>：工具改不了或找不出錯在哪（漏抽、整欄抓錯期間、很多項同時不通過），寫下要求，會原文送給 AI。A／B 不同時，B 對可以按「把 A 改成 B 的值」。</p>
-    <div class="tablewrap pad t3"><table><thead><tr><th style="width:90px">狀態</th><th>項目與處理方式</th></tr></thead><tbody>
-    ${l3.map((it) => {
-      const ch = state.choices[it.id] || {};
-      let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>`;
-      if (it.kind === "diff" && it.adoptable) body += `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>`;
-      body += OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
-      const oc = OUTCOMES.find((o) => o[0] === ch.choice);
-      const cid = it.id.startsWith("check:") ? it.id.slice(6) : "";
-      if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「數據正確」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
-      if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次損益表上方的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。</div>`;
-      if (it.kind === "fail" && ch.choice === "fixed") body += `<div class="note fail">這項仍然不通過，代表還沒改對：改對之後這一項會自動消失。</div>`;
-      if (ch.choice === "ai") body += `<textarea data-text="${esc(it.id)}" placeholder="${esc(oc[2])}">${esc(ch.text || "")}</textarea>`;
-      const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">待 AI 修正</span>` : `<span class="pending">未處理</span>`;
-      return `<tr><td>${st}</td><td>${body}</td></tr>`;
-    }).join("")}</tbody></table></div>`);
+  const users = l3.filter((x) => x.group === "user"), ais = l3.filter((x) => x.group === "ai"), autos = l3.filter((x) => x.group === "auto");
+  const userRow = (it) => {
+    const ch = state.choices[it.id] || {};
+    const cid = it.id.startsWith("check:") ? it.id.slice(6) : "";
+    let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>`;
+    if (it.escalated) body += `<div class="note">上一輪已交給 AI，仍未解決</div>`;
+    body += USER_OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
+    if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「原文如此」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
+    if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次表頭的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。數字或單位可以直接在第一、二層改，改對後這一項會自動消失。</div>`;
+    if (ch.choice === "ai") body += `<textarea data-text="${esc(it.id)}" placeholder="你的判斷（必填）：例如「財測單位是 millions」「這兩列都要算進營業費用」">${esc(ch.text || "")}</textarea>`;
+    const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">未判斷</span>`;
+    return `<tr><td>${st}</td><td>${body}</td></tr>`;
+  };
+  const aiRow = (it) => `<tr><td><span class="pending">交給 AI</span></td><td><div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>
+    <div class="note">給 AI 的要求：${esc(it.request)}</div>
+    <div class="row" style="margin-top:4px"><button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button></div></td></tr>`;
+  const autoRow = (it) => `<tr><td><span class="resolved">自動</span></td><td><div class="item">${esc(it.text)}</div><div class="note">${esc(it.reason || "")}</div>
+    ${it.adoptable ? `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>` : ""}</td></tr>`;
+  const table3 = (rows) => `<div class="tablewrap pad t3"><table><thead><tr><th style="width:90px">狀態</th><th>內容</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  blocks.push(`<h3>第三層｜數字以外的問題（${l3.length} 項，工具已自動分類）</h3>
+    <p class="pad note">第一、二層把數字對過原文後，剩下的是算法、AI 抓取邏輯與重大風險。<b>需要你判斷</b>的先處理；<b>交給 AI</b> 的不用逐條看，工具會連同你的判斷整理成一段文字，貼回原本的 AI 對話，再把 AI 重新輸出的 JSON 貼回步驟 1。<b>自動處理</b>的不需要動作。</p>
+    <h3>需要你判斷（${users.length}）</h3>
+    ${users.length ? table3(users.map(userRow).join("")) : `<p class="pad note">沒有。</p>`}
+    <h3>交給 AI（${ais.length}）</h3>
+    ${ais.length ? `<details class="pad" ${state.aiOpen ? "open" : ""} id="aiDetails"><summary>不用逐條看，已整理在下方「給 AI 的整理」；展開可查看，或把確定是原文如此的項目移出</summary>${table3(ais.map(aiRow).join(""))}</details>` : `<p class="pad note">沒有。</p>`}
+    <details class="pad"><summary>自動處理（${autos.length}，不需動作）</summary>${table3(autos.map(autoRow).join(""))}</details>`);
 
   $("manualBox").innerHTML = blocks.join("");
   bindManual();
@@ -312,7 +363,7 @@ function editorL1(f, name, type, v) {
 
 function editorL2(it) {
   if (it.kind === "unitfield") return `<tr class="editor"><td></td><td colspan="5">
-    <div>修改「財測金額單位」：<select id="edVal">${["ones", "thousands", "millions", "billions"].map((u) => `<option ${u === it.value ? "selected" : ""}>${u}</option>`).join("")}</select></div>
+    <div>修改「${esc(it.name)}」：<select id="edVal">${["ones", "thousands", "millions", "billions"].map((u) => `<option ${u === it.value ? "selected" : ""}>${u}</option>`).join("")}</select></div>
     <input type="text" id="edNote" placeholder="備註（選填）：例如財測表格上方寫 in millions">
     <div class="row"><button class="small" id="edSave">儲存</button><button class="ghost small" id="edCancel">取消</button>
     ${editOf(it.path) ? `<button class="ghost small" id="edRevert">還原為 AI 的值</button>` : ""}<span id="edMsg" class="note"></span></div></td></tr>`;
@@ -361,6 +412,11 @@ function bindManual() {
     const t = document.querySelector(`textarea[data-text="${CSS.escape(id)}"]`);
     if (t) t.focus();
   }));
+  if ($("aiDetails")) $("aiDetails").addEventListener("toggle", (e) => (state.aiOpen = e.target.open));
+  box.querySelectorAll("[data-keep]").forEach((btn) => (btn.onclick = () => {
+    state.choices[btn.dataset.keep] = { choice: "ok", text: "" };
+    recompute();
+  }));
   box.querySelectorAll("[data-adopt]").forEach((btn) => (btn.onclick = () => {
     const it = state.l3.find((x) => x.id === btn.dataset.adopt);
     const valOf = (n) => (n && typeof n === "object" ? n.value : n);
@@ -380,10 +436,6 @@ function bindManual() {
     const id = t.dataset.text;
     state.choices[id] = { ...(state.choices[id] || {}), text: t.value };
     updateGate();
-    // 更新狀態欄
-    const it = state.l3.find((x) => x.id === id);
-    const cell = t.closest("tr").firstElementChild;
-    cell.innerHTML = resolved(it) ? `<span class="resolved">已處理</span>` : state.choices[id].choice === "ai" ? `<span class="pending">待 AI 修正</span>` : `<span class="pending">未處理</span>`;
   }));
   // 編輯器
   const path = state.editing;
@@ -481,53 +533,53 @@ function bindManual() {
   };
 }
 
-function pendingRequests() {
-  const reqs = [];
-  for (const [id, ch] of Object.entries(state.choices)) {
-    if (ch.choice !== "ai") continue;
-    const it = (state.l3 || []).find((x) => x.id === id);
-    const path = id === "meta:period" ? "meta.period_end" : it?.path || id.replace(/^\w+:/, "");
-    reqs.push({ path, issue: it ? it.text : "期末日與數字出處欄名不一致", request: ch.text || "" });
-  }
-  return reqs;
-}
-
 function updateGate() {
   const boxes = [...document.querySelectorAll(".mc")];
   const ticked = boxes.filter((b) => b.checked).length;
   const l3 = state.l3 || [];
-  const l3done = l3.filter(resolved).length;
-  const reqs = pendingRequests();
+  const users = l3.filter((x) => x.group === "user"), ais = l3.filter((x) => x.group === "ai");
+  const userOpen = users.filter((x) => !state.choices[x.id]?.choice);
+  const userToAI = users.filter((x) => state.choices[x.id]?.choice === "ai");
+  const userToAIEmpty = userToAI.filter((x) => !(state.choices[x.id].text || "").trim());
   const general = $("general").value.trim();
-  const total = boxes.length + l3.length;
-  const done = ticked + l3done;
+  const needAI = ais.length > 0 || userToAI.length > 0 || general.length > 0;
+  // 本輪交給 AI 的項目（下一輪若仍存在，會改列「需要你判斷」）
+  state.aiIds = [...ais.map((x) => x.id), ...userToAI.map((x) => x.id), ...(ais.some((x) => x.kind === "amb") ? ["amb"] : [])];
+
+  const total = boxes.length + users.length;
+  const done = ticked + users.filter(resolved).length;
   $("bar").style.width = `${total ? (done / total) * 100 : 0}%`;
-  $("progressText").textContent = `第一、二層已打勾 ${ticked} / ${boxes.length}｜第三層已處理 ${l3done} / ${l3.length}${state.edits.length ? `｜已修改 ${state.edits.length} 處` : ""}`;
-  const needAI = reqs.length > 0 || general.length > 0;
+  $("progressText").textContent = `第一、二層已打勾 ${ticked} / ${boxes.length}｜第三層：需要你判斷 ${users.length - userOpen.length} / ${users.length}、交給 AI ${ais.length + userToAI.length}、自動處理 ${l3.length - users.length - ais.length}${state.edits.length ? `｜已修改 ${state.edits.length} 處` : ""}`;
+
+  // 給 AI 的整理：「需要你判斷」全部選完才產生，讓你的判斷一起送出
   $("promptBox").hidden = !needAI;
-  if (needAI) {
+  const promptReady = needAI && userOpen.length === 0 && userToAIEmpty.length === 0;
+  $("promptWait").textContent = !promptReady && needAI
+    ? (userOpen.length ? `先完成「需要你判斷」的 ${userOpen.length} 項，才會產生給 AI 的整理。` : `「需要修正」的 ${userToAIEmpty.length} 項還沒寫下你的判斷。`) : "";
+  $("promptText").hidden = !promptReady;
+  $("btnCopy").disabled = !promptReady;
+  if (promptReady) {
     const edits = state.edits.filter((e) => e.value !== undefined).map((e) => ({ path: e.path, value: e.value, period_type: e.period_type, column_label: e.column_label }));
-    $("promptText").value = correctionPrompt({ requests: reqs, edits, general });
+    $("promptText").value = correctionPrompt({
+      userDecisions: userToAI.map((x) => ({ path: x.path || x.id.replace(/^\w+:/, ""), issue: x.text, decision: state.choices[x.id].text.trim() })),
+      aiItems: ais.map((x) => ({ path: x.path || x.id.replace(/^\w+:/, ""), issue: x.text, request: x.request })),
+      edits, general,
+    });
   }
-  const ready = done === total && !needAI;
+
+  const ready = ticked === boxes.length && userOpen.length === 0 && !needAI;
   $("btnRender").disabled = !ready;
   const missing = [];
   if (ticked < boxes.length) missing.push(`第一、二層還有 ${boxes.length - ticked} 項沒打勾`);
-  if (l3done < l3.length) {
-    const nAI = l3.filter((it) => state.choices[it.id]?.choice === "ai").length;
-    const nFix = l3.filter((it) => it.kind === "fail" && state.choices[it.id]?.choice === "fixed").length;
-    const nNone = l3.filter((it) => !state.choices[it.id]).length;
-    if (nNone) missing.push(`第三層還有 ${nNone} 項沒選結果`);
-    if (nFix) missing.push(`第三層有 ${nFix} 項選了「已改正」但仍不通過`);
-    if (nAI) missing.push(`第三層有 ${nAI} 項交給 AI 修正`);
-  }
-  if (general) missing.push("「其他要求」有內容，需要先交給 AI");
+  if (userOpen.length) missing.push(`「需要你判斷」還有 ${userOpen.length} 項`);
+  if (needAI) missing.push(`有 ${ais.length + userToAI.length} 項${general ? "與其他要求" : ""}要交給 AI，貼回新的 JSON 後才能出圖`);
   $("renderMsg").innerHTML = ready ? "" : `${esc(missing.join("；"))}　<button class="ghost small" id="btnNext">跳到下一個未完成項目</button>`;
   if ($("btnNext")) $("btnNext").onclick = () => {
     const box = [...document.querySelectorAll(".mc")].find((b) => !b.checked);
     const row = box ? box.closest("tr") : [...document.querySelectorAll("#manualBox .t3 tr")].find((tr) => tr.querySelector(".pending"));
-    if (row) { row.scrollIntoView({ behavior: "smooth", block: "center" }); row.style.outline = "2px solid #C2410C"; setTimeout(() => (row.style.outline = ""), 2000); }
-    else $("general").scrollIntoView({ behavior: "smooth", block: "center" });
+    const target = row || $("promptBox");
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (row) { row.style.outline = "2px solid #C2410C"; setTimeout(() => (row.style.outline = ""), 2000); }
   };
 }
 $("general").addEventListener("input", updateGate);
@@ -539,7 +591,8 @@ $("btnCopy").onclick = async () => {
 // ───── 步驟 4：圖卡
 $("btnRender").onclick = async () => {
   $("s4").hidden = false;
-  await drawCards();
+  try { await drawCards(); }
+  catch (e) { console.error(e); $("exportMsg").innerHTML = `<span class="fail">產出圖卡時發生錯誤：${esc(e.message)}。請把這段訊息截圖給維護者。</span>`; }
   $("s4").scrollIntoView({ behavior: "smooth" });
 };
 
@@ -555,10 +608,14 @@ function selectionHtml() {
 
 async function drawCards() {
   const cards = structuredClone(state.out.cards);
+  // 下次財報日期只加在 K1；沒有 K1（公司沒給財測、也沒有財測調整）時不另外出卡
   const k1 = cards.find((c) => c.id === "K1");
   const nd = $("nextDate").value.trim();
-  k1.body.sections = k1.body.sections.filter((s) => s.heading !== "下次財報日期");
-  if (nd) k1.body.sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: nd, value: "下一季財報公布（公司公告）", text: true }] });
+  if (k1) {
+    k1.body.sections = k1.body.sections.filter((s) => s.heading !== "下次財報日期");
+    if (nd) k1.body.sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: nd, value: "下一季財報公布（公司公告）", text: true }] });
+  }
+  $("nextDateNote").textContent = !k1 && nd ? "這次沒有 K1（公司沒給財測，也沒有財測調整），下次財報日期不會顯示。" : "";
   state.cards = cards;
   $("selBox").innerHTML = selectionHtml();
   await ensureFonts(brand, cards);
@@ -616,7 +673,7 @@ $("btnArchive").onclick = () => {
     ai_fact_sheet: A,                 // AI 原始輸出
     edits: state.edits,               // 人工修改紀錄（AI 原值 → 修改值、備註）
     overrides: out.checks.filter((c) => c.status === "fail" && state.choices[`check:${c.id}`]?.choice === "ok").map((c) => c.id), // 確認「數據正確」的不通過項目
-    review_choices: (state.l3 || []).map((it) => ({ item: it.text, choice: state.choices[it.id]?.choice || null, note: state.choices[it.id]?.text || "" })),
+    review_items: (state.l3 || []).map((it) => ({ group: it.group, item: it.text, choice: state.choices[it.id]?.choice || null, note: state.choices[it.id]?.text || "" })),
     correction_rounds: state.rounds,  // 請 AI 修正的次數
     checks: out.checks,
     derived: out.derived,

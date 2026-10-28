@@ -28,7 +28,8 @@
       "E:inside",
       "I"
     ],
-    "priority_note": "條件模組超過 2 個被觸發時，依 selection_priority 取前 2 個；選中後依 order_on_deck 排列張次"
+    "priority_note": "條件模組超過 2 個被觸發時，依 selection_priority 取前 2 個；選中後依 order_on_deck 排列張次",
+    "fixed_note": "A1、C 一律產出（C 在虧損時改為瀑布圖）；K1 有財測或財測調整時才產出"
   },
   "missing_data_policy": "某條規則需要的數據不存在（例如還沒有 8 季歷史），該條規則視為不觸發，並在選圖結果中列出「因資料不足略過」",
   "metrics": {
@@ -232,10 +233,10 @@
       }
     },
     "K1": {
-      "name": "下季財測",
+      "name": "下季財測／財測調整",
       "template": "T8",
       "type": "fixed",
-      "note": "只列公司公布的下季財測（與公司公告的下次財報日期，若有）；不放預告或其他資訊"
+      "note": "有公司下季財測或公司明確寫出的財測調整（上修／下修）才產出；兩者都沒有就不產出 K1，不顯示「未提供」。只放公司公布的內容。"
     }
   },
   "market_overrides": {
