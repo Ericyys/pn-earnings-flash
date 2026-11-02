@@ -433,7 +433,7 @@ export function analyze(fs, ctx) {
     add("fcf_identity", "自由現金流＝營業現金流−資本支出", Math.abs(d) <= tol(2) ? "pass" : "warn", `差 ${d}（公司定義可能不同）`);
   }
 
-  // ── 10. 公司自己寫出的比率 → 驗證 PN 的計算（容許值依原文精度）
+  // ── 10. 公司自己寫出的 EPS 年增率：與公布 EPS 一致時圖卡採用（其他比率在「圖卡數字核對」比對）
   const statedMap = { revenue_yoy: M.revenue_yoy, operating_margin: M.operating_margin, gross_margin: M.gross_margin, net_margin: M.net_margin, eps_yoy: M.eps_yoy, revenue_qoq: M.revenue_qoq };
   // 公布的 EPS 已四捨五入，公司自己寫的 EPS 年增率可能用未四捨五入的數字算：容許 EPS 尾數 ±0.5 個最小單位造成的差異
   const epsYoyRange = () => {
@@ -454,11 +454,7 @@ export function analyze(fs, ctx) {
     const rg = s.metric === "eps_yoy" && !(npsRule && epsYoyNps !== null) ? epsYoyRange() : null;
     const ok = rg ? s.value >= rg[0] - allow && s.value <= rg[1] + allow : Math.abs(calc - s.value) <= allow;
     if (s.metric === "eps_yoy" && ok && s.unit === "percent") epsStatedOk.push(s);
-    let suggest = null;
-    if (s.metric === "eps_yoy" && !ok && !npsRule && epsYoyNps !== null && Math.abs(epsYoyNps - s.value) <= allow) suggest = { patch: { calc: { eps_yoy: "net_income_per_share" } },
-      text: `用「${epsNumZh} ÷ ${shZh}」（四捨五入前的 EPS）算為 ${epsYoyNps.toFixed(2)}%，與原文相符：這家公司的 EPS 年增率用四捨五入前的數字計算` };
-    add(`stated_${s.metric}_${s.value}`, `原文寫 ${s.metric} ${s.value}${s.unit === "percent" ? "%" : ""}`, ok ? "pass" : "fail",
-      `PN 計算 ${calc.toFixed(2)}${rg && ok && Math.abs(calc - s.value) > allow ? "（差異在公布 EPS 四捨五入的範圍內）" : ""}${rg && !ok ? "；不在公布 EPS 四捨五入可能的範圍內，可能抓到非 GAAP、其他口徑或累計期間的年增率。圖卡不採用這個數字，改用公布的 EPS 計算" : ""}`, suggest);
+    // 公司寫的比率與工具計算的比對，移到「圖卡數字核對」（依四捨五入／定義不同／抓錯分類），不列在第三層
   }
   // 公司有寫 EPS 年增率、且與公布 EPS 一致 → 圖卡用公司的數字（位數依原文；表格與內文各寫一次時用位數較多的）
   if (epsStatedOk.length) {
@@ -580,9 +576,16 @@ export function analyze(fs, ctx) {
   const header = { ticker: m.ticker, period, label: "財報快報" };
   const docName = company.source_doc_name_zh || "財報新聞稿";
   const baseSource = `資料來源：${company.company_name_zh || m.company_name} ${period} ${docName}（${m.report_date}）`;
-  // 圖卡底部只寫名稱，不寫主詞（帳號署名已在右下角），例如「毛利、業外收支淨額依損益表科目計算」；公式寫在 rules/derivations.json 與核對畫面
-  const withDerived = (list) => (list.length ? `${baseSource}。${list.map((d) => d.replace(/（.*）$/, "")).join("、")}依損益表科目計算。` : `${baseSource}。`);
-  const cNotes = cogsNote ? `${cogsNote}。` : "";
+  // 頁尾附註（spec.notes）：頁尾最多兩行，放不下時依優先順序（p 越小越優先）保留，其餘列在「圖卡數字核對」請寫進貼文
+  //   p1 計算方式與公司算式；p2 口徑（淨利口徑、與新聞稿定義不同）；p3 調節項目
+  //   附註只寫名稱，不寫主詞（帳號署名已在右下角），例如「毛利、業外收支淨額依損益表科目計算」；公式寫在 rules/derivations.json 與核對畫面
+  const src = `${baseSource}。`;
+  const derivedNote = (list) => (list.length ? [{ text: `${list.map((d) => d.replace(/（.*）$/, "")).join("、")}依損益表科目計算。`, p: 1 }] : []);
+  const cNotes = cogsNote ? [{ text: `${cogsNote}。`, p: 1 }] : [];
+  // 淨利口徑：圖上的淨利與 EPS 的分子不同（且差異不只是四捨五入）時才註明；不寫差額（避免連串四捨五入造成的小差異被放大）
+  const r2d = (v) => (v === null ? null : Math.round(disp(v) * 100) / 100);
+  const niBasisNote = epsNum !== niP && epsNum && r2d(epsNum.c) !== r2d(niP.c)
+    ? `淨利為${niP.c === ni.c ? "損益表淨利" : "歸屬母公司淨利"}；EPS 以歸屬普通股股東之淨利計算。` : "";
 
   const cards = [];
   const name = company.company_name_zh || m.company_name;
@@ -590,7 +593,7 @@ export function analyze(fs, ctx) {
   const a1Miss = missingOf([["營收", rev.c], ["去年同期營收", rev.p], ["營業利益", oi.c], ["去年同期營業利益", oi.p], [epsZh, eps.c], [`去年同期${epsZh}`, eps.p]]);
   if (a1Miss.length) incomplete.push({ card: "A1", reason: `缺${a1Miss.join("、")}` });
   else cards.push({
-    id: "A1", template: "T1", header, source: `${baseSource}。${epsNote}`,
+    id: "A1", template: "T1", header, source: src, notes: epsNote ? [{ text: epsNote, p: 1 }] : [],
     body: {
       ticker: m.ticker, company: name, period,
       headline: `營收 ${unitText.split(" ")[0]} ${fmt2(disp(rev.c))}${DISPLAY_LABEL[dispUnit]}，年增 ${yoyText(yoyShown(rev.c, rev.p))}`,
@@ -614,7 +617,7 @@ export function analyze(fs, ctx) {
   else if (cMiss.length) incomplete.push({ card: "C", reason: `缺${cMiss.join("、")}` });
   else cards.push({
     id: "C", template: "T4", header: { ...header, label: "損益流向" },
-    source: withDerived(stopAtOI ? derived.filter((d) => !d.startsWith("業外")) : derived) + cNotes,
+    source: src, notes: [...derivedNote(stopAtOI ? derived.filter((d) => !d.startsWith("業外")) : derived), ...cNotes],
     body: {
       unit: unitText,
       revenue: disp(rev.c), cogs: cogs.c === null ? 0 : disp(cogs.c), grossProfit: chartGp.c === null ? null : disp(chartGp.c),
@@ -624,7 +627,9 @@ export function analyze(fs, ctx) {
       otherOperating: disp(other.c || 0), operatingIncome: disp(oi.c),
       nonOperating: disp(nonop.c || 0), tax: disp(tax.c ?? 0), netIncome: disp(niP.c),
       margins: { gross: chartGp.c !== null && cogs.c !== null ? M.gross_margin : undefined, operating: M.operating_margin, net: M.net_margin },
-      note: hl ? (fs.notable_items?.length ? fs.notable_items.map((x) => `${useName(nameOf(x, `notable:${x.label_source}`, ctx))} ${fmt2(disp(num(x.amount)))}`).join("；") : `業外收支淨額佔淨利 ${fmt1(M.non_operating_share_of_net_income * 100)}%`) : undefined,
+      // 圖下註記：公司標示的一次性項目（＊）；淨利口徑（條件觸發）
+      note: hl && fs.notable_items?.length ? fs.notable_items.map((x) => `${useName(nameOf(x, `notable:${x.label_source}`, ctx))} ${fmt2(disp(num(x.amount)))}`).join("；") : undefined,
+      footnote: stopAtOI ? undefined : niBasisNote || undefined,
     },
   });
 
@@ -639,7 +644,8 @@ export function analyze(fs, ctx) {
       ];
       const hasGM = series[0].name === "毛利率";
       cards.push({
-        id: "D", template: "T3", header: { ...header, label: "利潤率" }, source: withDerived(hasGM ? derived.filter((d) => d.startsWith("毛利")) : []) + (hasGM ? cNotes : ""),
+        id: "D", template: "T3", header: { ...header, label: "利潤率" }, source: src,
+        notes: [...derivedNote(hasGM ? derived.filter((d) => d.startsWith("毛利")) : []), ...(hasGM ? cNotes : []), ...(niBasisNote ? [{ text: niBasisNote, p: 2 }] : [])],
         body: {
           unit: "%", kind: "pct",
           periods: [shiftYear(period, -1), period],
@@ -652,14 +658,15 @@ export function analyze(fs, ctx) {
       // 畫觸發 B 的那個維度（部門規則有命中就畫部門，否則畫地區）；那個維度資料不完整時改畫另一個
       const segHit = (selection.fired.B || []).some((h) => h.startsWith("segment_"));
       const ok = (bd, why) => (bd && !why ? bd : null);
-      const src = (segHit && ok(seg, segWhy)) || ok(geo, geoWhy) || ok(seg, segWhy);
+      const srcB = (segHit && ok(seg, segWhy)) || ok(geo, geoWhy) || ok(seg, segWhy);
       const periodsB = [shiftYear(period, -1), period];
       // 一般部門畫成柱子（負值畫在 0 軸下方）；調節項目兩期都不畫、不列入圖例，改放註腳。同一項目兩期處理方式相同。
-      const barRows = src.rows.filter((r) => !r.reconciling), recRows = src.rows.filter((r) => r.reconciling);
+      const barRows = srcB.rows.filter((r) => !r.reconciling), recRows = srcB.rows.filter((r) => r.reconciling);
       const totalsB = [disp(rev.p), disp(rev.c)]; // 柱頂總額＝財報公布的營收淨額
-      const foot = recRows.length ? periodsB.map((pl, i) => `${pl} 總營收 ${fmt2(totalsB[i])} 含 ${recRows.map((r) => `${useName(r.nm)} ${fmt2(disp(i ? r.c : r.p))}`).join("、")}`).join("；") : "";
+      // 例：「總營收含避險損益（−0.21／0.19）。」括號內依柱子由左到右：去年同期／本季。中文與項目名稱之間不加空格
+      const foot = recRows.length ? `總營收含${recRows.map((r) => `${useName(r.nm)}（${fmt2(disp(r.p))}／${fmt2(disp(r.c))}）`).join("、")}。` : "";
       cards.push({
-        id: "B", template: "T2", header: { ...header, label: src === seg ? "營收組成" : "各地區營收" }, source: `${baseSource}。${foot ? `${foot}。` : ""}`,
+        id: "B", template: "T2", header: { ...header, label: srcB === seg ? "營收組成" : "各地區營收" }, source: src, notes: foot ? [{ text: foot, p: 3 }] : [],
         body: {
           unit: unitText, kind: "amount", periods: periodsB,
           series: barRows.map((r) => ({ name: useName(r.nm), values: [disp(r.p), disp(r.c)] })),
@@ -681,7 +688,7 @@ export function analyze(fs, ctx) {
       if (buy.c) steps.push({ label: "庫藏股買回", value: disp(buy.c), type: "bar", group: "股東回饋" });
       if (div.c) steps.push({ label: "現金股利", value: disp(div.c), type: "bar", group: "股東回饋" });
       cards.push({
-        id: "G", template: "T5", header: { ...header, label: "現金流量與股東回饋" }, source: `${baseSource}。${fcfShown !== null ? fcfNote : ""}`,
+        id: "G", template: "T5", header: { ...header, label: "現金流量與股東回饋" }, source: src, notes: fcfShown !== null && fcfNote ? [{ text: fcfNote, p: 1 }] : [],
         body: { unit: unitText, kind: "amount", steps },
       });
     }
@@ -752,7 +759,7 @@ export function analyze(fs, ctx) {
     });
     if (company.next_report_date) sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: company.next_report_date, value: "下一季財報公布（公司公告）", text: true }] });
     cards.push({
-      id: "K1", template: "T8", header: { ...header, label: gRows.length ? "下季財測" : "財測調整" }, source: `${baseSource}。`,
+      id: "K1", template: "T8", header: { ...header, label: gRows.length ? "下季財測" : "財測調整" }, source: src,
       title: gRows.length ? `公司下季財測（${fiscalToCalendar(g.period_label, company.fiscal_year_end_month || 12)}）` : `公司${revTitle}`,
       body: { sections },
     });
@@ -765,6 +772,112 @@ export function analyze(fs, ctx) {
   const ord = triggers.deck.order_on_deck;
   cards.sort((x, y) => ord.indexOf(x.id) - ord.indexOf(y.id));
   if (stopAtOI) for (let i = derived.length - 1; i >= 0; i--) if (derived[i].startsWith("業外")) derived.splice(i, 1);
+  // ── 17. 圖卡數字核對表：圖卡上的重點數字，與新聞稿比對（預填新聞稿數字；分類在 lib/verify.js）
+  //   value：圖卡用的數字（顯示單位、未四捨五入）；shown：圖卡上的文字；alts：工具算得出的其他口徑（新聞稿若等於其中之一＝定義不同）
+  const verify = buildVerify();
+  function buildVerify() {
+    const rows = new Map();
+    const on = (id) => cards.some((c) => c.id === id);
+    const amt = (v) => (v === null || v === undefined ? null : disp(v));
+    const pctv = (a, b) => pctOf(a, b);
+    const put = (key, label, kind, value, decimals, card, extra = {}) => {
+      if (value === null || value === undefined || typeof value !== "number") return;
+      const r = rows.get(key) || { key, label, kind, value, decimals, cards: [], alts: [], ...extra };
+      if (!r.cards.includes(card)) r.cards.push(card);
+      rows.set(key, r);
+    };
+    const nonGaap = fs.market_specific?.us || {};
+    const ngOI = { c: cur(nonGaap.non_gaap_operating_income), p: pri(nonGaap.non_gaap_operating_income) };
+    const ngNI = { c: cur(nonGaap.non_gaap_net_income), p: pri(nonGaap.non_gaap_net_income) };
+    const ngEPS = { c: cur(nonGaap.non_gaap_eps_diluted), p: pri(nonGaap.non_gaap_eps_diluted) };
+    const recSum = (k) => { const rr = [...(seg?.rows || []), ...(geo?.rows || [])].filter((r) => r.reconciling && r[k] !== null); return rr.length ? rr.reduce((a, r) => a + r[k], 0) : null; };
+    const recNames = [...new Set([...(seg?.rows || []), ...(geo?.rows || [])].filter((r) => r.reconciling).map((r) => r.nm.zh))].join("、");
+    const niOurs = niP.c === ni.c ? "損益表淨利" : "歸屬母公司淨利";
+    const niAlts = (f) => [
+      ...(ni.c !== niP.c ? [{ value: f(ni), def: "損益表淨利（含非控制權益）" }] : []),
+      ...(niCommon && r2d(niCommon.c) !== r2d(niP.c) ? [{ value: f(niCommon), def: "歸屬普通股股東淨利" }] : []),
+      ...(ngNI.c !== null ? [{ value: f(ngNI), def: "Non-GAAP 淨利" }] : []),
+    ].filter((a) => a.value !== null);
+    if (on("A1")) {
+      put("revenue", "營收", "amount", amt(rev.c), 2, "A1");
+      const ry = yoyShown(rev.c, rev.p);
+      if (typeof ry === "number") put("revenue_yoy", "營收年增率", "pct", ry, 1, "A1");
+      put("operating_margin", "營益率", "pct", M.operating_margin, 1, "A1");
+      put("eps", epsZh, "perShare", eps.c, epsDec, "A1");
+      const ey = yoyShown(eps.c, eps.p, M.eps_yoy);
+      if (typeof ey === "number") put("eps_yoy", `${epsZh} 年增率`, "pct", ey, M.eps_yoy_decimals, "A1");
+    }
+    if (on("C")) {
+      if (chartGp.c !== null && cogs.c !== null) { put("gross_profit", "毛利", "amount", amt(chartGp.c), 2, "C"); put("gross_margin", "毛利率", "pct", M.gross_margin, 1, "C"); }
+      put("operating_income", "營業利益", "amount", amt(oi.c), 2, "C");
+      put("operating_margin", "營益率", "pct", M.operating_margin, 1, "C");
+      if (!stopAtOI) { put("net_income", "淨利", "amount", amt(niP.c), 2, "C"); put("net_margin", "淨利率", "pct", M.net_margin, 1, "C"); }
+    }
+    if (on("D")) {
+      if (M.gross_margin !== null && cogs.c !== null) put("gross_margin", "毛利率", "pct", M.gross_margin, 1, "D");
+      put("operating_margin", "營益率", "pct", M.operating_margin, 1, "D");
+      put("net_margin", "淨利率", "pct", M.net_margin, 1, "D");
+    }
+    const bCard = cards.find((c) => c.id === "B");
+    if (bCard) for (const r of [...(seg?.rows || []), ...(geo?.rows || [])]) {
+      if (r.reconciling || !bCard.body.series.some((x) => x.name === r.nm.zh)) continue;
+      put(`seg:${r.key}`, `${r.nm.zh}營收`, "amount", amt(r.c), 2, "B", { item: r.key });
+    }
+    if (on("G")) {
+      put("operating_cash_flow", "營業現金流", "amount", amt(ocf.c), 2, "G");
+      put("capex", "資本支出", "amount", amt(capex.c), 2, "G");
+      if (fcfShown !== null) put("free_cash_flow", "自由現金流", "amount", amt(fcfShown), 2, "G");
+      if (buy.c) put("buybacks", "庫藏股買回", "amount", amt(buy.c), 2, "G");
+      if (div.c) put("dividends", "現金股利", "amount", amt(div.c), 2, "G");
+    }
+    // 其他口徑（工具算得出來的）
+    const R_ = (k) => rows.get(k);
+    const addAlt = (k, alts, ours) => { const r = R_(k); if (r) { r.alts.push(...alts.filter((a) => a.value !== null && a.value !== undefined)); if (ours) r.ours = ours; } };
+    const rx = recSum("c"), rxp = recSum("p");
+    if (rx !== null) {
+      addAlt("revenue", [{ value: amt(rev.c - rx), def: `不含${recNames}的營收` }], `含${recNames}的總營收`);
+      if (rxp !== null) addAlt("revenue_yoy", [{ value: yoy(rev.c - rx, rev.p - rxp), def: `不含${recNames}計算` }], `含${recNames}計算`);
+    }
+    addAlt("net_income", niAlts((x) => amt(x.c)), niOurs);
+    addAlt("net_margin", niAlts((x) => pctv(x.c, rev.c)), `${niOurs}計算`);
+    addAlt("operating_income", ngOI.c !== null ? [{ value: amt(ngOI.c), def: "Non-GAAP 營業利益" }] : [], "GAAP 營業利益");
+    addAlt("operating_margin", ngOI.c !== null ? [{ value: pctv(ngOI.c, rev.c), def: "Non-GAAP 營業利益計算" }] : [], "GAAP 營業利益計算");
+    const otherBasis = epsBasis === "basic" ? IS.eps_diluted : IS.eps_basic;
+    addAlt("eps", [...(ngEPS.c !== null ? [{ value: ngEPS.c, def: "Non-GAAP EPS" }] : []), ...(cur(otherBasis) !== null ? [{ value: cur(otherBasis), def: epsBasis === "basic" ? "稀釋 EPS" : "基本 EPS" }] : [])], `GAAP ${epsZh}`);
+    // EPS 年增率：四捨五入前的 EPS 算出來的視為四捨五入差異（silent，不加附註）
+    addAlt("eps_yoy", [...(epsYoyNps !== null ? [{ value: epsYoyNps, def: "四捨五入前的 EPS 計算", silent: true }] : []), ...(epsYoyRange() ? [{ value: epsYoyRange()[0], def: "公布 EPS 四捨五入範圍", silent: true, range: epsYoyRange() }] : []),
+      ...(ngEPS.c !== null && ngEPS.p !== null ? [{ value: yoy(ngEPS.c, ngEPS.p), def: "Non-GAAP EPS 計算" }] : [])], `GAAP ${epsZh}計算`);
+    if (fcfStated !== null && ocf.c !== null && capex.c !== null) addAlt("free_cash_flow", fcfShown === fcfStated ? [{ value: amt(ocf.c - capex.c), def: "營業現金流 − 資本支出" }] : [{ value: amt(fcfStated), def: "公司公布的自由現金流" }], fcfShown === fcfStated ? "公司公布的自由現金流" : "營業現金流 − 資本支出");
+    if (gp.c !== null && cogs.c !== null && chartGp.c !== null) {
+      const gStated = cur(IS.gross_profit), gCalc = rev.c - cogs.c;
+      if (gStated !== null && Math.abs(gStated - gCalc) > tol(2)) addAlt("gross_profit", [{ value: amt(chartGp.c === gStated ? gCalc : gStated), def: chartGp.c === gStated ? "營收 − 營業成本" : "損益表上的毛利" }], chartGp.c === gStated ? "損益表上的毛利" : "營收 − 營業成本");
+    }
+    // 預填：AI 抄下的新聞稿重點數字（headline_figures），其次是公司寫的比率（stated_metrics）
+    const toDispAmount = (v, unit) => (UNIT_POWER[unit] === undefined ? v : (v * Math.pow(10, UNIT_POWER[unit])) / Math.pow(10, dispPow));
+    const fmtIn = (v, d) => (typeof v === "number" ? (d === undefined ? String(v) : v.toFixed(d)) : "");
+    for (const h of fs.headline_figures || []) {
+      const key = h.metric === "segment_revenue" ? `seg:${h.item}` : h.metric;
+      const r = rows.get(key);
+      if (!r || r.prefill) continue;
+      const v = h.unit === "monetary" ? toDispAmount(h.value, h.monetary_unit) : h.value;
+      const d = h.unit === "monetary" && UNIT_POWER[h.monetary_unit] !== undefined && h.monetary_unit !== "billions" ? Math.max(0, 2) : decOf(h, "value");
+      r.prefill = { value: fmtIn(v, d), src: h.src?.quote || "" };
+    }
+    for (const sm of fs.stated_metrics || []) {
+      const key = sm.metric === "revenue_amount" ? "revenue" : sm.metric;
+      const r = rows.get(key);
+      if (!r || r.prefill) continue;
+      const v = sm.metric === "revenue_amount" ? toDispAmount(sm.value, sm.unit) : sm.value;
+      r.prefill = { value: fmtIn(v, sm.metric === "revenue_amount" && sm.unit !== "billions" ? 2 : decOf(sm, "value")), src: sm.src?.quote || "" };
+    }
+    // 圖卡上的文字
+    for (const r of rows.values()) {
+      r.shown = r.kind === "pct" ? `${fixed(r.value, r.decimals)}%` : fixed(r.value, r.decimals);
+      r.unit = r.kind === "amount" ? unitText : r.kind === "pct" ? "%" : profile.defaults.display_currency;
+    }
+    return [...rows.values()];
+  }
+
   // 公司規範畫面用的資訊（只列本季有的項目）
   const revenueItems = (list, dim) => (list || []).filter((s) => s.revenue).map((s) => {
     const meta = (company.geographies || []).concat(company.segments || []).find((x) => x.key === s.key);
@@ -780,7 +893,7 @@ export function analyze(fs, ctx) {
     hasCommon: !!niCommon,
     revenueItems: [...revenueItems(fs.segments, "部門"), ...revenueItems(fs.geographies, "地區")],
   };
-  return { checks, derived, derivable, metrics: M, selection, cards, company: companyInfo, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
+  return { checks, derived, derivable, metrics: M, selection, cards, verify, company: companyInfo, units: { source: m.monetary_unit, display: unitText, srcPow, dispPow }, revenueDisplay: disp(rev.c) };
 }
 
 // ───────── 選圖 ─────────
@@ -887,7 +1000,7 @@ export function diffExtractions(a, b) {
 
 /** 給人工核對用的差異清單：略過只用於驗算的欄位，並把同一項目的本季／去年／上季合併成一列 */
 export function diffForReview(a, b) {
-  const raw = diffExtractions(a, b).filter((d) => !/^stated_metrics|^market_specific/.test(d.path) && !(d.a === null && d.b === null));
+  const raw = diffExtractions(a, b).filter((d) => !/^stated_metrics|^market_specific|^headline_figures/.test(d.path) && !(d.a === null && d.b === null));
   const groups = new Map();
   for (const d of raw) {
     const key = d.path.replace(/\.(current|prior_year|prior_quarter|point|low|high|basis)$/, "");

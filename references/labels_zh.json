@@ -21,6 +21,11 @@
     "diluted eps": "稀釋 EPS",
     "operating margin": "營益率",
     "operating income": "營業利益",
-    "revenue": "營收"
+    "revenue": "營收",
+    "hedging gains (losses)": "避險損益",
+    "hedging gains": "避險損益",
+    "hedging losses": "避險損益",
+    "hedging gains/losses": "避險損益",
+    "hedging gain (loss)": "避險損益"
   }
 }

@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.9）
+# PN 財報快報｜美股數據抽取指令（v1.0）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -31,7 +31,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.7"`。
+- 填 `"1.8"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -99,6 +99,12 @@
 - 公司原文自己寫出的比率，例如「revenue up 100% year-over-year」→ `{ "metric": "revenue_yoy", "value": 100, "unit": "percent" }`。只抄原文明確寫出的。
 - 以公司整體的比率為主（營收年增率、各項利潤率、EPS 年增率）；同一比率在表格和內文各寫一次（例如 11.8% 與 12%），兩筆都列。
 - **內文寫出的營收金額也要列一筆**：例如「revenue of $12.9 billion」→ `{ "metric": "revenue_amount", "value": 12.9, "unit": "billions" }`，附原句出處。這筆用來獨立驗證金額單位。
+
+### headline_figures（新聞稿重點數字）
+- 新聞稿標題、Highlights、第一段或摘要表**用文字或大字寫出的本季重點數字**照抄一筆，例如「Revenue of $12.9 billion, up 17%」→ revenue（12.9、monetary、billions）與 revenue_yoy（17、percent）兩筆；「operating margin of 31.5%」→ operating_margin。
+- 部門或地區營收用 `segment_revenue`，並在 `item` 填你在 segments／geographies 用的 key。
+- 數字與位數照抄原文，不換算、不自己算；下降寫負數。`src` 附原句。
+- 這一區用來和圖卡數字對照；財務報表裡的數字已經在其他欄位，不用重複抄。沒有就給空陣列。
 
 ### market_specific.us
 - 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `notes` 註明即可。

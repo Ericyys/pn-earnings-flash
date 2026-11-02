@@ -10,7 +10,8 @@
 //   tax,                                           // 所得稅費用（負數＝所得稅利益）
 //   netIncome,
 //   margins: { gross: 58.6, operating: 31.2, net: 26.4 },
-//   showPct: true,                                 // 選填：每個節點標「佔營收 X%」（利潤節點已有利潤率，不重複）
+//   showPct: true,                                 // 選填：非利潤節點在金額後標佔營收 %（灰色、小一號，例如「−20.64 16.2%」）；單位列註明「% 為佔營收比」
+//   footnote: "淨利為損益表淨利；EPS 以歸屬普通股股東之淨利計算。"   // 選填：圖下註記（淨利口徑，條件觸發）
 //   note: "業外含處分投資利益 0.85（原文：Gain on sale of investments）"   // 選填，觸發 C 的標註規則時由網頁填入
 // }
 //
@@ -22,6 +23,8 @@
 // 所有金額都用公司報告值，底稿不自行計算毛利、營業利益、淨利。
 // 只要毛利、營業利益或淨利 ≤ 0，或流量出現負值，流向圖無法正確表達，
 // 回傳 null，由 templates/index.js 改用 T5 瀑布圖。
+
+import { richLine } from "../lib/text.js";
 
 export function sankeyFlows(b) {
   const pos = (v) => Math.max(v || 0, 0);
@@ -89,14 +92,16 @@ export function renderT4(box, ctx, spec) {
   const { nodes, links } = flows;
   const lab = st("label");
   const small = st("small");
+  const pctSt = st("label", { size: lab.size - 4 }); // 佔營收 %：小一號
   let svg = "";
 
-  svg += text(box.x, baseline(box.y, small), `單位：${b.unit}`, small, { fill: c.muted });
+  svg += text(box.x, baseline(box.y, small), `單位：${b.unit}${b.showPct ? "｜% 為佔營收比" : ""}`, small, { fill: c.muted });
   const top = box.y + lineBox(small) + 32;
-  // 標註（觸發 C 的業外／一次性項目規則時）放在圖下方
+  // 圖下註記：一次性項目（＊，觸發 C 的標註規則時）、淨利口徑（條件觸發）
   let bottom = box.y + box.h;
-  if (b.note) {
-    const nl = wrap("＊" + b.note, small, box.w, measure);
+  const noteText = [b.note ? "＊" + b.note : "", b.footnote || ""].filter(Boolean).join("\n");
+  if (noteText) {
+    const nl = wrap(noteText, small, box.w, measure);
     const nTop = bottom - nl.length * lineBox(small);
     nl.forEach((ln, i) => (svg += text(box.x, baseline(nTop + i * lineBox(small), small), ln, small, { fill: c.text2 })));
     bottom = nTop - 24;
@@ -118,15 +123,21 @@ export function renderT4(box, ctx, spec) {
   const labelLines = (n) => {
     const lines = [{ str: n.name, fill: c.text2, st: lab }];
     const sign = n.kind === "cost" || n.kind === "loss" ? fmt.MINUS : "";
-    lines.push({ str: sign + fmt.amount(n.display), fill: c.text, st: lab, num: true });
-    if (n.margin && n.margin[1] !== undefined) lines.push({ str: `${n.margin[0]} ${fmt.pct(n.margin[1])}`, fill: c.muted, st: lab, num: true });
-    // 整體佔比：其他節點標「佔營收 X%」（營收本身不標）
-    else if (b.showPct && n.id !== "rev" && b.revenue) lines.push({ str: `佔營收 ${fmt.pct((n.display / b.revenue) * 100)}`, fill: c.muted, st: lab, num: true });
+    const amountStr = sign + fmt.amount(n.display);
+    if (n.margin && n.margin[1] !== undefined) {
+      // 毛利、營業利益、淨利：維持三行（名稱、金額、利潤率）
+      lines.push({ str: amountStr, fill: c.text, st: lab, num: true });
+      lines.push({ str: `${n.margin[0]} ${fmt.pct(n.margin[1])}`, fill: c.muted, st: lab, num: true });
+    } else if (b.showPct && n.id !== "rev" && b.revenue) {
+      // 其他節點：兩行。佔營收 % 併到金額同一行，灰色、小一號（不用括號，避免被誤讀成負數）
+      lines.push({ str: amountStr, fill: c.text, st: lab, num: true, tail: { str: `\u00A0\u00A0${fmt.pct((n.display / b.revenue) * 100)}`, fill: c.muted, st: pctSt } });
+    } else lines.push({ str: amountStr, fill: c.text, st: lab, num: true });
     return lines;
   };
   const nodeW = 14;
   const lastCol = cols[nCols - 1];
-  const labelW3 = Math.max(...lastCol.map((id) => Math.max(...labelLines(nodes[id]).map((l) => measure(l.str, lab, l.num)))));
+  const lineW = (l) => measure(l.str, lab, l.num) + (l.tail ? measure(l.tail.str, l.tail.st, true) : 0);
+  const labelW3 = Math.max(...lastCol.map((id) => Math.max(...labelLines(nodes[id]).map(lineW))));
   const colGap = (box.w - nodeW - labelW3 - 12) / (nCols - 1);
   const colX = (ci) => box.x + ci * colGap;
 
@@ -213,7 +224,12 @@ export function renderT4(box, ctx, spec) {
       const right = side === "right";
       const x = right ? it.n.x + nodeW + 12 : it.n.x - 12;
       it.lines.forEach((ln, i) => {
-        svg += text(x, baseline(it.y + i * lineBox(lab), lab), ln.str, lab, { fill: ln.fill, num: ln.num, anchor: right ? "start" : "end" });
+        const by = baseline(it.y + i * lineBox(lab), lab);
+        if (ln.tail) {
+          // 金額＋佔比：兩段不同字級、顏色，整段依標籤方向對齊
+          const segs = [{ str: ln.str, fill: ln.fill, num: true }, { str: ln.tail.str, fill: ln.tail.fill, st: ln.tail.st, num: true }];
+          svg += richLine(x, by, segs, lab, { anchor: right ? "start" : "end", num: true }, measure).svg;
+        } else svg += text(x, by, ln.str, lab, { fill: ln.fill, num: ln.num, anchor: right ? "start" : "end" });
       });
     });
   });

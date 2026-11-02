@@ -68,14 +68,9 @@
       "type": "fixed",
       "annotations": [
         {
-          "id": "highlight_non_operating",
+          "id": "highlight_notable_items",
           "when": {
             "any": [
-              {
-                "metric": "non_operating_share_of_net_income",
-                "op": "gte",
-                "value": 0.1
-              },
               {
                 "metric": "notable_items_share_of_net_income",
                 "op": "gte",
@@ -83,7 +78,7 @@
               }
             ]
           },
-          "effect": "在流向圖上另外標出業外或一次性項目，並加註原文名稱"
+          "effect": "公司標示的一次性項目佔淨利 10% 以上時，在流向圖下方加註原文名稱與金額（＊）。原本的「業外收支淨額佔淨利」註記已移除（與節點上的佔營收百分比重複，且分母不同）"
         }
       ]
     },

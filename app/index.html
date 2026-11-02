@@ -72,12 +72,27 @@
     <textarea id="promptText" readonly style="min-height:200px" hidden></textarea>
     <div class="row"><button id="btnCopy" class="ghost" disabled>複製給 AI 的整理</button><span id="copyMsg" class="note"></span></div>
   </div>
-  <div class="row pad"><button id="btnRender" disabled>產出圖卡</button><span id="renderMsg" class="note"></span></div>
+  <div class="row pad"><button id="btnRender" disabled>下一步：核對圖卡數字</button><span id="renderMsg" class="note"></span></div>
 </section>
 
 <!-- 步驟 4 -->
 <section id="s4" hidden>
-  <h2>4｜圖卡</h2>
+  <h2>4｜圖卡數字核對（對照新聞稿）</h2>
+  <div class="pad note">
+    <p>下表是這次圖卡上會出現的重點數字。工具已先填入 AI 從新聞稿抄下的數字；<b>空白的請照新聞稿補上</b>（新聞稿沒寫的可以留白），你只需要處理被標記的行：</p>
+    <ul>
+      <li><b>四捨五入</b>（例如 24.7% 對 25%）：自動通過。</li>
+      <li><b>定義不同</b>（例如淨利含不含非控制權益、營收含不含避險損益）：圖卡數字不改，自動在圖卡頁尾加附註。</li>
+      <li><b>對不上</b>（科目抓錯、單位錯）：必須修正，回到步驟 3 改數字、交給 AI，或在「公司規範」調整這家公司的算式。</li>
+    </ul>
+  </div>
+  <div id="verifyBox"></div>
+  <div class="row pad"><button id="btnDraw" disabled>產出圖卡</button><span id="drawMsg" class="note"></span></div>
+</section>
+
+<!-- 步驟 5 -->
+<section id="s5" hidden>
+  <h2>5｜圖卡</h2>
   <div class="pad" id="selBox"></div>
   <div class="pad">
     <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示；顯示在 K1）</label>
@@ -88,6 +103,7 @@
       <button id="btnRules" class="ghost">下載公司規範</button>
       <button id="btnArchive" class="ghost">下載本季存檔</button>
     </div>
+    <div id="dropBox"></div>
     <p class="note" id="exportMsg"></p>
   </div>
   <div id="grid"></div>

@@ -35,7 +35,10 @@ export function makeCtx(brand, measure) {
  * spec: { header:{ticker, period, label}, title, subtitle?, source, layout? }
  * body(box, ctx) → svg 字串
  */
-export function card(spec, brand, measure, body) {
+/**
+ * report（選填）：回傳 { droppedNotes }：頁尾放不下而沒有放進圖卡的附註
+ */
+export function card(spec, brand, measure, body, report = {}) {
   const { width: W, height: H, safe: S } = brand.canvas;
   const ctx = makeCtx(brand, measure);
   const { c, st } = ctx;
@@ -54,13 +57,25 @@ export function card(spec, brand, measure, body) {
   const ruleY = S + lineBox(small) + 12;
   svg += hline(S, W - S, ruleY, c.text);
 
-  // ── 頁尾：資料來源與免責合併成一段，放在弱線下方；署名在最後一行右側
-  //    有資料來源時：「資料來源：…。」＋ 免責的後半段（避免「資料整理自公司公開財報」與來源重複）
-  const footText = spec.source ? `${spec.source.trim()}${brand.identity.disclaimer_with_source}` : brand.identity.disclaimer;
+  // ── 頁尾：資料來源＋附註＋免責合併成一段，放在弱線下方；署名在最後一行右側
+  //    有資料來源時：「資料來源：…。」＋ 附註 ＋ 免責的後半段（避免「資料整理自公司公開財報」與來源重複）
+  //    頁尾固定佔兩行高度（所有圖卡的圖表區與底線位置一致，輪播時版面不跳動）。
+  //    附註（spec.notes：[{ text, p }]）放不下兩行時，依優先順序（p 越大越先拿掉）移除，移除的附註回報給頁面，請寫進貼文。
+  const FOOT_LINES = 2;
   const sigW = measure(brand.identity.signature, small) + 32;
-  const footLines = wrap(footText, small, innerW - sigW, measure);
+  const kept = [...(spec.notes || [])];
+  const dropped = [];
+  const compose = () => (spec.source ? `${spec.source.trim()}${kept.map((n) => n.text).join("")}${brand.identity.disclaimer_with_source}` : brand.identity.disclaimer);
+  let footLines = wrap(compose(), small, innerW - sigW, measure);
+  while (footLines.length > FOOT_LINES && kept.length) {
+    let worst = 0;
+    kept.forEach((n, i) => { if ((n.p ?? 1) >= (kept[worst].p ?? 1)) worst = i; });
+    dropped.unshift(kept.splice(worst, 1)[0]);
+    footLines = wrap(compose(), small, innerW - sigW, measure);
+  }
+  report.droppedNotes = dropped;
   const footTop = H - S - footLines.length * lineBox(small);
-  const footRuleY = footTop - brand.footer.disclaimer_gap_below_rule - 1;
+  const footRuleY = H - S - Math.max(FOOT_LINES, footLines.length) * lineBox(small) - brand.footer.disclaimer_gap_below_rule - 1;
   svg += hline(S, W - S, footRuleY, c.rule);
   svg += textBlock(S, footTop, footLines, small, { fill: c.muted }).svg;
   svg += text(W - S, baseline(footTop + (footLines.length - 1) * lineBox(small), small), brand.identity.signature, small, { fill: c.muted, anchor: "end" });

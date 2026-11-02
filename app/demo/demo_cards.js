@@ -29,6 +29,7 @@ export const DEMO_CARDS = [
       margins: { gross: 58.61, operating: 31.24, net: 29.16 },
       showPct: true,
       note: "含處分投資利益 1.10（原文：Gain on sale of investments）",
+      footnote: "淨利為損益表淨利；EPS 以歸屬普通股股東之淨利計算。",
     },
   },
   {
@@ -172,7 +173,7 @@ export const DEMO_CARDS = [
   // 堆疊柱狀圖：一般部門出現負值畫在 0 軸下方；調節項目（避險損益）不畫進柱子、不列入圖例，兩期都放註腳；柱頂為財報公布的淨額
   {
     id: "B-neg", template: "T2", header: { ...header, label: "營收組成" },
-    source: `${source}2025Q3 總營收 1.87 含 避險損益 0.02；2026Q3 總營收 1.78 含 避險損益 −0.01。`,
+    source, notes: [{ text: "總營收含避險損益（0.02／−0.01）。", p: 3 }],
     body: {
       unit: "USD B", kind: "amount",
       periods: ["2025Q3", "2026Q3"],

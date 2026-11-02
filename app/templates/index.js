@@ -31,6 +31,8 @@ export function renderCard(spec, brand, measure) {
   if (!["T1", "T8"].includes(s.template) && s.layout !== "titled") s.layout = "chart";
 
   // T4 無法表達虧損：改用 T5 損益瀑布，並在結果中註記
+  // report.droppedNotes：頁尾放不下而沒有放進圖卡的附註（頁尾最多兩行）
+  const report = {};
   if (s.template === "T4") {
     let fellBack = false;
     const svg = card(s, brand, measure, (box, ctx, sp) => {
@@ -38,8 +40,8 @@ export function renderCard(spec, brand, measure) {
       if (out !== null) return out;
       fellBack = true;
       return renderT5(box, ctx, { ...sp, body: incomeWaterfall(sp.body) });
-    });
-    return { svg, template: fellBack ? "T5" : "T4", fallback: fellBack ? "損益出現虧損或負流量，流向圖改為瀑布圖" : null };
+    }, report);
+    return { svg, template: fellBack ? "T5" : "T4", fallback: fellBack ? "損益出現虧損或負流量，流向圖改為瀑布圖" : null, droppedNotes: report.droppedNotes };
   }
-  return { svg: card(s, brand, measure, tpl.render), template: s.template, fallback: null };
+  return { svg: card(s, brand, measure, tpl.render, report), template: s.template, fallback: null, droppedNotes: report.droppedNotes };
 }

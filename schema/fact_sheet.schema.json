@@ -26,9 +26,10 @@
         "1.4",
         "1.5",
         "1.6",
-        "1.7"
+        "1.7",
+        "1.8"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）；1.8 新增 headline_figures（新聞稿重點數字，供圖卡數字核對預填）"
     },
     "comment": {
       "type": "string",
@@ -645,6 +646,71 @@
         }
       }
     },
+    "headline_figures": {
+      "description": "新聞稿重點段落（標題、Highlights、摘要表、第一段）寫出的本季重點數字，照抄原文，附原句。出圖工具在「圖卡數字核對」預填，與圖卡上的數字比對。沒有就給空陣列或省略。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metric",
+          "value",
+          "unit",
+          "src"
+        ],
+        "properties": {
+          "metric": {
+            "enum": [
+              "revenue",
+              "revenue_yoy",
+              "gross_profit",
+              "gross_margin",
+              "operating_income",
+              "operating_margin",
+              "net_income",
+              "net_margin",
+              "eps",
+              "eps_yoy",
+              "operating_cash_flow",
+              "capex",
+              "free_cash_flow",
+              "buybacks",
+              "dividends",
+              "segment_revenue"
+            ],
+            "description": "segment_revenue＝部門或地區營收，另填 item"
+          },
+          "item": {
+            "type": "string",
+            "description": "metric 為 segment_revenue 時填：你在 segments／geographies 中這個項目的 key"
+          },
+          "value": {
+            "type": "number",
+            "description": "照抄原文數字與位數（例如 $12.9 billion → 12.9；25% → 25；下降寫負數）"
+          },
+          "unit": {
+            "enum": [
+              "monetary",
+              "percent",
+              "per_share"
+            ]
+          },
+          "monetary_unit": {
+            "enum": [
+              "ones",
+              "thousands",
+              "millions",
+              "billions"
+            ],
+            "description": "unit 為 monetary 時必填，照原文（例如 $12.9 billion → billions）"
+          },
+          "src": {
+            "$ref": "#/$defs/source",
+            "description": "含該數字的原句"
+          }
+        }
+      }
+    },
     "market_specific": {
       "type": "object",
       "additionalProperties": false,
@@ -1122,7 +1188,8 @@
               "1.4",
               "1.5",
               "1.6",
-              "1.7"
+              "1.7",
+              "1.8"
             ]
           }
         }
@@ -1148,7 +1215,8 @@
               "1.4",
               "1.5",
               "1.6",
-              "1.7"
+              "1.7",
+              "1.8"
             ]
           }
         }

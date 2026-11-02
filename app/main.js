@@ -1,10 +1,11 @@
 // PN 財報快報｜出圖工具（頁面邏輯）
 // 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（原始數字＋這家公司的算式與科目名稱；可修改、可交給 AI）
-//       → 4 圖卡（選圖規則自動決定張數；資料不完整的不出）、下載 PNG、公司規範與本季存檔
+//       → 4 圖卡數字核對（對照新聞稿：四捨五入自動通過、定義不同自動加附註、對不上必須修正）
+//       → 5 圖卡（選圖規則自動決定張數；資料不完整的不出）、下載 PNG、公司規範與本季存檔
 // 計算在 lib/compute.js、修改在 lib/review.js、公司規範（算式、科目名稱）在 lib/company_rules.js、
 // 公司規範畫面在 company_panel.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.7.0（2026-11-02）";
+export const APP_VERSION = "1.8.0（2026-11-02）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -16,6 +17,7 @@ import { applyEdits, getNode, periodColumnCheck, correctionPrompt } from "./lib/
 import { decimalsOfText, decOf } from "./lib/decimals.js";
 import { mergeRules, diffRules, describeChanges, RULES_VERSION } from "./lib/company_rules.js";
 import { renderCompanyPanel, pendingLabels, applyPatch } from "./company_panel.js";
+import { classify } from "./lib/verify.js";
 
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
@@ -61,7 +63,7 @@ $("btnCheck").onclick = async () => {
 
 async function runCheck() {
   $("s1msg").textContent = "";
-  ["s2", "s3", "s4"].forEach((id) => ($(id).hidden = true));
+  ["s2", "s3", "s4", "s5"].forEach((id) => ($(id).hidden = true));
   let A, B = null;
   try { A = parseFactSheet($("fsA").value); } catch (e) { $("s1msg").innerHTML = `<span class="fail">A 不是有效的 JSON：${esc(e.message)}</span>`; return; }
   if ($("fsB").value.trim()) {
@@ -75,7 +77,8 @@ async function runCheck() {
   state = { A, B, company, errA, errB, ticks: new Set(), choices: {}, edits: [], rounds: prev ? prev.rounds + 1 : 0, editing: null,
     sentToAI: new Set(prev ? [...prev.sentToAI, ...(prev.aiIds || [])] : []),
     // A／B 名稱統一：B 的代號在本機改成選定的名稱（只影響比對）；noPair＝使用者判斷不是同一項目
-    bKeyMap: prev ? prev.bKeyMap : {}, noPair: new Set(prev ? prev.noPair : []) };
+    bKeyMap: prev ? prev.bKeyMap : {}, noPair: new Set(prev ? prev.noPair : []),
+    press: prev ? prev.press : {} }; // 圖卡數字核對：使用者填的新聞稿數字（同一家公司同一季重貼時保留）
   // 公司規範（算式、科目名稱）：同一家公司同一季重貼 → 沿用目前的規範；否則讀 history/<市場>/<代號>/company_rules.json（沒有就用通用算式）
   const cpath = $("company").value; // 例如 us/NFLX.json
   const market = cpath ? cpath.split("/")[0] : A.meta?.market || "us";
@@ -133,7 +136,7 @@ function recompute() {
   const overrides = Object.entries(state.choices).filter(([id, ch]) => id.startsWith("check:") && ch.choice === "ok").map(([id]) => id.slice(6));
   // 公司規範（這家公司的算式）同時套用在自動檢查與圖卡
   state.out = analyze(Aeff, { profile: state.profile, company: state.company, triggers, labels, history: [], overrides, rules: state.rules });
-  $("s4").hidden = true; // 數據或規範改了：圖卡要重新產出
+  $("s4").hidden = true; $("s5").hidden = true; // 數據或規範改了：圖卡數字核對與圖卡要重新進行
   state.diffs = state.B ? diffForReview(Aeff, remapB(state.B)) : [];
   const lab = { pass: "通過", fail: "不通過", warn: "需確認", skip: "略過" };
   $("checks").querySelector("tbody").innerHTML = state.out.checks.map((c) =>
@@ -772,11 +775,50 @@ $("btnCopy").onclick = async () => {
 };
 
 // ───── 步驟 4：圖卡（選圖規則自動決定張數；資料不完整的圖卡不產出）
-$("btnRender").onclick = async () => {
-  $("s4").hidden = false;
+// 步驟 3 → 4：圖卡數字核對
+$("btnRender").onclick = () => {
+  $("s4").hidden = false; $("s5").hidden = true;
+  renderVerify();
+  $("s4").scrollIntoView({ behavior: "smooth" });
+};
+
+const CARD_ZH = { A1: "A1 封面", C: "C 損益流向", B: "B 營收拆解", D: "D 利潤率", G: "G 現金流量", K1: "K1 財測" };
+/** 圖卡數字核對表：工具列出圖卡上的重點數字，預填新聞稿數字；使用者補空白、處理被標記的行 */
+function renderVerify() {
+  const rows = state.out.verify || [];
+  const res = rows.map((r) => {
+    const input = state.press[r.key] !== undefined ? state.press[r.key] : r.prefill?.value ?? "";
+    return { r, input, c: classify(r, input) };
+  });
+  state.verifyResult = res;
+  const ST = {
+    match: `<span class="pass">相符</span>`, empty: `<span class="note">未填（新聞稿沒寫）</span>`,
+    definition: `<span class="warn">定義不同 → 自動加附註</span>`, error: `<span class="fail">對不上，必須修正</span>`, invalid: `<span class="fail">不是數字</span>`,
+  };
+  const row = ({ r, input, c }) => `<tr class="${c.status === "error" || c.status === "invalid" ? "edited" : ""}">
+    <td>${esc(r.label)}<div class="note">${esc(r.cards.map((x) => CARD_ZH[x] || x).join("、"))}</div></td>
+    <td class="num">${esc(r.shown)} <span class="note">${r.kind === "pct" ? "" : esc(r.unit)}</span></td>
+    <td><input type="text" data-press="${esc(r.key)}" value="${esc(input)}" placeholder="新聞稿數字" style="width:120px">
+      ${r.prefill && state.press[r.key] === undefined ? `<div class="note">AI 預填${r.prefill.src ? `：「${esc(r.prefill.src.slice(0, 60))}${r.prefill.src.length > 60 ? "…" : ""}」` : ""}</div>` : ""}</td>
+    <td>${ST[c.status]}${c.status === "definition" ? `<div class="note">附註：${esc(c.note)}</div>` : ""}${c.status === "error" ? `<div class="note">${esc(c.hint)}。請回到步驟 3：第二層改數字或交給 AI，或在「公司規範」調整這家公司的算式。</div>` : ""}${c.via ? `<div class="note">（${esc(c.via)}，屬四捨五入差異）</div>` : ""}</td></tr>`;
+  const flagged = res.filter((x) => ["error", "invalid", "definition"].includes(x.c.status));
+  const ordered = [...flagged, ...res.filter((x) => !flagged.includes(x))]; // 被標記的行排在最前面
+  $("verifyBox").innerHTML = rows.length ? `<div class="tablewrap pad"><table><thead><tr><th>項目（用在）</th><th>圖卡數字</th><th>新聞稿數字</th><th>結果</th></tr></thead><tbody>${ordered.map(row).join("")}</tbody></table></div>`
+    : `<p class="pad note">這次的圖卡沒有需要對照新聞稿的數字。</p>`;
+  $("verifyBox").querySelectorAll("[data-press]").forEach((inp) => inp.addEventListener("change", () => { state.press[inp.dataset.press] = inp.value.trim(); renderVerify(); }));
+  const bad = res.filter((x) => x.c.status === "error" || x.c.status === "invalid");
+  const empty = res.filter((x) => x.c.status === "empty").length;
+  $("btnDraw").disabled = bad.length > 0;
+  $("drawMsg").innerHTML = bad.length ? `<span class="fail">有 ${bad.length} 行對不上，修正後才能產出圖卡：${esc(bad.map((x) => x.r.label).join("、"))}</span>`
+    : `${res.filter((x) => x.c.status === "definition").length ? `定義不同 ${res.filter((x) => x.c.status === "definition").length} 行，已自動加附註。` : ""}${empty ? `${empty} 行未填（視為新聞稿沒寫）。` : ""}`;
+}
+
+// 步驟 4 → 5：產出圖卡
+$("btnDraw").onclick = async () => {
+  $("s5").hidden = false;
   try { await drawCards(); }
   catch (e) { console.error(e); $("exportMsg").innerHTML = `<span class="fail">產出圖卡時發生錯誤：${esc(e.message)}。請把這段訊息截圖給維護者。</span>`; }
-  $("s4").scrollIntoView({ behavior: "smooth" });
+  $("s5").scrollIntoView({ behavior: "smooth" });
 };
 
 function selectionHtml() {
@@ -802,6 +844,14 @@ async function drawCards() {
     if (nd) k1.body.sections.push({ heading: "下次財報日期", columns: ["日期", "事件"], rows: [{ label: nd, value: "下一季財報公布（公司公告）", text: true }] });
   }
   $("nextDateNote").textContent = !k1 && nd ? "這次沒有 K1（公司沒給財測，也沒有財測調整），下次財報日期不會顯示。" : "";
+  // 圖卡數字核對：與新聞稿定義不同的項目，在用到它的圖卡頁尾加附註（口徑，優先順序 2）
+  for (const { r, c } of state.verifyResult || []) {
+    if (c.status !== "definition") continue;
+    for (const id of r.cards) {
+      const spec = cards.find((x) => x.id === id);
+      if (spec && !(spec.notes || []).some((n) => n.text === c.note)) spec.notes = [...(spec.notes || []), { text: c.note, p: 2 }];
+    }
+  }
   state.cards = cards;
   $("selBox").innerHTML = selectionHtml();
   await ensureFonts(brand, cards);
@@ -809,14 +859,19 @@ async function drawCards() {
   const grid = $("grid");
   grid.innerHTML = "";
   state.rendered = [];
+  const dropped = [];
   cards.forEach((spec, i) => {
     const r = renderCard(spec, brand, measure);
+    for (const n of r.droppedNotes || []) dropped.push({ card: spec.id, text: n.text });
     const fname = `${state.Aeff.meta.ticker}_${spec.header.period}_${String(i + 1).padStart(2, "0")}_${spec.id}.png`;
     state.rendered.push({ svg: r.svg, fname });
     const fig = document.createElement("figure");
     fig.innerHTML = r.svg + `<figcaption><span>${i + 1}｜${spec.id}${r.fallback ? "（" + r.fallback + "）" : ""}</span><button class="ghost" data-i="${state.rendered.length - 1}">下載 PNG</button></figcaption>`;
     grid.appendChild(fig);
   });
+  // 頁尾最多兩行：放不下的附註不放進圖卡，列出來請寫進貼文文字
+  state.droppedNotes = dropped;
+  $("dropBox").innerHTML = dropped.length ? `<div class="banner">頁尾放不下、沒有放進圖卡的附註（請寫進貼文文字）：<ul>${dropped.map((d) => `<li>${esc(CARD_ZH[d.card] || d.card)}：${esc(d.text)}</li>`).join("")}</ul></div>` : "";
   lockExport(false);
   grid.querySelectorAll("button[data-i]").forEach((b) => (b.onclick = async () => {
     lockExport(true);
@@ -838,7 +893,7 @@ async function exportOne(i) {
 }
 
 // 匯出時鎖住按鈕，避免重複點擊造成重複下載或下載到改版前的圖
-const lockExport = (on) => document.querySelectorAll("#s4 button").forEach((b) => (b.disabled = on));
+const lockExport = (on) => document.querySelectorAll("#s5 button").forEach((b) => (b.disabled = on));
 $("btnAll").onclick = async () => {
   lockExport(true);
   try {
@@ -863,7 +918,7 @@ $("btnRules").onclick = () => { $("exportMsg").textContent = downloadRules(); };
 $("btnArchive").onclick = () => {
   const { A, Aeff, out } = state;
   const archive = {
-    archive_version: "1.5",
+    archive_version: "1.6",
     app_version: APP_VERSION,
     created_at: new Date().toISOString(),
     fact_sheet: Aeff,                 // 套用人工修改後、實際用來出圖的數據
@@ -875,6 +930,8 @@ $("btnArchive").onclick = () => {
     company_rules: diffRules(state.rules), // 本季套用的公司規範（與通用算式不同的部分；完整規範另存 company_rules.json）
     checks: out.checks,
     incomplete: out.selection.incomplete,  // 資料不完整而沒有產出的圖卡
+    press_check: (state.verifyResult || []).map(({ r, input, c }) => ({ item: r.label, cards: r.cards, card_value: r.shown, press_value: input, result: c.status, note: c.note || c.via || c.hint || "" })), // 圖卡數字核對
+    dropped_notes: state.droppedNotes || [], // 頁尾放不下、請寫進貼文的附註
     derived: out.derived,
     selection: out.selection,
     second_extraction_used: !!state.B,
