@@ -33,11 +33,11 @@
 
 ## 1.4 版新增
 
-- `label_zh`：每個有 `label_source`（原文名稱）的項目都可以附中文名稱，由 AI 用台灣常用的財報用語翻譯。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。
+- `label_zh`：每個有 `label_source`（原文名稱）的項目都可以附中文名稱，由 AI 用台灣常用的財報用語翻譯。工具先用公司繪圖規範、公司設定與科目對照表，都沒有時才用這個譯名，並列入「繪圖設定」讓人確認。
 
 ## 1.5 版新增
 
-- `segments[].reconciling`、`geographies[].reconciling`：調節項目（營收表中列在各部門小計之外、但計入總營收的項目，例如 Hedging、Corporate and other、Eliminations）填 `true`。營收拆解卡不畫進柱子、改放註腳；一般部門即使是負值也不填。
+- `segments[].reconciling`、`geographies[].reconciling`：調節項目（營收表中列在各部門小計之外、但計入總營收的項目，例如 Hedging、Corporate and other、Eliminations）填 `true`。這是 AI 的建議，營收拆解卡預設不畫進柱子、改放註腳，最後由「繪圖設定」決定；一般部門即使是負值也不填。
 
 ## 人工填寫的欄位
 

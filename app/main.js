@@ -1,8 +1,10 @@
 // PN 財報快報｜出圖工具（頁面邏輯）
-// 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（可修改、可交給 AI）→ 4 產出圖卡、下載 PNG 與本季存檔
-// 計算在 lib/compute.js、修改在 lib/review.js、畫圖在 templates/，這裡只負責畫面與狀態。
+// 流程：1 貼上數據 → 2 自動檢查 → 3 人工核對（只管原始數字；可修改、可交給 AI）
+//       → 4 繪圖設定（通用規則＋公司繪圖規範）→ 5 圖卡、下載 PNG、繪圖規範與本季存檔
+// 計算在 lib/compute.js、修改在 lib/review.js、公司繪圖規範在 lib/chart_rules.js、繪圖設定畫面在 chart_panel.js、
+// 畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.4.0（2026-10-29）";
+export const APP_VERSION = "1.5.0（2026-11-02）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -12,6 +14,8 @@ import { ensureFonts, installLocalAliases } from "./lib/fonts.js";
 import { svgToPng, download } from "./lib/export.js";
 import { applyEdits, getNode, periodColumnCheck, correctionPrompt } from "./lib/review.js";
 import { decimalsOfText, decOf } from "./lib/decimals.js";
+import { mergeRules, diffRules, describeChanges, RULES_VERSION } from "./lib/chart_rules.js";
+import { renderChartPanel, pendingLabels } from "./chart_panel.js";
 
 const $ = (id) => document.getElementById(id);
 const q = new URLSearchParams(location.search);
@@ -57,7 +61,7 @@ $("btnCheck").onclick = async () => {
 
 async function runCheck() {
   $("s1msg").textContent = "";
-  ["s2", "s3", "s4"].forEach((id) => ($(id).hidden = true));
+  ["s2", "s3", "s4", "s5"].forEach((id) => ($(id).hidden = true));
   let A, B = null;
   try { A = parseFactSheet($("fsA").value); } catch (e) { $("s1msg").innerHTML = `<span class="fail">A 不是有效的 JSON：${esc(e.message)}</span>`; return; }
   if ($("fsB").value.trim()) {
@@ -70,6 +74,21 @@ async function runCheck() {
   const prev = state.A && state.A.meta?.ticker === A.meta?.ticker && state.A.meta?.fiscal_period === A.meta?.fiscal_period ? state : null;
   state = { A, B, company, errA, errB, ticks: new Set(), choices: {}, edits: [], rounds: prev ? prev.rounds + 1 : 0, editing: null,
     sentToAI: new Set(prev ? [...prev.sentToAI, ...(prev.aiIds || [])] : []) };
+  // 公司繪圖規範：同一家公司同一季重貼 → 沿用目前的規範；否則讀 history/<市場>/<代號>/chart_rules.json（沒有就用通用預設）
+  const cpath = $("company").value; // 例如 us/NFLX.json
+  const market = cpath ? cpath.split("/")[0] : A.meta?.market || "us";
+  const ticker = cpath ? cpath.split("/").pop().replace(/\.json$/, "") : A.meta?.ticker || "";
+  state.rulesPath = `history/${market}/${ticker}/chart_rules.json`;
+  if (prev && prev.rules) { state.rules = prev.rules; state.rulesSource = prev.rulesSource; }
+  else {
+    try {
+      const r = await fetch(`../${state.rulesPath}`);
+      if (!r.ok) throw new Error("none");
+      const raw = await r.json();
+      state.rules = mergeRules(raw);
+      state.rulesSource = `已載入 ${state.rulesPath}（${raw.updated_at ? `更新於 ${String(raw.updated_at).slice(0, 10)}` : "沒有更新日期"}）`;
+    } catch { state.rules = mergeRules({}); state.rulesSource = "這家公司還沒有繪圖規範，使用通用預設"; }
+  }
   let carry = "";
   if (prev) {
     // 修改：AI 已照修正要求改好 → 不必再套用；AI 沒改 → 繼續套用；AI 改成別的值 → 丟棄，該項需重新核對
@@ -78,15 +97,12 @@ async function runCheck() {
       const now = getNode(A, e.path);
       const nowV = e.kind === "datapoint" ? now?.value : now;
       const same = (x, y) => JSON.stringify(x) === JSON.stringify(y);
-      if (same(nowV, e.value)) {
-        absorbed++;
-        // 你填的科目譯名 AI 已照用 → 這個譯名視為已確認，不必再確認一次
-        if (e.labelFor) state.choices[`label:${e.path}|${e.value}`] = { choice: "ok", text: "" };
-      } else if (same(nowV, e.ai)) { state.edits.push(e); kept++; }
+      if (same(nowV, e.value)) absorbed++;
+      else if (same(nowV, e.ai)) { state.edits.push(e); kept++; }
       else dropped++;
     }
     state.ticks = new Set(prev.ticks);
-    for (const [id, ch] of Object.entries(prev.choices)) if (ch.choice !== "ai" && !state.choices[id]) state.choices[id] = ch;
+    for (const [id, ch] of Object.entries(prev.choices)) if (ch.choice !== "ai") state.choices[id] = ch;
     carry = `沿用上一輪的核對紀錄：勾選 ${prev.ticks.size} 項（數值有變的會自動取消）、修改 ${kept} 項仍需套用、${absorbed} 項 AI 已照改、${dropped} 項 AI 改成其他值（需重新核對）、你的判斷 ${Object.keys(state.choices).length} 項。上一輪交給 AI 的問題若仍存在，這一輪會改列在「需要你判斷」。`;
   }
   $("carryMsg").innerHTML = carry ? `<div class="banner ok">${esc(carry)}</div>` : "";
@@ -113,10 +129,15 @@ function recompute() {
   const { fs: Aeff, failed } = applyEdits(state.A, state.edits);
   state.Aeff = Aeff;
   const overrides = Object.entries(state.choices).filter(([id, ch]) => id.startsWith("check:") && ch.choice === "ok").map(([id]) => id.slice(6));
-  state.out = analyze(Aeff, { profile: state.profile, company: state.company, triggers, labels, history: [], overrides });
+  // 數據檢查一律用通用預設規範（調整繪圖規範不會改變核對結果）；圖卡用公司繪圖規範
+  const base = { profile: state.profile, company: state.company, triggers, labels, history: [], overrides };
+  state.outData = analyze(Aeff, { ...base, rules: mergeRules({}) });
+  state.outData.checks = state.outData.checks.filter((c) => c.scope !== "chart");
+  state.out = analyze(Aeff, { ...base, rules: state.rules });
+  ["s4", "s5"].forEach((id) => ($(id).hidden = true)); // 數據改了：繪圖設定與圖卡要重新進入
   state.diffs = state.B ? diffForReview(Aeff, state.B) : [];
   const lab = { pass: "通過", fail: "不通過", warn: "需確認", skip: "略過" };
-  $("checks").querySelector("tbody").innerHTML = state.out.checks.map((c) =>
+  $("checks").querySelector("tbody").innerHTML = state.outData.checks.map((c) =>
     `<tr><td class="${c.status}">${lab[c.status]}</td><td>${esc(c.label)}</td><td>${esc(c.detail)}</td></tr>`).join("");
   $("diffBox").innerHTML = state.B ? `<h3>A／B 比對：${state.diffs.length} 處不同</h3>
     <p class="pad note">差異列在步驟 3 第三層：A 有數字的，第二層對照原文核對即可（自動處理）；A 沒有、B 有的，交給 AI 判斷是否補抽。只用於驗算的欄位不列入。</p>` : "";
@@ -167,10 +188,8 @@ function layer2Items() {
     addPair("損益表", FIELD_ZH[k], `income_statement.${k}`, A.income_statement[k], k === epsK ? "每股" : k === shK ? `股（${A.meta.share_unit}）` : unit);
   }
   for (const it of A.operating_expense_items || []) addPair("費用逐列", it.label_source, `operating_expense_items[${it.key}].amount`, it.amount);
-  // 調節項目（列在部門小計之外、但計入總營收）：名稱後註明，核對時一併確認是否標對
-  const recTag = (s) => ((state.company.segments || []).concat(state.company.geographies || []).find((x) => x.key === s.key)?.reconciling ?? s.reconciling) ? "（調節項目：不畫進柱子，放註腳）" : "";
-  for (const s of A.segments || []) { addPair("部門", s.label_source + recTag(s), `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
-  for (const s of A.geographies || []) { addPair("地區", s.label_source + recTag(s), `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
+  for (const s of A.segments || []) { addPair("部門", s.label_source, `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
+  for (const s of A.geographies || []) { addPair("地區", s.label_source, `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const k of A.kpis || []) {
     for (const p of ["current", "prior_year"]) if (k[p] && (typeof k[p].value === "number" || editOf(`kpis[${k.key}].${p}`)))
       items.push({ group: "營運指標", name: `${k.label_source}｜${PERIOD_ZH[p]}`, path: `kpis[${k.key}].${p}`, kind: "datapoint", value: k[p].value, text: rawNum(k[p], "value"), ptype: k[p].period_type || "quarter", unit: k.unit, src: k[p].src });
@@ -218,11 +237,11 @@ const GENERIC_FAIL = "請回原文確認相關科目是否抓錯列、漏列或�
 const AMB_REQUEST = "請依原文自行判斷並處理：能從原文確定的，照規則修正數據並把說明移到 notes；只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。";
 
 function layer3Items() {
-  const out = state.out, A = state.Aeff, sent = state.sentToAI || new Set();
+  const out = state.outData, A = state.Aeff, sent = state.sentToAI || new Set();
   const list = [];
   const push = (it) => {
-    // 交給 AI 的項目若使用者標記「原文如此」（科目名稱則是「自己填譯名」），改列在「需要你判斷」
-    if (it.group === "ai" && ["ok", "rename"].includes(state.choices[it.id]?.choice)) it.group = "user";
+    // 交給 AI 的項目若使用者標記「原文如此」，改列在「需要你判斷」並視為已處理
+    if (it.group === "ai" && state.choices[it.id]?.choice === "ok") it.group = "user";
     list.push(it);
   };
   if (state.choices["meta:period"]) push({ id: "meta:period", group: "user", kind: "period", path: "meta.period_end", text: "期末日與本季數字的出處欄名不是同一期（AI 可能抓錯整欄），工具不允許直接修改" });
@@ -235,20 +254,6 @@ function layer3Items() {
       const group = AUTO_WARN.has(c.id) ? "auto" : c.id === "fiscal_period_vs_end" || sent.has(id) ? "user" : "ai";
       push({ id, group, kind: "warn", text: `需確認：${c.label}｜${c.detail}`, escalated: group === "user" && sent.has(id), request: AI_REQUEST[c.id] || GENERIC_FAIL,
         reason: group === "auto" ? "數字已在第二層對照原文核對，這是資訊性提示" : "" });
-    }
-  }
-  // 科目中文名稱：圖卡標籤一律中文。AI 譯名 → 需要你確認；缺少中文名稱 → 第一次交給 AI 翻譯，仍沒有就由你填
-  for (const lb of out.labels || []) {
-    const aiZh = getNode(state.A, lb.path);
-    const id = `label:${lb.path}|${aiZh ?? ""}`; // 以 AI 原始譯名為準：你改了譯名不會變成新項目；AI 換了譯名要重新確認
-    if (lb.origin === "missing") {
-      const group = sent.has(id) ? "user" : "ai";
-      push({ id, group, kind: "label", missing: true, path: lb.path, en: lb.en, escalated: group === "user",
-        text: `需要確認：科目沒有中文名稱｜${lb.en}（對照表沒有，AI 也沒有翻譯）`,
-        request: `請為「${lb.en}」填 label_zh：用台灣常用的財報用語翻譯成中文，不要保留英文。` });
-    } else {
-      push({ id, group: "user", kind: "label", path: lb.path, en: lb.en,
-        text: `需要確認：科目中文名稱｜${lb.en} → ${aiZh && aiZh !== lb.zh ? `AI 譯名「${aiZh}」，已改為「${lb.zh}」` : `「${lb.zh}」（AI 翻譯，對照表沒有這個科目）`}` });
     }
   }
   for (const d of out.derivable) push({ id: `derived:${d.id}`, group: "auto", kind: "derived", text: `計算得出的數字：${d.name}＝${d.formula}`, reason: "原文沒有這一列；依 rules/derivations.json 計算，結果與原文科目恆等，圖卡底部已註明" });
@@ -277,14 +282,8 @@ const USER_OUTCOMES = [
   ["ok", "原文如此，維持現狀"],
   ["ai", "需要修正：寫下你的判斷，連同其他問題一起交給 AI"],
 ];
-/** 「需要你判斷」的項目是否已處理完（選「原文如此」才算；「需要修正」要等 AI 回來）。科目名稱：譯名正確，或已填入新譯名 */
-const resolved = (it) => {
-  const ch = state.choices[it.id];
-  if (it.kind === "label") return (ch?.choice === "ok" && !it.missing) || (ch?.choice === "rename" && !!(ch.text || "").trim());
-  return ch?.choice === "ok";
-};
-// 科目名稱的兩種結果：直接在這裡改，不交給 AI
-const LABEL_OUTCOMES = [["ok", "譯名正確"], ["rename", "改用這個譯名："]];
+/** 「需要你判斷」的項目是否已處理完（選「原文如此」才算；「需要修正」要等 AI 回來） */
+const resolved = (it) => state.choices[it.id]?.choice === "ok";
 
 // 對「不通過」選「數據正確」時，工具為了不畫出與數字矛盾的圖，會自動少畫的部分
 const OVERRIDE_EFFECT = {
@@ -342,23 +341,21 @@ function buildManual() {
     const cid = it.id.startsWith("check:") ? it.id.slice(6) : "";
     let body = `<div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>`;
     if (it.escalated) body += `<div class="note">上一輪已交給 AI，仍未解決</div>`;
-    const outcomes = it.kind === "label" ? LABEL_OUTCOMES.filter(([v]) => !(it.missing && v === "ok")) : USER_OUTCOMES;
-    body += outcomes.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
-    if (it.kind === "label" && ch.choice === "rename") body += `<input type="text" data-rename="${esc(it.id)}" data-path="${esc(it.path)}" value="${esc(ch.text || "")}" placeholder="台灣常用的財報用語，例如「重組費用」（輸入後按 Enter）">`;
+    body += USER_OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
     if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「原文如此」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
     if (it.kind === "fail" && ch.choice === "ok" && UNIT_RISK.test(cid)) body += `<div class="banner"><b class="fail">這是金額單位的問題，幾乎不會是「原文如此」。</b>確認前請再看一次表頭的單位說明（例如 in thousands）。單位錯會讓每一張圖卡的金額差 1,000 倍。數字或單位可以直接在第一、二層改，改對後這一項會自動消失。</div>`;
     if (ch.choice === "ai") body += `<textarea data-text="${esc(it.id)}" placeholder="你的判斷（必填）：例如「財測單位是 millions」「這兩列都要算進營業費用」">${esc(ch.text || "")}</textarea>`;
-    const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">${it.kind === "label" ? "未確認" : "未判斷"}</span>`;
+    const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">未判斷</span>`;
     return `<tr><td>${st}</td><td>${body}</td></tr>`;
   };
   const aiRow = (it) => `<tr><td><span class="pending">交給 AI</span></td><td><div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>
     <div class="note">給 AI 的要求：${esc(it.request)}</div>
-    <div class="row" style="margin-top:4px">${it.kind === "label" ? `<button class="ghost small" data-keep="${esc(it.id)}" data-val="rename">不用交給 AI（我自己填譯名）</button>` : `<button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button>`}</div></td></tr>`;
+    <div class="row" style="margin-top:4px"><button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button></div></td></tr>`;
   const autoRow = (it) => `<tr><td><span class="resolved">自動</span></td><td><div class="item">${esc(it.text)}</div><div class="note">${esc(it.reason || "")}</div>
     ${it.adoptable ? `<div class="row" style="margin-top:4px"><button class="ghost small" data-adopt="${esc(it.id)}">把 A 改成 B 的值（連同出處）</button></div>` : ""}</td></tr>`;
   const table3 = (rows) => `<div class="tablewrap pad t3"><table><thead><tr><th style="width:90px">狀態</th><th>內容</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   blocks.push(`<h3>第三層｜數字以外的問題（${l3.length} 項，工具已自動分類）</h3>
-    <p class="pad note">第一、二層把數字對過原文後，剩下的是算法、AI 抓取邏輯、重大風險，以及 AI 翻譯的科目名稱（圖卡標籤一律中文，對照表沒有的科目由 AI 翻譯，要你確認或直接改）。<b>需要你判斷</b>的先處理；<b>交給 AI</b> 的不用逐條看，工具會連同你的判斷整理成一段文字，貼回原本的 AI 對話，再把 AI 重新輸出的 JSON 貼回步驟 1。<b>自動處理</b>的不需要動作。</p>
+    <p class="pad note">第一、二層把數字對過原文後，剩下的是 AI 的抓取邏輯與重大風險（只看數據對不對；怎麼畫、科目名稱、算法選擇在步驟 4「繪圖設定」處理）。<b>需要你判斷</b>的先處理；<b>交給 AI</b> 的不用逐條看，工具會連同你的判斷整理成一段文字，貼回原本的 AI 對話，再把 AI 重新輸出的 JSON 貼回步驟 1。<b>自動處理</b>的不需要動作。</p>
     <h3>需要你判斷（${users.length}）</h3>
     ${users.length ? table3(users.map(userRow).join("")) : `<p class="pad note">沒有。</p>`}
     <h3>交給 AI（${ais.length}）</h3>
@@ -444,17 +441,13 @@ function bindManual() {
   box.querySelectorAll("[data-choice]").forEach((r) => r.addEventListener("change", () => {
     const id = r.dataset.choice;
     state.choices[id] = { choice: r.value, text: state.choices[id]?.text || "" };
-    // 科目名稱改選「譯名正確」：取消先前填的譯名
-    if (r.value !== "rename") state.edits = state.edits.filter((e) => e.labelFor !== id);
     recompute();
-    const rn = document.querySelector(`input[data-rename="${CSS.escape(id)}"]`);
-    if (rn) rn.focus();
     const t = document.querySelector(`textarea[data-text="${CSS.escape(id)}"]`);
     if (t) t.focus();
   }));
   if ($("aiDetails")) $("aiDetails").addEventListener("toggle", (e) => (state.aiOpen = e.target.open));
   box.querySelectorAll("[data-keep]").forEach((btn) => (btn.onclick = () => {
-    state.choices[btn.dataset.keep] = { choice: btn.dataset.val || "ok", text: "" };
+    state.choices[btn.dataset.keep] = { choice: "ok", text: "" };
     recompute();
   }));
   box.querySelectorAll("[data-adopt]").forEach((btn) => (btn.onclick = () => {
@@ -470,14 +463,6 @@ function bindManual() {
       return;
     }
     for (const p of it.d.paths) putEdit({ layer: 3, kind: "replace", path: p, ai: getNode(state.A, p), value: getNode(state.B, p), note: "A／B 比對：改用 B 的值" });
-    recompute();
-  }));
-  // 科目譯名：輸入完成（Enter 或離開輸入框）後直接套用到數據表，圖卡用這個名稱
-  box.querySelectorAll("[data-rename]").forEach((inp) => inp.addEventListener("change", () => {
-    const id = inp.dataset.rename, path = inp.dataset.path, v = inp.value.trim();
-    state.choices[id] = { choice: "rename", text: v };
-    state.edits = state.edits.filter((e) => e.labelFor !== id);
-    if (v) state.edits.push({ layer: 3, kind: "field", path, ai: getNode(state.A, path), value: v, note: "第三層：科目中文名稱", labelFor: id, at: new Date().toISOString() });
     recompute();
   }));
   box.querySelectorAll("[data-text]").forEach((t) => t.addEventListener("input", () => {
@@ -587,7 +572,7 @@ function updateGate() {
   const ticked = boxes.filter((b) => b.checked).length;
   const l3 = state.l3 || [];
   const users = l3.filter((x) => x.group === "user"), ais = l3.filter((x) => x.group === "ai");
-  const userOpen = users.filter((x) => !state.choices[x.id]?.choice || (x.kind === "label" && !resolved(x)));
+  const userOpen = users.filter((x) => !state.choices[x.id]?.choice);
   const userToAI = users.filter((x) => state.choices[x.id]?.choice === "ai");
   const userToAIEmpty = userToAI.filter((x) => !(state.choices[x.id].text || "").trim());
   const general = $("general").value.trim();
@@ -637,13 +622,41 @@ $("btnCopy").onclick = async () => {
   catch { $("promptText").select(); $("copyMsg").textContent = "請按 Ctrl＋C 複製"; }
 };
 
-// ───── 步驟 4：圖卡
+// ───── 步驟 4：繪圖設定（通用規則＋公司繪圖規範）→ 步驟 5：圖卡
 $("btnRender").onclick = async () => {
-  $("s4").hidden = false;
-  try { await drawCards(); }
-  catch (e) { console.error(e); $("exportMsg").innerHTML = `<span class="fail">產出圖卡時發生錯誤：${esc(e.message)}。請把這段訊息截圖給維護者。</span>`; }
+  $("s4").hidden = false; $("s5").hidden = false;
+  await renderChart();
   $("s4").scrollIntoView({ behavior: "smooth" });
 };
+
+/** 依目前的繪圖規範重算圖卡（不重跑數據檢查），更新繪圖設定畫面與圖卡 */
+async function renderChart() {
+  try {
+    renderChartPanel($("chartBox"), {
+      out: state.out, rules: state.rules,
+      source: { path: state.rulesPath, text: state.rulesSource },
+      onChange: async (rules) => {
+        state.rules = mergeRules(rules);
+        state.rulesDirty = true;
+        state.out = analyze(state.Aeff, { profile: state.profile, company: state.company, triggers, labels, history: [], rules: state.rules,
+          overrides: Object.entries(state.choices).filter(([id, ch]) => id.startsWith("check:") && ch.choice === "ok").map(([id]) => id.slice(6)) });
+        await renderChart();
+      },
+    });
+    $("rulesMsg").textContent = state.rulesDirty ? `繪圖規範已調整，記得按「下載繪圖規範」並上傳到 ${state.rulesPath}，下次才會自動套用。` : "";
+    await drawCards();
+  } catch (e) { console.error(e); $("exportMsg").innerHTML = `<span class="fail">產出圖卡時發生錯誤：${esc(e.message)}。請把這段訊息截圖給維護者。</span>`; }
+}
+
+/** 下載圖卡前的把關：科目名稱都確認過、繪圖檢查都通過 */
+function exportBlockers() {
+  const out = [];
+  const pend = pendingLabels(state.out);
+  if (pend.length) out.push(`還有 ${pend.length} 個科目名稱要在「繪圖設定」確認`);
+  const bad = state.out.chart.checks.filter((c) => c.status === "fail");
+  if (bad.length) out.push(`繪圖檢查不通過：${bad.map((c) => c.label).join("、")}`);
+  return out;
+}
 
 function selectionHtml() {
   const s = state.out.selection;
@@ -651,8 +664,10 @@ function selectionHtml() {
   const skipped = Object.entries(s.skipped).map(([k, v]) => `${k}（缺 ${v.join("、")}）`).join("；") || "無";
   const unbuilt = (s.unbuilt || []).length ? `<br>觸發但圖卡尚未接上（不佔張數）：${esc(s.unbuilt.join("、"))}` : "";
   const drop = (s.dropped || []).length ? `<div class="banner">因為你在第三層確認「數據正確」而自動不畫：${esc(s.dropped.join("；"))}</div>` : "";
+  const ch = describeChanges(state.rules);
+  const rl = ch.length ? `<p class="note">套用的公司繪圖規範：${esc(ch.join("；"))}</p>` : `<p class="note">全部使用通用規則（沒有公司繪圖規範）。</p>`;
   const ed = state.edits.length ? `<p class="note">本次人工修改 ${state.edits.length} 處（第一層 ${state.edits.filter((e) => e.layer === 1).length}、第二層 ${state.edits.filter((e) => e.layer === 2).length}、採用 B ${state.edits.filter((e) => e.layer === 3).length}），明細寫在本季存檔。</p>` : "";
-  return `<p>這次的張次：<b>${s.deck.filter((c) => state.cards.some((x) => x.id === c)).join(" → ")}</b></p>${drop}${ed}<p class="note">觸發：${esc(fired)}<br>因資料不足略過：${esc(skipped)}${unbuilt}<br>依損益表計算的數字：${esc(state.out.derived.join("；") || "無")}</p>`;
+  return `<p>這次的張次：<b>${state.cards.map((x) => x.id).join(" → ")}</b></p>${drop}${rl}${ed}<p class="note">觸發：${esc(fired)}<br>因資料不足略過：${esc(skipped)}${unbuilt}<br>依損益表計算的數字：${esc(state.out.derived.join("；") || "無")}</p>`;
 }
 
 async function drawCards() {
@@ -680,6 +695,7 @@ async function drawCards() {
     fig.innerHTML = r.svg + `<figcaption><span>${i + 1}｜${spec.id}${r.fallback ? "（" + r.fallback + "）" : ""}</span><button class="ghost" data-i="${state.rendered.length - 1}">下載 PNG</button></figcaption>`;
     grid.appendChild(fig);
   });
+  lockExport(false);
   grid.querySelectorAll("button[data-i]").forEach((b) => (b.onclick = async () => {
     lockExport(true);
     try { await exportOne(+b.dataset.i); }
@@ -699,8 +715,12 @@ async function exportOne(i) {
   return fontInfo;
 }
 
-// 匯出時鎖住按鈕，避免重複點擊造成重複下載或下載到改版前的圖
-const lockExport = (on) => document.querySelectorAll("#s4 button").forEach((b) => (b.disabled = on));
+// 匯出時鎖住按鈕，避免重複點擊造成重複下載或下載到改版前的圖。科目名稱未確認或繪圖檢查不通過時，PNG 下載一律鎖住
+const lockExport = (on) => {
+  const block = state.out ? exportBlockers() : [];
+  document.querySelectorAll("#s5 button").forEach((b) => (b.disabled = on || (block.length > 0 && (b.id === "btnAll" || b.dataset.i !== undefined))));
+  $("exportBlock").innerHTML = block.length ? `<span class="fail">還不能下載圖卡：${esc(block.join("；"))}</span>` : "";
+};
 $("btnAll").onclick = async () => {
   lockExport(true);
   try {
@@ -712,21 +732,30 @@ $("btnAll").onclick = async () => {
 };
 $("btnApply").onclick = () => drawCards();
 
+// 下載公司繪圖規範：只記與通用預設不同的設定，上傳到 history/<市場>/<代號>/chart_rules.json 後，下次自動套用
+$("btnRules").onclick = () => {
+  const { meta } = state.Aeff;
+  const body = { rules_version: RULES_VERSION, ticker: meta.ticker, market: meta.market, updated_at: new Date().toISOString(), app_version: APP_VERSION, ...diffRules(state.rules) };
+  download(new Blob([JSON.stringify(body, null, 2)], { type: "application/json" }), "chart_rules.json");
+  state.rulesDirty = false;
+  $("rulesMsg").textContent = `已下載 chart_rules.json。請上傳到 repo 的 ${state.rulesPath}（同名檔案會覆蓋），下次這家公司就會自動套用。`;
+};
+
 $("btnArchive").onclick = () => {
   const { A, Aeff, out } = state;
   const archive = {
-    archive_version: "1.3",
+    archive_version: "1.4",
     app_version: APP_VERSION,
     created_at: new Date().toISOString(),
     fact_sheet: Aeff,                 // 套用人工修改後、實際用來出圖的數據
     ai_fact_sheet: A,                 // AI 原始輸出
     edits: state.edits,               // 人工修改紀錄（AI 原值 → 修改值、備註）
-    overrides: out.checks.filter((c) => c.status === "fail" && state.choices[`check:${c.id}`]?.choice === "ok").map((c) => c.id), // 確認「數據正確」的不通過項目
+    overrides: state.outData.checks.filter((c) => c.status === "fail" && state.choices[`check:${c.id}`]?.choice === "ok").map((c) => c.id), // 確認「數據正確」的不通過項目
     review_items: (state.l3 || []).map((it) => ({ group: it.group, item: it.text, choice: state.choices[it.id]?.choice || null, note: state.choices[it.id]?.text || "" })),
     correction_rounds: state.rounds,  // 請 AI 修正的次數
-    // 本季確認過的科目譯名（AI 翻譯或人工填寫）：維護者可據此補進 references/labels_zh.json，下次就不用再確認
-    label_translations: (state.l3 || []).filter((it) => it.kind === "label" && resolved(it)).map((it) => ({ en: it.en, zh: getNode(Aeff, it.path), by: state.choices[it.id].choice === "rename" ? "人工填寫" : "AI 翻譯，人工確認" })),
-    checks: out.checks,
+    chart_rules: diffRules(state.rules), // 本季套用的公司繪圖規範（與通用預設不同的部分；完整規範另存 chart_rules.json）
+    checks: state.outData.checks,         // 數據檢查
+    chart_checks: out.chart.checks,       // 繪圖檢查
     derived: out.derived,
     selection: out.selection,
     second_extraction_used: !!state.B,

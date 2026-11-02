@@ -10,6 +10,7 @@
 //   tax,                                           // 所得稅費用（負數＝所得稅利益）
 //   netIncome,
 //   margins: { gross: 58.6, operating: 31.2, net: 26.4 },
+//   showPct: true,                                 // 選填：每個節點標「佔營收 X%」（利潤節點已有利潤率，不重複）
 //   note: "業外含處分投資利益 0.85（原文：Gain on sale of investments）"   // 選填，觸發 C 的標註規則時由網頁填入
 // }
 //
@@ -119,6 +120,8 @@ export function renderT4(box, ctx, spec) {
     const sign = n.kind === "cost" || n.kind === "loss" ? fmt.MINUS : "";
     lines.push({ str: sign + fmt.amount(n.display), fill: c.text, st: lab, num: true });
     if (n.margin && n.margin[1] !== undefined) lines.push({ str: `${n.margin[0]} ${fmt.pct(n.margin[1])}`, fill: c.muted, st: lab, num: true });
+    // 整體佔比：其他節點標「佔營收 X%」（營收本身不標）
+    else if (b.showPct && n.id !== "rev" && b.revenue) lines.push({ str: `佔營收 ${fmt.pct((n.display / b.revenue) * 100)}`, fill: c.muted, st: lab, num: true });
     return lines;
   };
   const nodeW = 14;

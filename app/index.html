@@ -11,7 +11,7 @@
 <body>
 <header>
   <h1>PN 財報快報｜出圖工具</h1>
-  <p>貼上 AI 抽出的數據 → 自動檢查 → 人工核對 → 產出圖卡 → 下載　<span id="appVersion"></span></p>
+  <p>貼上 AI 抽出的數據 → 自動檢查 → 人工核對（原始數字）→ 繪圖設定（各公司可調）→ 圖卡下載　<span id="appVersion"></span></p>
 </header>
 <main>
 <div id="fatal" class="banner" hidden></div>
@@ -49,7 +49,8 @@
     <p>依序完成三層：先第一層、第二層對照 PDF 打勾（用 Ctrl＋F／⌘F 搜尋「列名」），再處理第三層。<b>數字錯了可以直接修改</b>：</p>
     <ul>
       <li><b>第一層、第二層</b>：按「修改」輸入原文的正確值。改過的項目要重新打勾，自動檢查會立刻重算。</li>
-      <li><b>第三層</b>：工具自動分成「需要你判斷」「交給 AI」「自動處理」。你只要處理「需要你判斷」，其餘整理成一段文字交給 AI 重新抽取。</li>
+      <li><b>第三層</b>：只列數據問題（抓錯、漏抓、單位與期間風險）。工具自動分成「需要你判斷」「交給 AI」「自動處理」。你只要處理「需要你判斷」，其餘整理成一段文字交給 AI 重新抽取。</li>
+      <li>怎麼畫、科目中文名稱、算法選擇，不在這裡處理，在下一步「繪圖設定」依公司調整。</li>
     </ul>
     <p>規則說明：<a href="../rules/review_rules.md" target="_blank">哪些錯誤可以直接改、哪些必須請 AI 重抽</a></p>
   </div>
@@ -69,12 +70,20 @@
     <textarea id="promptText" readonly style="min-height:200px" hidden></textarea>
     <div class="row"><button id="btnCopy" class="ghost" disabled>複製給 AI 的整理</button><span id="copyMsg" class="note"></span></div>
   </div>
-  <div class="row pad"><button id="btnRender" disabled>產出圖卡</button><span id="renderMsg" class="note"></span></div>
+  <div class="row pad"><button id="btnRender" disabled>下一步：繪圖設定</button><span id="renderMsg" class="note"></span></div>
 </section>
 
 <!-- 步驟 4 -->
 <section id="s4" hidden>
-  <h2>4｜圖卡</h2>
+  <h2>4｜繪圖設定（通用規則＋這家公司的繪圖規範）</h2>
+  <div id="chartBox"></div>
+  <div class="row pad"><button id="btnRules" class="ghost">下載繪圖規範（chart_rules.json）</button><span id="rulesMsg" class="note"></span></div>
+  <p class="pad note">規則說明：<a href="../rules/chart_rules.md" target="_blank">繪圖規範可以調整哪些項目</a></p>
+</section>
+
+<!-- 步驟 5 -->
+<section id="s5" hidden>
+  <h2>5｜圖卡</h2>
   <div class="pad" id="selBox"></div>
   <div class="pad">
     <label class="block" for="nextDate">下次財報日期（選填：只有公司已正式公告時才填，例 2027-01-20；空白則不顯示；顯示在 K1）</label>
@@ -84,6 +93,7 @@
       <button id="btnAll">下載全部 PNG</button>
       <button id="btnArchive" class="ghost">下載本季存檔</button>
     </div>
+    <p class="note" id="exportBlock"></p>
     <p class="note" id="exportMsg"></p>
   </div>
   <div id="grid"></div>

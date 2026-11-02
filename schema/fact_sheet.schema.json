@@ -312,7 +312,7 @@
           },
           "label_zh": {
             "type": "string",
-            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
           },
           "amount": {
             "$ref": "#/$defs/pair"
@@ -357,7 +357,7 @@
           },
           "label_zh": {
             "type": "string",
-            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
           },
           "unit": {
             "type": "string",
@@ -420,7 +420,7 @@
             },
             "label_zh": {
               "type": "string",
-              "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+              "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
             }
           },
           "description": "只有原文明確寫出「本季新核准／新增」的回購授權金額才填；「剩餘額度」「尚可回購金額」不是新授權，寫進 ambiguities。"
@@ -494,7 +494,7 @@
           },
           "label_zh": {
             "type": "string",
-            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
           },
           "period_label": {
             "type": "string",
@@ -576,7 +576,7 @@
           },
           "label_zh": {
             "type": "string",
-            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
           },
           "amount": {
             "$ref": "#/$defs/datapoint"
@@ -917,11 +917,11 @@
         },
         "label_zh": {
           "type": "string",
-          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
         },
         "reconciling": {
           "type": "boolean",
-          "description": "調節項目填 true：營收表中列在各部門（或地區）小計之外、但計入總營收的項目，例如 Hedging gains (losses)、Corporate and other、Eliminations。圖卡不畫進柱子、不列入圖例，改放註腳。一般部門不填（即使是負值也是一般部門）。"
+          "description": "調節項目填 true：營收表中列在各部門（或地區）小計之外、但計入總營收的項目，例如 Hedging gains (losses)、Corporate and other、Eliminations。這是 AI 依營收表結構給的建議：預設不畫進柱子、不列入圖例，改放註腳；最後由出圖工具的「繪圖設定」決定（可依公司調整並記住）。一般部門不填（即使是負值也是一般部門）。"
         },
         "revenue": {
           "$ref": "#/$defs/pair"
@@ -972,7 +972,7 @@
         },
         "label_zh": {
           "type": "string",
-          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入核對第三層讓人確認。原文本身是中文時可省略。"
+          "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「繪圖設定」讓人確認（確認後記進該公司的繪圖規範）。原文本身是中文時可省略。"
         },
         "basis": {
           "enum": [

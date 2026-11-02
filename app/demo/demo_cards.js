@@ -27,6 +27,7 @@ export const DEMO_CARDS = [
       otherOperating: 0, operatingIncome: 10.96,
       nonOperating: 1.25, tax: 1.98, netIncome: 10.23,
       margins: { gross: 58.61, operating: 31.24, net: 29.16 },
+      showPct: true,
       note: "含處分投資利益 1.10（原文：Gain on sale of investments）",
     },
   },
@@ -43,6 +44,8 @@ export const DEMO_CARDS = [
         { name: "授權", values: [2.23, 2.2, 2.2, 2.3, 2.33] },
       ],
       yoy: [34.35, -1.63, 19.61, 4.48],
+      shares: [[44.0, 46.7, 47.8, 48.9, 50.2], [30.9, 30.8, 29.3, 27.5, 25.8], [17.1, 17.9, 18.0, 17.7, 17.4], [7.5, 7.4, 7.2, 7.0, 6.6]],
+      sharePosition: "inside",
     },
   },
   {
@@ -180,6 +183,8 @@ export const DEMO_CARDS = [
       ],
       totals: [1.87, 1.78],
       yoy: [13.64, -11.43, { label: "轉負" }],
+      shares: [[58.8, 70.2], [37.4, 34.8], [2.7, -4.5]],
+      sharePosition: "side",
     },
   },
 ];

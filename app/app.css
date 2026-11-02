@@ -51,3 +51,8 @@ button.small { padding: 4px 10px; font-size: 13px; }
 .t3 .item { font-size: 14px; margin-bottom: 4px; }
 .resolved { color: var(--up); font-size: 13px; }
 .pending { color: var(--down); font-size: 13px; }
+.tag { font-size: 12px; color: var(--up); border: 1px solid var(--up); padding: 0 6px; margin-left: 6px; vertical-align: middle; }
+.cp .choice { display: inline-block; margin: 4px 16px 4px 0; }
+.cp select { margin: 4px 8px 4px 0; }
+.cp td input[type=text] { width: 100%; }
+code { font-size: 13px; background: var(--paper); padding: 0 4px; }

@@ -6,6 +6,8 @@
 //   series: [{ name: "雲端", values: [...] }],    // 由下往上堆疊；第 7 類起併入 other。負值畫在 0 軸下方
 //   totals: [...],                                // 選填：柱頂標示的總額（財報公布的淨額）；省略時用各段加總
 //   yoy: [34.4, { label: "轉正" }, ...],           // 選填：各系列本季年增率 → 最後一根長條右側標示「名稱｜金額｜▲ 年增」
+//   shares: [[42.1, 43.7], ...],                   // 選填：各系列各期佔總營收的百分比（整體佔比）
+//   sharePosition: "inside",                       // inside：標在柱子每一段裡（段太矮放不下就不標）；side：加在右側標籤
 // }                                               //       { label } 為轉正／轉負／N/M，用中性灰色、不加 ▲▼
 // 調節項目（列在部門小計之外、但計入總營收）不傳進 series：由 compute.js 放到頁尾註腳。
 
@@ -71,6 +73,9 @@ export function renderT2(box, ctx, spec) {
   const sideLines = side ? b.series.map((s, si) => {
     const v = s.values[n - 1] || 0;
     const segs = [{ str: s.name + "\u00A0\u00A0", fill: c.text2 }, { str: f(v), fill: c.text, num: true }];
+    if (b.shares && b.sharePosition === "side" && b.shares[si]?.[n - 1] !== null && b.shares[si]?.[n - 1] !== undefined) {
+      segs.push({ str: "\u00A0\u00A0" + fmt.pct(b.shares[si][n - 1]), fill: c.text2, num: true });
+    }
     if (b.yoy && b.yoy[si] !== null && b.yoy[si] !== undefined) {
       segs.push({ str: "\u00A0\u00A0", fill: c.text }, ...deltaSegments(ctx, b.yoy[si], "pct"));
     }
@@ -89,6 +94,15 @@ export function renderT2(box, ctx, spec) {
       // 段與段之間留 1px 背景色縫（往上堆的縫在段的下緣、往下堆的縫在段的上緣）
       const gap = g.first ? 0 : 1;
       svg += rect(cx - barW / 2, g.pos ? g.top : g.top + gap, barW, g.h - gap, multi ? cat(si) : cat(0));
+      // 整體佔比標在段內（白字；灰色段用主文字色）。段的高度或柱寬放不下時不標
+      const sh = b.shares && b.sharePosition !== "side" ? b.shares[si]?.[i] : null;
+      if (sh !== null && sh !== undefined) {
+        const t = fmt.pct(sh);
+        if (g.h - gap >= lineBox(lab) && measure(t, lab, true) + 16 <= barW) {
+          const fill = (multi ? cat(si) : cat(0)) === c.other ? c.text : c.bg;
+          svg += text(cx, baseline(g.top + (g.h - lineBox(lab)) / 2, lab), t, lab, { fill, anchor: "middle", num: true });
+        }
+      }
     });
     // 總額標值：放在正值柱頂上方
     const topY = baseY - posSum(i) * k;
