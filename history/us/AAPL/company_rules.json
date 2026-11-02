@@ -1,0 +1,14 @@
+{
+  "rules_version": "1.0",
+  "ticker": "AAPL",
+  "market": "us",
+  "updated_at": "2026-11-02T14:25:59.789Z",
+  "app_version": "1.8.0（2026-11-02）",
+  "labels": {
+    "seg:iphone": "手機 iPhone",
+    "seg:mac": "電腦 Mac",
+    "seg:ipad": "平板 iPad",
+    "seg:wearables_home_and_accessories": "穿戴式裝置、居家及配件",
+    "seg:services": "服務"
+  }
+}
