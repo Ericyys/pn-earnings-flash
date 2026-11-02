@@ -33,11 +33,15 @@
 
 ## 1.4 版新增
 
-- `label_zh`：每個有 `label_source`（原文名稱）的項目都可以附中文名稱，由 AI 用台灣常用的財報用語翻譯。工具先用公司繪圖規範、公司設定與科目對照表，都沒有時才用這個譯名，並列入「繪圖設定」讓人確認。
+- `label_zh`：每個有 `label_source`（原文名稱）的項目都可以附中文名稱，由 AI 用台灣常用的財報用語翻譯。工具先用公司規範、公司設定與科目對照表，都沒有時才用這個譯名，並列入「公司規範｜科目中文名稱」讓人確認。
 
 ## 1.5 版新增
 
-- `segments[].reconciling`、`geographies[].reconciling`：調節項目（營收表中列在各部門小計之外、但計入總營收的項目，例如 Hedging、Corporate and other、Eliminations）填 `true`。這是 AI 的建議，營收拆解卡預設不畫進柱子、改放註腳，最後由「繪圖設定」決定；一般部門即使是負值也不填。
+- `segments[].reconciling`、`geographies[].reconciling`：調節項目（營收表中列在各部門小計之外、但計入總營收的項目，例如 Hedging、Corporate and other、Eliminations）填 `true`。這是 AI 的建議，營收拆解卡預設不畫進柱子、改放註腳，最後由「公司規範」決定；一般部門即使是負值也不填。
+
+## 1.6 版新增
+
+- `income_statement.net_income_to_common`（歸屬普通股股東淨利）、`income_statement.preferred_dividends`（特別股股利）：原文有才填。有特別股的公司，EPS 的分子常是歸屬普通股股東淨利；在出圖工具的「公司規範」選這個算式後，EPS 勾稽與年增率都會改用它。
 
 ## 人工填寫的欄位
 

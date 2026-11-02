@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.7）
+# PN 財報快報｜美股數據抽取指令（v0.8）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -26,12 +26,12 @@
 7. **標準欄位只在明確對應時才填。** `cost_of_revenue`、`gross_profit`、`rd_expense`、`sm_expense`、`ga_expense` 等，只有原文列名明確就是該科目時才填；否則填 `null`（`not_applicable`）。
 8. **輸出格式。** 只輸出一個 JSON 程式碼區塊，不要加任何解說。內容太長被截斷時，我會說「繼續」，請從中斷處接著輸出。
 9. **不要推定。** 原文沒寫的屬性一律不填或填 `unspecified`，例如財測沒寫 GAAP 就不要填 GAAP；文件沒出現股票代號，`ticker` 仍可依公司名稱填寫，但要在 `notes` 註明。
-10. **科目附中文名稱 `label_zh`。** 每個有 `label_source`（原文名稱）的項目，都另外填 `label_zh`：用**台灣常用的財報用語**翻譯成中文，例如 Restructuring charges → 重組費用、Content amortization → 內容攤銷、UCAN → 美國與加拿大。不要保留英文（常用縮寫如 EPS、EBITDA 可以夾在中文裡，例如「調整後 EBITDA」）。`label_source` 仍照抄原文，不要改。這是唯一允許你自己寫的文字，屬於建議值，會由人在繪圖設定確認。
+10. **科目附中文名稱 `label_zh`。** 每個有 `label_source`（原文名稱）的項目，都另外填 `label_zh`：用**台灣常用的財報用語**翻譯成中文，例如 Restructuring charges → 重組費用、Content amortization → 內容攤銷、UCAN → 美國與加拿大。不要保留英文（常用縮寫如 EPS、EBITDA 可以夾在中文裡，例如「調整後 EBITDA」）。`label_source` 仍照抄原文，不要改。這是唯一允許你自己寫的文字，屬於建議值，會由人在核對時確認。
 
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.5"`。
+- 填 `"1.6"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -50,6 +50,7 @@
 - `revenue`：營收合計那一列（例如 Total net revenues、Total revenues、Net sales）。
 - `operating_expenses_total`：費用合計那一列（例如 Total operating expenses、Total costs and expenses）。
 - `net_income_to_parent`：如有「attributable to」那一列就用它；沒有就與 `net_income` 相同並附同一出處。
+- `net_income_to_common`、`preferred_dividends`：原文有「Net income attributable to common stockholders」（或 available to common shareholders）、「Preferred stock dividends」這類列才填，沒有就省略。有特別股的公司，EPS 常以歸屬普通股股東淨利計算。
 - **EPS 抽稀釋（Diluted）**：填 `eps_diluted` 與 `shares_diluted`（稀釋加權平均股數，用來驗算）。`eps_basic`、`shares_basic` 不用填，省略即可。
 - 注意 EPS 區與股數區都有「Basic／Diluted」，看所在區塊。`row_label` 要連同區塊名稱一起寫，例如 `Earnings per share: Diluted`、`Weighted-average shares: Diluted`。
 - EPS 照抄原文的小數位數（例如原文 `$1.20` 就寫 `1.20`，不要寫成 `1.2`）。
@@ -64,7 +65,7 @@
 - 金額單位必須與損益表相同（見規則 5-2）。
 - 只放「加總起來等於某個合計」的拆分項目；如果有多層（例如交易收入合計＋其下各項），**放最細的那一層**，並在 `notes` 說明層級結構。
 - 只揭露百分比時填 `share_percent`。
-- **調節項目**：營收表中列在各部門（或地區）小計之外、但計入總營收的項目（例如 Hedging gains (losses)、Corporate and other、Eliminations），一樣放進來並填 `"reconciling": true`（這是你依營收表結構給的建議，最後畫不畫由人在繪圖設定決定）。一般部門不填，即使數字是負的也一樣。所有項目（含調節項目）加總應等於總營收。
+- **調節項目**：營收表中列在各部門（或地區）小計之外、但計入總營收的項目（例如 Hedging gains (losses)、Corporate and other、Eliminations），一樣放進來並填 `"reconciling": true`（這是你依營收表結構給的建議，最後由人在核對時決定）。一般部門不填，即使數字是負的也一樣。所有項目（含調節項目）加總應等於總營收。
 
 ### kpis
 - 抽新聞稿中營運指標段落（例如 Key Performance Metrics、Operating Highlights）的全部項目。
