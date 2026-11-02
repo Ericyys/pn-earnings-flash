@@ -1,0 +1,2689 @@
+{
+  "archive_version": "1.6",
+  "app_version": "1.8.0（2026-11-02）",
+  "created_at": "2026-11-02T23:14:32.885Z",
+  "fact_sheet": {
+    "schema_version": "1.8",
+    "extraction": {
+      "ai_name": "Claude",
+      "ai_model": "Claude Opus 5.5",
+      "run_id": "A",
+      "extracted_at": "2026-11-03T06:39:00+08:00"
+    },
+    "meta": {
+      "company_name": "Apple Inc.",
+      "ticker": "AAPL",
+      "market": "us",
+      "fiscal_period": "FY2026Q4",
+      "period_end": "2026-09-26",
+      "period_end_src": {
+        "doc": "pr",
+        "page": 1,
+        "quote": "Apple today announced financial results for its fiscal 2026 fourth quarter ended September 26, 2026."
+      },
+      "report_date": "2026-11-02",
+      "currency": "USD",
+      "monetary_unit": "millions",
+      "monetary_unit_src": {
+        "doc": "fs",
+        "page": 1,
+        "quote": "(In millions, except number of shares, which are reflected in thousands, and per-share amounts)"
+      },
+      "share_unit": "thousands",
+      "accounting_basis": "US GAAP",
+      "eps_basis": "diluted",
+      "source_docs": [
+        {
+          "id": "fs",
+          "type": "financial_statements",
+          "title": "Apple Inc. Condensed Consolidated Statements of Operations, Balance Sheets and Statements of Cash Flows (Unaudited)"
+        },
+        {
+          "id": "pr",
+          "type": "press_release",
+          "title": "Apple reports fourth quarter results"
+        }
+      ]
+    },
+    "income_statement": {
+      "revenue": {
+        "current": {
+          "value": 114477,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total net sales (1)",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 102466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total net sales (1)",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "cost_of_revenue": {
+        "current": {
+          "value": 59657,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 54125,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "gross_profit": {
+        "current": {
+          "value": 54820,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Gross margin",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 48341,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Gross margin",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "rd_expense": {
+        "current": {
+          "value": 11730,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Research and development",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 8866,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Research and development",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "sm_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "ga_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "sga_expense": {
+        "current": {
+          "value": 7459,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Selling, general and administrative",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 7048,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Selling, general and administrative",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "other_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "operating_expenses_total": {
+        "current": {
+          "value": 19189,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 15914,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "operating_income": {
+        "current": {
+          "value": 35631,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 32427,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "non_operating_net": {
+        "current": {
+          "value": 504,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Other income/(expense), net",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 377,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Other income/(expense), net",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "pretax_income": {
+        "current": {
+          "value": 36135,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Income before provision for income taxes",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 32804,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Income before provision for income taxes",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "income_tax": {
+        "current": {
+          "value": 5424,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Provision for income taxes",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 5338,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Provision for income taxes",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "net_income": {
+        "current": {
+          "value": 30711,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 27466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "net_income_to_parent": {
+        "current": {
+          "value": 30711,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 27466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "eps_diluted": {
+        "current": {
+          "value": 2.1,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Earnings per share: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1.85,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Earnings per share: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "shares_diluted": {
+        "current": {
+          "value": 14630318,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Shares used in computing earnings per share: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 14863609,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Shares used in computing earnings per share: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "operating_expense_items": [
+      {
+        "key": "research_and_development",
+        "label_source": "Research and development",
+        "label_zh": "研發費用",
+        "amount": {
+          "current": {
+            "value": 11730,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Research and development",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8866,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Research and development",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "selling_general_and_administrative",
+        "label_source": "Selling, general and administrative",
+        "label_zh": "銷售及管理費用",
+        "amount": {
+          "current": {
+            "value": 7459,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Selling, general and administrative",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 7048,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Selling, general and administrative",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "segments": [
+      {
+        "key": "iphone",
+        "label_source": "iPhone",
+        "label_zh": "iPhone",
+        "revenue": {
+          "current": {
+            "value": 57583,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPhone",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 49025,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPhone",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "mac",
+        "label_source": "Mac",
+        "label_zh": "Mac",
+        "revenue": {
+          "current": {
+            "value": 10792,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Mac",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8726,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Mac",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "ipad",
+        "label_source": "iPad",
+        "label_zh": "iPad",
+        "revenue": {
+          "current": {
+            "value": 6229,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPad",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 6952,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPad",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "wearables_home_and_accessories",
+        "label_source": "Wearables, Home and Accessories",
+        "label_zh": "穿戴式裝置、家居及配件",
+        "revenue": {
+          "current": {
+            "value": 8300,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Wearables, Home and Accessories",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 9013,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Wearables, Home and Accessories",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "services",
+        "label_source": "Services",
+        "label_zh": "服務",
+        "revenue": {
+          "current": {
+            "value": 31573,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Services",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 28750,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Services",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "geographies": [
+      {
+        "key": "americas",
+        "label_source": "Americas",
+        "label_zh": "美洲",
+        "revenue": {
+          "current": {
+            "value": 48680,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Americas",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 44192,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Americas",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "europe",
+        "label_source": "Europe",
+        "label_zh": "歐洲",
+        "revenue": {
+          "current": {
+            "value": 32008,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Europe",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 28703,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Europe",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "greater_china",
+        "label_source": "Greater China",
+        "label_zh": "大中華區",
+        "revenue": {
+          "current": {
+            "value": 17539,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Greater China",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 14493,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Greater China",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "japan",
+        "label_source": "Japan",
+        "label_zh": "日本",
+        "revenue": {
+          "current": {
+            "value": 6540,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Japan",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 6636,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Japan",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "rest_of_asia_pacific",
+        "label_source": "Rest of Asia Pacific",
+        "label_zh": "亞太其他地區",
+        "revenue": {
+          "current": {
+            "value": 9710,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Rest of Asia Pacific",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8442,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Rest of Asia Pacific",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "kpis": [],
+    "cash_flow": {
+      "operating_cash_flow": {
+        "current": {
+          "value": 145097,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Cash generated by operating activities",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 111482,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Cash generated by operating activities",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      },
+      "capex": {
+        "current": {
+          "value": -9041,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Investing activities: Payments for acquisition of property, plant and equipment",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -12715,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Investing activities: Payments for acquisition of property, plant and equipment",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "capital_return": {
+      "buybacks": {
+        "current": {
+          "value": -86390,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Repurchases of common stock",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -90711,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Repurchases of common stock",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      },
+      "dividends_paid": {
+        "current": {
+          "value": -15721,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Payments for dividends and dividend equivalents",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -15421,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Payments for dividends and dividend equivalents",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "notable_items": [],
+    "stated_metrics": [
+      {
+        "metric": "revenue_yoy",
+        "value": 12,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "revenue_amount",
+        "value": 114.5,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 47.9,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 14,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "other:tariff_refunds_gross_margin_impact",
+        "value": 1,
+        "unit": "pp",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "other:fiscal_year_revenue_amount",
+        "value": 479,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Our record September quarter capped off a strong fiscal 2026, with all-time record revenue of $479 billion and double-digit EPS growth,"
+        }
+      }
+    ],
+    "headline_figures": [
+      {
+        "metric": "revenue",
+        "value": 114.5,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 12,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 47.9,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps",
+        "value": 2.1,
+        "unit": "per_share",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 14,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "operating_cash_flow",
+        "value": 28,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "We generated $28 billion in operating cash flow during the quarter, allowing us to return $28 billion to shareholders."
+        }
+      }
+    ],
+    "ambiguities": [],
+    "notes": [
+      {
+        "note": "文件中未出現股票代號，依公司名稱填 AAPL。",
+        "related_field": "meta.ticker"
+      },
+      {
+        "note": "原文幣別只寫 $，填 USD。",
+        "related_field": "meta.currency"
+      },
+      {
+        "note": "文件未明文寫出會計準則；本欄無 unspecified 選項，依美股市場填 US GAAP，請於核對時確認。",
+        "related_field": "meta.accounting_basis"
+      },
+      {
+        "note": "Apple 財年與日曆年不同；新聞稿稱本季為 fiscal 2026 fourth quarter ended September 26, 2026，故填 FY2026Q4。去年同期期末日為 September 27, 2025。",
+        "related_field": "meta.fiscal_period"
+      },
+      {
+        "note": "損益表將銷售、一般及管理費用合併為 Selling, general and administrative 一列，故 sm_expense、ga_expense 填 null（not_applicable），金額填入 sga_expense。",
+        "related_field": "income_statement.sga_expense"
+      },
+      {
+        "note": "營業費用合計與營業利益之間沒有其他營業收益及費損列，other_operating_net 填 null（not_applicable）。",
+        "related_field": "income_statement.other_operating_net"
+      },
+      {
+        "note": "損益表沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。",
+        "related_field": "income_statement.net_income_to_parent"
+      },
+      {
+        "note": "損益表沒有上一季（June quarter）欄位，未填 prior_quarter。",
+        "related_field": "income_statement"
+      },
+      {
+        "note": "營收有兩層拆分：損益表 Net sales 分 Products／Services 兩列，附註 Net sales by category 再細分為 iPhone、Mac、iPad、Wearables, Home and Accessories、Services。segments 依規則放最細的一層（category）。",
+        "related_field": "segments"
+      },
+      {
+        "note": "原文標題為 Net sales by reportable segment，但各項為地區（Americas、Europe、Greater China、Japan、Rest of Asia Pacific），依指令放入 geographies。",
+        "related_field": "geographies"
+      },
+      {
+        "note": "損益表另有 Cost of sales 依 Products／Services 拆分的列，schema 無對應欄位，未抽取。",
+        "related_field": "income_statement.cost_of_revenue"
+      },
+      {
+        "note": "已重新檢查原文：現金流量表（fs 第 3 頁）只有 Twelve Months Ended 欄，完全沒有 Three Months Ended 單季欄，依規則維持抄累計數並標 period_type: ytd（即整個財年，圖卡應標示為全年）。",
+        "related_field": "cash_flow"
+      },
+      {
+        "note": "新聞稿內文另寫本季營業現金流 $28 billion，但單位為十億且為四捨五入的概數，依規則 5-2 不用於 cash_flow，僅列入 headline_figures。",
+        "related_field": "cash_flow.operating_cash_flow"
+      },
+      {
+        "note": "capex 取現金流量表 Payments for acquisition of property, plant and equipment 列，照抄原文負號。",
+        "related_field": "cash_flow.capex"
+      },
+      {
+        "note": "回購與股利同樣只有現金流量表的 Twelve Months Ended 欄，無單季欄，依規則抄累計數並標 period_type: ytd，照抄原文負號。文件未提及新核准或剩餘回購授權，未填 new_buyback_authorization。",
+        "related_field": "capital_return"
+      },
+      {
+        "note": "新聞稿寫本季回饋股東 $28 billion，但未拆分回購與股利，headline_figures 無對應代號，未列入。",
+        "related_field": "headline_figures"
+      },
+      {
+        "note": "董事會宣告每股現金股利 $0.27（11 月 16 日發放），schema 無對應欄位，未抽取。",
+        "related_field": "capital_return"
+      },
+      {
+        "note": "新聞稿寫出關稅退款（tariff refunds）對毛利率約 1 個百分點、對稀釋 EPS $0.05 的有利影響，但原文未標示為一次性、非經常性或特殊項目，也未揭露金額，依規則不列入 notable_items；毛利率影響已列於 stated_metrics，EPS 影響見 headline_figures 中 eps 的原句。",
+        "related_field": "notable_items"
+      },
+      {
+        "note": "文件未提供下一季或全年財測，省略 guidance_next 與 guidance_revisions。",
+        "related_field": "guidance_next"
+      },
+      {
+        "note": "新聞稿沒有營運指標段落；裝置裝機量（installed base）僅文字描述創新高，未給數字，kpis 為空陣列。",
+        "related_field": "kpis"
+      },
+      {
+        "note": "文件未提供 Non-GAAP 數字，省略 market_specific。",
+        "related_field": "market_specific"
+      },
+      {
+        "note": "資產負債表（第 2 頁）無 schema 對應欄位，未抽取。",
+        "related_field": "meta.source_docs"
+      }
+    ]
+  },
+  "ai_fact_sheet": {
+    "schema_version": "1.8",
+    "extraction": {
+      "ai_name": "Claude",
+      "ai_model": "Claude Opus 5.5",
+      "run_id": "A",
+      "extracted_at": "2026-11-03T06:39:00+08:00"
+    },
+    "meta": {
+      "company_name": "Apple Inc.",
+      "ticker": "AAPL",
+      "market": "us",
+      "fiscal_period": "FY2026Q4",
+      "period_end": "2026-09-26",
+      "period_end_src": {
+        "doc": "pr",
+        "page": 1,
+        "quote": "Apple today announced financial results for its fiscal 2026 fourth quarter ended September 26, 2026."
+      },
+      "report_date": "2026-11-02",
+      "currency": "USD",
+      "monetary_unit": "millions",
+      "monetary_unit_src": {
+        "doc": "fs",
+        "page": 1,
+        "quote": "(In millions, except number of shares, which are reflected in thousands, and per-share amounts)"
+      },
+      "share_unit": "thousands",
+      "accounting_basis": "US GAAP",
+      "eps_basis": "diluted",
+      "source_docs": [
+        {
+          "id": "fs",
+          "type": "financial_statements",
+          "title": "Apple Inc. Condensed Consolidated Statements of Operations, Balance Sheets and Statements of Cash Flows (Unaudited)"
+        },
+        {
+          "id": "pr",
+          "type": "press_release",
+          "title": "Apple reports fourth quarter results"
+        }
+      ]
+    },
+    "income_statement": {
+      "revenue": {
+        "current": {
+          "value": 114477,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total net sales (1)",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 102466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total net sales (1)",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "cost_of_revenue": {
+        "current": {
+          "value": 59657,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 54125,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "gross_profit": {
+        "current": {
+          "value": 54820,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Gross margin",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 48341,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Gross margin",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "rd_expense": {
+        "current": {
+          "value": 11730,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Research and development",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 8866,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Research and development",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "sm_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "ga_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "sga_expense": {
+        "current": {
+          "value": 7459,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Selling, general and administrative",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 7048,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating expenses: Selling, general and administrative",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "other_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "operating_expenses_total": {
+        "current": {
+          "value": 19189,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 15914,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "operating_income": {
+        "current": {
+          "value": 35631,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 32427,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "non_operating_net": {
+        "current": {
+          "value": 504,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Other income/(expense), net",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 377,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Other income/(expense), net",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "pretax_income": {
+        "current": {
+          "value": 36135,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Income before provision for income taxes",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 32804,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Income before provision for income taxes",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "income_tax": {
+        "current": {
+          "value": 5424,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Provision for income taxes",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 5338,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Provision for income taxes",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "net_income": {
+        "current": {
+          "value": 30711,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 27466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "net_income_to_parent": {
+        "current": {
+          "value": 30711,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 27466,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "eps_diluted": {
+        "current": {
+          "value": 2.1,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Earnings per share: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1.85,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Earnings per share: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      },
+      "shares_diluted": {
+        "current": {
+          "value": 14630318,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Shares used in computing earnings per share: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 14863609,
+          "src": {
+            "doc": "fs",
+            "page": 1,
+            "row_label": "Shares used in computing earnings per share: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "operating_expense_items": [
+      {
+        "key": "research_and_development",
+        "label_source": "Research and development",
+        "label_zh": "研發費用",
+        "amount": {
+          "current": {
+            "value": 11730,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Research and development",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8866,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Research and development",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "selling_general_and_administrative",
+        "label_source": "Selling, general and administrative",
+        "label_zh": "銷售及管理費用",
+        "amount": {
+          "current": {
+            "value": 7459,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Selling, general and administrative",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 7048,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Operating expenses: Selling, general and administrative",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "segments": [
+      {
+        "key": "iphone",
+        "label_source": "iPhone",
+        "label_zh": "iPhone",
+        "revenue": {
+          "current": {
+            "value": 57583,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPhone",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 49025,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPhone",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "mac",
+        "label_source": "Mac",
+        "label_zh": "Mac",
+        "revenue": {
+          "current": {
+            "value": 10792,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Mac",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8726,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Mac",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "ipad",
+        "label_source": "iPad",
+        "label_zh": "iPad",
+        "revenue": {
+          "current": {
+            "value": 6229,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPad",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 6952,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: iPad",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "wearables_home_and_accessories",
+        "label_source": "Wearables, Home and Accessories",
+        "label_zh": "穿戴式裝置、家居及配件",
+        "revenue": {
+          "current": {
+            "value": 8300,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Wearables, Home and Accessories",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 9013,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Wearables, Home and Accessories",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "services",
+        "label_source": "Services",
+        "label_zh": "服務",
+        "revenue": {
+          "current": {
+            "value": 31573,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Services",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 28750,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by category: Services",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "geographies": [
+      {
+        "key": "americas",
+        "label_source": "Americas",
+        "label_zh": "美洲",
+        "revenue": {
+          "current": {
+            "value": 48680,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Americas",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 44192,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Americas",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "europe",
+        "label_source": "Europe",
+        "label_zh": "歐洲",
+        "revenue": {
+          "current": {
+            "value": 32008,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Europe",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 28703,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Europe",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "greater_china",
+        "label_source": "Greater China",
+        "label_zh": "大中華區",
+        "revenue": {
+          "current": {
+            "value": 17539,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Greater China",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 14493,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Greater China",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "japan",
+        "label_source": "Japan",
+        "label_zh": "日本",
+        "revenue": {
+          "current": {
+            "value": 6540,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Japan",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 6636,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Japan",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      },
+      {
+        "key": "rest_of_asia_pacific",
+        "label_source": "Rest of Asia Pacific",
+        "label_zh": "亞太其他地區",
+        "revenue": {
+          "current": {
+            "value": 9710,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Rest of Asia Pacific",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 8442,
+            "src": {
+              "doc": "fs",
+              "page": 1,
+              "row_label": "Net sales by reportable segment: Rest of Asia Pacific",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          }
+        }
+      }
+    ],
+    "kpis": [],
+    "cash_flow": {
+      "operating_cash_flow": {
+        "current": {
+          "value": 145097,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Cash generated by operating activities",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 111482,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Cash generated by operating activities",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      },
+      "capex": {
+        "current": {
+          "value": -9041,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Investing activities: Payments for acquisition of property, plant and equipment",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -12715,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Investing activities: Payments for acquisition of property, plant and equipment",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "capital_return": {
+      "buybacks": {
+        "current": {
+          "value": -86390,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Repurchases of common stock",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -90711,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Repurchases of common stock",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      },
+      "dividends_paid": {
+        "current": {
+          "value": -15721,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Payments for dividends and dividend equivalents",
+            "column_label": "Twelve Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -15421,
+          "period_type": "ytd",
+          "src": {
+            "doc": "fs",
+            "page": 3,
+            "row_label": "Financing activities: Payments for dividends and dividend equivalents",
+            "column_label": "Twelve Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "notable_items": [],
+    "stated_metrics": [
+      {
+        "metric": "revenue_yoy",
+        "value": 12,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "revenue_amount",
+        "value": 114.5,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 47.9,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 14,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "other:tariff_refunds_gross_margin_impact",
+        "value": 1,
+        "unit": "pp",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "other:fiscal_year_revenue_amount",
+        "value": 479,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Our record September quarter capped off a strong fiscal 2026, with all-time record revenue of $479 billion and double-digit EPS growth,"
+        }
+      }
+    ],
+    "headline_figures": [
+      {
+        "metric": "revenue",
+        "value": 114.5,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 12,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "The Company posted quarterly revenue of $114.5 billion, up 12 percent year over year."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 47.9,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Company gross margin was 47.9 percent, including a favorable impact of approximately 1 percentage point from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps",
+        "value": 2.1,
+        "unit": "per_share",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 14,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Diluted earnings per share was $2.10, up 14 percent year over year, and included a favorable impact of $0.05 from tariff refunds."
+        }
+      },
+      {
+        "metric": "operating_cash_flow",
+        "value": 28,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "We generated $28 billion in operating cash flow during the quarter, allowing us to return $28 billion to shareholders."
+        }
+      }
+    ],
+    "ambiguities": [],
+    "notes": [
+      {
+        "note": "文件中未出現股票代號，依公司名稱填 AAPL。",
+        "related_field": "meta.ticker"
+      },
+      {
+        "note": "原文幣別只寫 $，填 USD。",
+        "related_field": "meta.currency"
+      },
+      {
+        "note": "文件未明文寫出會計準則；本欄無 unspecified 選項，依美股市場填 US GAAP，請於核對時確認。",
+        "related_field": "meta.accounting_basis"
+      },
+      {
+        "note": "Apple 財年與日曆年不同；新聞稿稱本季為 fiscal 2026 fourth quarter ended September 26, 2026，故填 FY2026Q4。去年同期期末日為 September 27, 2025。",
+        "related_field": "meta.fiscal_period"
+      },
+      {
+        "note": "損益表將銷售、一般及管理費用合併為 Selling, general and administrative 一列，故 sm_expense、ga_expense 填 null（not_applicable），金額填入 sga_expense。",
+        "related_field": "income_statement.sga_expense"
+      },
+      {
+        "note": "營業費用合計與營業利益之間沒有其他營業收益及費損列，other_operating_net 填 null（not_applicable）。",
+        "related_field": "income_statement.other_operating_net"
+      },
+      {
+        "note": "損益表沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。",
+        "related_field": "income_statement.net_income_to_parent"
+      },
+      {
+        "note": "損益表沒有上一季（June quarter）欄位，未填 prior_quarter。",
+        "related_field": "income_statement"
+      },
+      {
+        "note": "營收有兩層拆分：損益表 Net sales 分 Products／Services 兩列，附註 Net sales by category 再細分為 iPhone、Mac、iPad、Wearables, Home and Accessories、Services。segments 依規則放最細的一層（category）。",
+        "related_field": "segments"
+      },
+      {
+        "note": "原文標題為 Net sales by reportable segment，但各項為地區（Americas、Europe、Greater China、Japan、Rest of Asia Pacific），依指令放入 geographies。",
+        "related_field": "geographies"
+      },
+      {
+        "note": "損益表另有 Cost of sales 依 Products／Services 拆分的列，schema 無對應欄位，未抽取。",
+        "related_field": "income_statement.cost_of_revenue"
+      },
+      {
+        "note": "已重新檢查原文：現金流量表（fs 第 3 頁）只有 Twelve Months Ended 欄，完全沒有 Three Months Ended 單季欄，依規則維持抄累計數並標 period_type: ytd（即整個財年，圖卡應標示為全年）。",
+        "related_field": "cash_flow"
+      },
+      {
+        "note": "新聞稿內文另寫本季營業現金流 $28 billion，但單位為十億且為四捨五入的概數，依規則 5-2 不用於 cash_flow，僅列入 headline_figures。",
+        "related_field": "cash_flow.operating_cash_flow"
+      },
+      {
+        "note": "capex 取現金流量表 Payments for acquisition of property, plant and equipment 列，照抄原文負號。",
+        "related_field": "cash_flow.capex"
+      },
+      {
+        "note": "回購與股利同樣只有現金流量表的 Twelve Months Ended 欄，無單季欄，依規則抄累計數並標 period_type: ytd，照抄原文負號。文件未提及新核准或剩餘回購授權，未填 new_buyback_authorization。",
+        "related_field": "capital_return"
+      },
+      {
+        "note": "新聞稿寫本季回饋股東 $28 billion，但未拆分回購與股利，headline_figures 無對應代號，未列入。",
+        "related_field": "headline_figures"
+      },
+      {
+        "note": "董事會宣告每股現金股利 $0.27（11 月 16 日發放），schema 無對應欄位，未抽取。",
+        "related_field": "capital_return"
+      },
+      {
+        "note": "新聞稿寫出關稅退款（tariff refunds）對毛利率約 1 個百分點、對稀釋 EPS $0.05 的有利影響，但原文未標示為一次性、非經常性或特殊項目，也未揭露金額，依規則不列入 notable_items；毛利率影響已列於 stated_metrics，EPS 影響見 headline_figures 中 eps 的原句。",
+        "related_field": "notable_items"
+      },
+      {
+        "note": "文件未提供下一季或全年財測，省略 guidance_next 與 guidance_revisions。",
+        "related_field": "guidance_next"
+      },
+      {
+        "note": "新聞稿沒有營運指標段落；裝置裝機量（installed base）僅文字描述創新高，未給數字，kpis 為空陣列。",
+        "related_field": "kpis"
+      },
+      {
+        "note": "文件未提供 Non-GAAP 數字，省略 market_specific。",
+        "related_field": "market_specific"
+      },
+      {
+        "note": "資產負債表（第 2 頁）無 schema 對應欄位，未抽取。",
+        "related_field": "meta.source_docs"
+      }
+    ]
+  },
+  "edits": [],
+  "overrides": [],
+  "review_items": [
+    {
+      "group": "user",
+      "item": "需確認：現金流量為單季數字｜含年初至今累計數；若原文有單季欄位，應改抽單季",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "user",
+      "item": "需確認：會計期間與期末日一致｜FY2026Q4 換算為 2026Q4，但期末日 2026-09-26 屬於 2026Q3（沒有公司設定檔，以 12 月底為財年結束推算）",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜meta.accounting_basis｜A＝US GAAP｜B＝other",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[0].note｜A＝文件中未出現股票代號，依公司名稱填 AAPL。｜B＝ticker AAPL 依公司名稱填寫；財報文件本身未列股票代號。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[10].note｜A＝損益表另有 Cost of sales 依 Products／Services 拆分的列，schema 無對應欄位，未抽取。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[10].related_field｜A＝income_statement.cost_of_revenue｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[11].note｜A＝已重新檢查原文：現金流量表（fs 第 3 頁）只有 Twelve Months Ended 欄，完全沒有 Three Months Ended 單季欄，依規則維持抄累計數並標 period_type: ytd（即整個財年，圖卡應標示為全年）。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[11].related_field｜A＝cash_flow｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[12].note｜A＝新聞稿內文另寫本季營業現金流 $28 billion，但單位為十億且為四捨五入的概數，依規則 5-2 不用於 cash_flow，僅列入 headline_figures。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[12].related_field｜A＝cash_flow.operating_cash_flow｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[13].note｜A＝capex 取現金流量表 Payments for acquisition of property, plant and equipment 列，照抄原文負號。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[13].related_field｜A＝cash_flow.capex｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[14].note｜A＝回購與股利同樣只有現金流量表的 Twelve Months Ended 欄，無單季欄，依規則抄累計數並標 period_type: ytd，照抄原文負號。文件未提及新核准或剩餘回購授權，未填 new_buyback_authorization。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[14].related_field｜A＝capital_return｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[15].note｜A＝新聞稿寫本季回饋股東 $28 billion，但未拆分回購與股利，headline_figures 無對應代號，未列入。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[15].related_field｜A＝headline_figures｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[16].note｜A＝董事會宣告每股現金股利 $0.27（11 月 16 日發放），schema 無對應欄位，未抽取。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[16].related_field｜A＝capital_return｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[17].note｜A＝新聞稿寫出關稅退款（tariff refunds）對毛利率約 1 個百分點、對稀釋 EPS $0.05 的有利影響，但原文未標示為一次性、非經常性或特殊項目，也未揭露金額，依規則不列入 notable_items；毛利率影響已列於 stated_metrics，EPS 影響見 headline_figures 中 eps 的原句。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[17].related_field｜A＝notable_items｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[18].note｜A＝文件未提供下一季或全年財測，省略 guidance_next 與 guidance_revisions。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[18].related_field｜A＝guidance_next｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[19].note｜A＝新聞稿沒有營運指標段落；裝置裝機量（installed base）僅文字描述創新高，未給數字，kpis 為空陣列。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[19].related_field｜A＝kpis｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[1].note｜A＝原文幣別只寫 $，填 USD。｜B＝財報文件未明確標示會計準則；依 schema 必填限制填 other，待人工確認。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[1].related_field｜A＝meta.currency｜B＝meta.accounting_basis",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[20].note｜A＝文件未提供 Non-GAAP 數字，省略 market_specific。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[20].related_field｜A＝market_specific｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[21].note｜A＝資產負債表（第 2 頁）無 schema 對應欄位，未抽取。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[21].related_field｜A＝meta.source_docs｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[2].note｜A＝文件未明文寫出會計準則；本欄無 unspecified 選項，依美股市場填 US GAAP，請於核對時確認。｜B＝Press.pdf 第 1 頁提及 active devices installed base 達歷史新高，但未揭露具體數值，因此未填入 kpis。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[2].related_field｜A＝meta.accounting_basis｜B＝kpis",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[3].note｜A＝Apple 財年與日曆年不同；新聞稿稱本季為 fiscal 2026 fourth quarter ended September 26, 2026，故填 FY2026Q4。去年同期期末日為 September 27, 2025。｜B＝損益表與分部營收以 millions 為單位；股數以 thousands 為單位。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[3].related_field｜A＝meta.fiscal_period｜B＝meta.monetary_unit",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[4].note｜A＝損益表將銷售、一般及管理費用合併為 Selling, general and administrative 一列，故 sm_expense、ga_expense 填 null（not_applicable），金額填入 sga_expense。｜B＝財務報表未提供上一季欄位，因此未填 prior_quarter。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[4].related_field｜A＝income_statement.sga_expense｜B＝income_statement",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[5].note｜A＝營業費用合計與營業利益之間沒有其他營業收益及費損列，other_operating_net 填 null（not_applicable）。｜B＝財務報表的現金流量表只有 Twelve Months Ended 欄位，故現金流量與股東回饋採 YTD，period_type 標為 ytd。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[5].related_field｜A＝income_statement.other_operating_net｜B＝cash_flow",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[6].note｜A＝損益表沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。｜B＝新聞稿提及 tariff refunds 對毛利率及稀釋 EPS 的有利影響，但未將其明確標示為一次性或非經常性項目，因此未列入 notable_items。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[6].related_field｜A＝income_statement.net_income_to_parent｜B＝notable_items",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[7].note｜A＝損益表沒有上一季（June quarter）欄位，未填 prior_quarter。｜B＝新聞稿未提供下一季財測；未填 guidance_next。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[7].related_field｜A＝income_statement｜B＝guidance_next",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[8].note｜A＝營收有兩層拆分：損益表 Net sales 分 Products／Services 兩列，附註 Net sales by category 再細分為 iPhone、Mac、iPad、Wearables, Home and Accessories、Services。segments 依規則放最細的一層（category）。｜B＝新聞稿提及股東回饋總額 $28 billion，未拆分為回購與股利的季度金額；headline_figures 僅照抄該總額，不作拆分。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[8].related_field｜A＝segments｜B＝headline_figures",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[9].note｜A＝原文標題為 Net sales by reportable segment，但各項為地區（Americas、Europe、Greater China、Japan、Rest of Asia Pacific），依指令放入 geographies。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[9].related_field｜A＝geographies｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.ticker）：文件中未出現股票代號，依公司名稱填 AAPL。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.currency）：原文幣別只寫 $，填 USD。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.accounting_basis）：文件未明文寫出會計準則；本欄無 unspecified 選項，依美股市場填 US GAAP，請於核對時確認。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.fiscal_period）：Apple 財年與日曆年不同；新聞稿稱本季為 fiscal 2026 fourth quarter ended September 26, 2026，故填 FY2026Q4。去年同期期末日為 September 27, 2025。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.sga_expense）：損益表將銷售、一般及管理費用合併為 Selling, general and administrative 一列，故 sm_expense、ga_expense 填 null（not_applicable），金額填入 sga_expense。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.other_operating_net）：營業費用合計與營業利益之間沒有其他營業收益及費損列，other_operating_net 填 null（not_applicable）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.net_income_to_parent）：損益表沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement）：損益表沒有上一季（June quarter）欄位，未填 prior_quarter。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（segments）：營收有兩層拆分：損益表 Net sales 分 Products／Services 兩列，附註 Net sales by category 再細分為 iPhone、Mac、iPad、Wearables, Home and Accessories、Services。segments 依規則放最細的一層（category）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（geographies）：原文標題為 Net sales by reportable segment，但各項為地區（Americas、Europe、Greater China、Japan、Rest of Asia Pacific），依指令放入 geographies。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.cost_of_revenue）：損益表另有 Cost of sales 依 Products／Services 拆分的列，schema 無對應欄位，未抽取。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow）：已重新檢查原文：現金流量表（fs 第 3 頁）只有 Twelve Months Ended 欄，完全沒有 Three Months Ended 單季欄，依規則維持抄累計數並標 period_type: ytd（即整個財年，圖卡應標示為全年）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow.operating_cash_flow）：新聞稿內文另寫本季營業現金流 $28 billion，但單位為十億且為四捨五入的概數，依規則 5-2 不用於 cash_flow，僅列入 headline_figures。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow.capex）：capex 取現金流量表 Payments for acquisition of property, plant and equipment 列，照抄原文負號。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（capital_return）：回購與股利同樣只有現金流量表的 Twelve Months Ended 欄，無單季欄，依規則抄累計數並標 period_type: ytd，照抄原文負號。文件未提及新核准或剩餘回購授權，未填 new_buyback_authorization。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（headline_figures）：新聞稿寫本季回饋股東 $28 billion，但未拆分回購與股利，headline_figures 無對應代號，未列入。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（capital_return）：董事會宣告每股現金股利 $0.27（11 月 16 日發放），schema 無對應欄位，未抽取。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（notable_items）：新聞稿寫出關稅退款（tariff refunds）對毛利率約 1 個百分點、對稀釋 EPS $0.05 的有利影響，但原文未標示為一次性、非經常性或特殊項目，也未揭露金額，依規則不列入 notable_items；毛利率影響已列於 stated_metrics，EPS 影響見 headline_figures 中 eps 的原句。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（guidance_next）：文件未提供下一季或全年財測，省略 guidance_next 與 guidance_revisions。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（kpis）：新聞稿沒有營運指標段落；裝置裝機量（installed base）僅文字描述創新高，未給數字，kpis 為空陣列。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（market_specific）：文件未提供 Non-GAAP 數字，省略 market_specific。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.source_docs）：資產負債表（第 2 頁）無 schema 對應欄位，未抽取。",
+      "choice": null,
+      "note": ""
+    }
+  ],
+  "correction_rounds": 1,
+  "company_rules": {
+    "labels": {
+      "seg:iphone": "手機 iPhone",
+      "seg:mac": "電腦 Mac",
+      "seg:ipad": "平板 iPad",
+      "seg:wearables_home_and_accessories": "穿戴式裝置、居家及配件",
+      "seg:services": "服務"
+    }
+  },
+  "checks": [
+    {
+      "id": "gross_profit_identity",
+      "label": "毛利＝營收−營業成本",
+      "status": "pass",
+      "detail": "差 0"
+    },
+    {
+      "id": "operating_income_identity_c",
+      "label": "本季：營業利益＝毛利−營業費用",
+      "status": "pass",
+      "detail": "計算 35631，原文 35631，差 0"
+    },
+    {
+      "id": "operating_income_identity_p",
+      "label": "去年同期：營業利益＝毛利−營業費用",
+      "status": "pass",
+      "detail": "計算 32427，原文 32427，差 0"
+    },
+    {
+      "id": "pretax_identity",
+      "label": "稅前淨利＝營業利益＋業外",
+      "status": "pass",
+      "detail": "差 0"
+    },
+    {
+      "id": "net_income_identity",
+      "label": "淨利＝稅前淨利−所得稅",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "eps_basis",
+      "label": "EPS 口徑",
+      "status": "pass",
+      "detail": "稀釋 EPS"
+    },
+    {
+      "id": "eps_identity_c",
+      "label": "本季：EPS≈淨利÷稀釋股數",
+      "status": "pass",
+      "detail": "計算 2.0991，原文 2.1"
+    },
+    {
+      "id": "eps_identity_p",
+      "label": "去年同期：EPS≈淨利÷稀釋股數",
+      "status": "pass",
+      "detail": "計算 1.8479，原文 1.85"
+    },
+    {
+      "id": "segments_sum_c",
+      "label": "本季：部門加總＝營收",
+      "status": "pass",
+      "detail": "加總 114477，營收 114477"
+    },
+    {
+      "id": "segments_sum_p",
+      "label": "去年同期：部門加總＝營收",
+      "status": "pass",
+      "detail": "加總 102466，營收 102466"
+    },
+    {
+      "id": "geographies_sum_c",
+      "label": "本季：地區加總＝營收",
+      "status": "pass",
+      "detail": "加總 114477，營收 114477"
+    },
+    {
+      "id": "geographies_sum_p",
+      "label": "去年同期：地區加總＝營收",
+      "status": "pass",
+      "detail": "加總 102466，營收 102466"
+    },
+    {
+      "id": "cash_flow_period",
+      "label": "現金流量為單季數字",
+      "status": "warn",
+      "detail": "含年初至今累計數；若原文有單季欄位，應改抽單季"
+    },
+    {
+      "id": "eps_yoy_source",
+      "label": "EPS 年增率的來源",
+      "status": "pass",
+      "detail": "採用公司公布的 14%（與公布 EPS 一致）"
+    },
+    {
+      "id": "range_gross_margin",
+      "label": "毛利率在合理範圍",
+      "status": "pass",
+      "detail": "47.9%"
+    },
+    {
+      "id": "range_operating_margin",
+      "label": "營益率在合理範圍",
+      "status": "pass",
+      "detail": "31.1%"
+    },
+    {
+      "id": "range_net_margin",
+      "label": "淨利率在合理範圍",
+      "status": "pass",
+      "detail": "26.8%"
+    },
+    {
+      "id": "yoy_outlier",
+      "label": "營收年增率未超過 ±100%",
+      "status": "pass",
+      "detail": "11.7%"
+    },
+    {
+      "id": "revenue_amount_114.5",
+      "label": "內文營收金額 114.5 billions 與報表一致",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "fiscal_period_vs_end",
+      "label": "會計期間與期末日一致",
+      "status": "warn",
+      "detail": "FY2026Q4 換算為 2026Q4，但期末日 2026-09-26 屬於 2026Q3（沒有公司設定檔，以 12 月底為財年結束推算）"
+    }
+  ],
+  "incomplete": [],
+  "press_check": [
+    {
+      "item": "營收",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "114.48",
+      "press_value": "114.5",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營收年增率",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "11.7%",
+      "press_value": "12",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營益率",
+      "cards": [
+        "A1",
+        "C"
+      ],
+      "card_value": "31.1%",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "稀釋 EPS",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "2.10",
+      "press_value": "2.10",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "稀釋 EPS 年增率",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "14%",
+      "press_value": "14",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "毛利",
+      "cards": [
+        "C"
+      ],
+      "card_value": "54.82",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "毛利率",
+      "cards": [
+        "C"
+      ],
+      "card_value": "47.9%",
+      "press_value": "47.9",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營業利益",
+      "cards": [
+        "C"
+      ],
+      "card_value": "35.63",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "淨利",
+      "cards": [
+        "C"
+      ],
+      "card_value": "30.71",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "淨利率",
+      "cards": [
+        "C"
+      ],
+      "card_value": "26.8%",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "手機 iPhone營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "57.58",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "電腦 Mac營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "10.79",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "平板 iPad營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "6.23",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "穿戴式裝置、居家及配件營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "8.30",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "服務營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "31.57",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    }
+  ],
+  "dropped_notes": [],
+  "derived": [],
+  "selection": {
+    "fired": {
+      "B": [
+        "segment_yoy_gap_pp=22.12"
+      ]
+    },
+    "skipped": {
+      "E:outside": [
+        "guidance_position"
+      ],
+      "E:inside": [
+        "guidance_position",
+        "consensus_gap"
+      ],
+      "F": [
+        "kpi_extreme",
+        "kpi_growth_sign_flip"
+      ],
+      "I": [
+        "peers_available"
+      ]
+    },
+    "chosen": [
+      "B"
+    ],
+    "deck": [
+      "A1",
+      "C",
+      "B",
+      "K1"
+    ],
+    "unbuilt": [],
+    "incompleteFired": [],
+    "dropped": [],
+    "incomplete": []
+  },
+  "second_extraction_used": true,
+  "diff_count": 44
+}
