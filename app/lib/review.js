@@ -134,7 +134,7 @@ export function periodColumnCheck(fs, periodEnd) {
  */
 export function correctionPrompt({ userDecisions = [], aiItems = [], edits = [], general = "" }) {
   const L = [];
-  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.6\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
+  L.push("以下是你剛才輸出的財報數據 JSON 的修正要求。請依照原本的抽取指令與規則逐項處理，然後**重新輸出完整的 JSON**（同樣格式，schema_version 填 \"1.7\"；只輸出一個 JSON 程式碼區塊，不要解說）。");
   L.push("");
   if (userDecisions.length) {
     L.push("## 一、人工判斷（已由人對照原文決定，請直接照做）");
@@ -171,6 +171,7 @@ export function correctionPrompt({ userDecisions = [], aiItems = [], edits = [],
   L.push("- 只抄原文、不計算、不估計；每個數字附出處。");
   L.push("- 能從原文確定的問題：直接修正數據，並在 notes 用一句話說明怎麼處理的。");
   L.push("- 只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。");
+  L.push("- 「另一個 AI 抽到、你的版本沒有」的項目：先找你的版本裡是不是已經有同一個項目（只是代號不同）；每一項都在 cross_check 回應一筆（same_item／added／not_applicable）。同一個項目以你的版本為準，不要為了配合另一份而改名或重複新增。");
   L.push("- 上面沒有提到的欄位維持原樣，不要重新抽取或改動。");
   return L.join("\n");
 }

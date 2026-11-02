@@ -866,7 +866,7 @@ export function diffExtractions(a, b) {
       const idOf = (x, i) => x?.key ?? (x?.metric && x?.label_source ? `${x.metric}|${x.label_source}` : x?.metric !== undefined && x?.value !== undefined ? `${x.metric}|${x.value}` : i);
       if (Array.isArray(o)) o.forEach((x, i) => flat(x, `${p}[${idOf(x, i)}]`, out));
       else for (const [k, v] of Object.entries(o)) {
-        if (["src", "extraction", "ambiguities", "comment", "key", "label_source", "label_zh", "unit", "metric"].includes(k)) continue;
+        if (["src", "extraction", "ambiguities", "cross_check", "comment", "key", "label_source", "label_zh", "unit", "metric"].includes(k)) continue;
         flat(v, p ? `${p}.${k}` : k, out);
       }
     } else if (typeof o === "number" || typeof o === "string") out[p] = { value: o };

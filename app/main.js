@@ -4,7 +4,7 @@
 // 計算在 lib/compute.js、修改在 lib/review.js、公司規範（算式、科目名稱）在 lib/company_rules.js、
 // 公司規範畫面在 company_panel.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.6.0（2026-11-02）";
+export const APP_VERSION = "1.7.0（2026-11-02）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -151,9 +151,25 @@ function recompute() {
   updateGate();
 }
 
-/** B 的代號改成使用者選定的名稱（只用於 A／B 比對；B 不用來出圖） */
+/**
+ * B 的代號改成 A 的名稱（只用於 A／B 比對；B 不用來出圖）。對應來源：
+ *   1. A 的 cross_check：A 回原文判斷「B 多出來的項目，我其實有，只是代號不同」（same_item）或「已補上」（added）
+ *   2. 使用者在第三層選定的名稱
+ * A 是主要的抽取結果：同一個項目以 A 的名稱與數字為準。
+ */
+const itemPath = (p) => /^(\w+)\[([^\]]+)\]/.exec(p || "");
+function crossMap() {
+  const map = {};
+  for (const x of state.Aeff?.cross_check || []) {
+    if (!["same_item", "added"].includes(x.result)) continue;
+    const o = itemPath(x.other_path), a = itemPath(x.key);
+    if (o && a && o[1] === a[1] && o[2] !== a[2]) (map[o[1]] = map[o[1]] || {})[o[2]] = a[2];
+  }
+  return map;
+}
 function remapB(B) {
-  const map = state.bKeyMap || {};
+  const map = structuredClone(crossMap());
+  for (const [arr, m] of Object.entries(state.bKeyMap || {})) map[arr] = { ...(map[arr] || {}), ...m };
   if (!Object.keys(map).length) return B;
   const out = structuredClone(B);
   for (const [arr, m] of Object.entries(map)) for (const it of out[arr] || []) if (it && m[it.key]) it.key = m[it.key];
@@ -292,9 +308,15 @@ function layer3Items() {
     if ([...paired].some((p) => d.path === p || d.path.startsWith(p + "."))) continue;
     const adoptable = d.paths.every((p) => getNode(A, p) !== undefined && getNode(state.B, p) !== undefined);
     if (d.type === "只有 B 有") {
+      // A 是主要的抽取結果：A 回原文判斷「不該抽」（cross_check: not_applicable）→ 以 A 為準，自動處理
+      const ip = itemPath(d.path);
+      const cc = (A.cross_check || []).find((x) => x.result === "not_applicable" && (x.other_path === d.path || (ip && itemPath(x.other_path)?.[0] === ip[0])));
+      if (cc) { push({ id, group: "auto", kind: "diff", path: d.path, text: `A 沒有、B 有：${d.path}｜B＝${d.b}`, reason: `A 回原文判斷不該抽，以 A 為準：${cc.reason || "（未寫原因）"}` }); continue; }
       const group = sent.has(id) ? "user" : "ai";
-      push({ id, group, kind: "diff", path: d.path, text: `A 沒有、B 有：${d.path}｜B＝${d.b}`, escalated: group === "user",
-        request: `另一個 AI 抽到 ${d.path}＝${d.b}，你的版本沒有。請回原文確認：該抽就補上（附出處），不該抽（例如不符合規則）就不要加，並在 notes 說明。` });
+      // A 裡同一個陣列的項目（給使用者手動指定「A 其實有，名稱是…」）
+      const aKeys = ip ? (A[ip[1]] || []).map((x) => x?.key).filter(Boolean) : [];
+      push({ id, group, kind: "bonly", path: d.path, arr: ip?.[1], bKey: ip?.[2], aKeys, text: `A 沒有、B 有：${d.path}｜B＝${d.b}`, escalated: group === "user",
+        request: `另一個 AI 抽到 ${d.path}＝${d.b}，你的版本沒有。請回原文確認：你的版本裡若已經有同一個項目（只是代號不同），不要新增，在 cross_check 填 same_item 並寫出你的路徑；原文有、你漏抽了，就補上（附出處），cross_check 填 added；依規則不該抽，就不要加，cross_check 填 not_applicable 並寫原因。` });
     } else {
       push({ id, group: "auto", kind: "diff", path: d.path, d, adoptable, text: `A／B 不同｜${d.path}｜A＝${d.a}｜B＝${d.b}`,
         reason: d.type === "只有 A 有" ? "B 漏抽，以 A 為準" : "A 的數字已在第二層對照原文核對；若 B 才對，可按「把 A 改成 B 的值」" });
@@ -426,6 +448,7 @@ function buildManual() {
       const st2 = ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">未判斷</span>`;
       return `<tr><td>${st2}</td><td>${body}</td></tr>`;
     }
+    body += aHas(it);
     if (it.suggest) body += `<div class="banner ok">${esc(it.suggest.text)}<div class="row" style="margin-top:6px"><button class="small" data-suggest="${esc(it.id)}">採用這個公司算式（記進這家公司的規範）</button></div></div>`;
     body += USER_OUTCOMES.map(([v, label]) => `<label class="choice"><input type="radio" name="${esc(it.id)}" value="${v}" data-choice="${esc(it.id)}" ${ch.choice === v ? "checked" : ""}>${esc(label)}</label>`).join("");
     if (it.kind === "fail" && ch.choice === "ok" && OVERRIDE_EFFECT[cid]) body += `<div class="banner">確認「原文如此」後：${esc(OVERRIDE_EFFECT[cid])}。工具不會畫出與數字互相矛盾的圖。</div>`;
@@ -434,7 +457,9 @@ function buildManual() {
     const st = resolved(it) ? `<span class="resolved">已處理</span>` : ch.choice === "ai" ? `<span class="pending">交給 AI</span>` : `<span class="pending">未判斷</span>`;
     return `<tr><td>${st}</td><td>${body}</td></tr>`;
   };
-  const aiRow = (it) => `<tr><td><span class="pending">交給 AI</span></td><td><div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>
+  // A 沒有、B 有：大多是 B 的名稱和 A 不同。你可以直接指定 A 裡對應的項目（以 A 為準），不必交給 AI
+  const aHas = (it) => (it.kind === "bonly" && it.aKeys?.length ? `<div class="row" style="margin-top:4px"><span class="note">A 其實有這一項，只是名稱不同：</span><select data-ahas="${esc(it.id)}"><option value="">選 A 的項目…</option>${it.aKeys.map((k) => `<option value="${esc(k)}">${esc(`${it.arr}[${k}]`)}</option>`).join("")}</select></div>` : "");
+  const aiRow = (it) => `<tr><td><span class="pending">交給 AI</span></td><td><div class="item ${it.kind === "fail" ? "fail" : ""}">${esc(it.text)}</div>${aHas(it)}
     <div class="note">給 AI 的要求：${esc(it.request)}</div>
     <div class="row" style="margin-top:4px"><button class="ghost small" data-keep="${esc(it.id)}">不用交給 AI（原文如此）</button></div></td></tr>`;
   const autoRow = (it) => `<tr><td><span class="resolved">自動</span></td><td><div class="item">${esc(it.text)}</div><div class="note">${esc(it.reason || "")}</div>
@@ -556,6 +581,13 @@ function bindManual() {
     const it = state.l3.find((x) => x.id === btn.dataset.suggest);
     state.rules = mergeRules(applyPatch(state.rules, it.suggest.patch));
     state.rulesDirty = true;
+    recompute();
+  }));
+  // A 沒有、B 有 → 使用者指定 A 裡對應的項目：B 在本機改成 A 的名稱，以 A 為準
+  box.querySelectorAll("[data-ahas]").forEach((sel) => sel.addEventListener("change", () => {
+    if (!sel.value) return;
+    const it = state.l3.find((x) => x.id === sel.dataset.ahas);
+    (state.bKeyMap[it.arr] = state.bKeyMap[it.arr] || {})[it.bKey] = sel.value;
     recompute();
   }));
   // A／B 名稱不同

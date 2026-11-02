@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v0.8）
+# PN 財報快報｜美股數據抽取指令（v0.9）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -31,7 +31,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.6"`。
+- 填 `"1.7"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -102,6 +102,13 @@
 
 ### market_specific.us
 - 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `notes` 註明即可。
+
+### cross_check（只在修正要求時填）
+- 第一次抽取不用填。修正要求中若列出「另一個 AI 抽到、你的版本沒有」的項目，每一項在 `cross_check` 回應一筆：
+  - 你其實已經抽了同一個項目、只是代號不同 → `result: "same_item"`，`key` 填你的路徑（例如 `segments[search_and_other]`）。**不要再新增一筆重複的項目。**
+  - 原文有、你漏抽了 → 補上該項目（附出處），`result: "added"`，`key` 填補上後的路徑。
+  - 依規則不該抽 → 不要加，`result: "not_applicable"`，`reason` 寫原因。
+- `other_path` 照修正要求裡的路徑照抄。你是主要的抽取結果：同一個項目以你的數字與出處為準。
 
 ### consensus
 - **不要填。** 這一區由人工填寫。

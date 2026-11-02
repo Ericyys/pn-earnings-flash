@@ -25,9 +25,10 @@
         "1.3",
         "1.4",
         "1.5",
-        "1.6"
+        "1.6",
+        "1.7"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）"
     },
     "comment": {
       "type": "string",
@@ -787,6 +788,40 @@
           }
         }
       }
+    },
+    "cross_check": {
+      "description": "只在修正要求列出「另一個 AI 抽到、你的版本沒有」的項目時填寫，每一項回應一筆。你是主要的抽取結果：同一個項目以你的為準。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "other_path",
+          "result"
+        ],
+        "properties": {
+          "other_path": {
+            "type": "string",
+            "description": "另一份抽取的路徑，照修正要求照抄，例如 segments[search_other]"
+          },
+          "result": {
+            "enum": [
+              "same_item",
+              "added",
+              "not_applicable"
+            ],
+            "description": "same_item：你其實已經抽了同一個項目，只是代號不同（不要重複新增）；added：原文有、你漏抽了，已補上；not_applicable：依規則不該抽，沒有加"
+          },
+          "key": {
+            "type": "string",
+            "description": "result 為 same_item 或 added 時填：你的版本中這個項目的路徑，例如 segments[search_and_other]"
+          },
+          "reason": {
+            "type": "string",
+            "description": "一句話說明，例如「原文 Search & other 即此項」「是剩餘授權額度，不是新授權」"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -1086,7 +1121,8 @@
               "1.3",
               "1.4",
               "1.5",
-              "1.6"
+              "1.6",
+              "1.7"
             ]
           }
         }
@@ -1111,7 +1147,8 @@
               "1.3",
               "1.4",
               "1.5",
-              "1.6"
+              "1.6",
+              "1.7"
             ]
           }
         }
