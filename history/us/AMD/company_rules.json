@@ -1,0 +1,19 @@
+{
+  "rules_version": "1.0",
+  "ticker": "AMD",
+  "market": "us",
+  "updated_at": "2026-11-03T22:51:07.969Z",
+  "app_version": "1.9.0（2026-11-04）",
+  "labels": {
+    "opex:marketing_general_and_administrative": "行銷及管理費用",
+    "opex:amortization_of_acquisition_related_intangibles": "收購相關無形資產攤銷",
+    "post:equity_income_in_investee": "權益法投資收益",
+    "post:loss_income_from_discontinued_operations_net_of_tax": "停業單位損益",
+    "seg:data_center": "資料中心部門",
+    "seg:client": "用戶端",
+    "seg:gaming": "遊戲",
+    "seg:embedded": "Embedded 部門",
+    "guidance:other|year-over-year growth": "年增率(以中位數計)",
+    "guidance:other|sequential increase": "季增率(以中位數計)"
+  }
+}
