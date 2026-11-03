@@ -113,6 +113,7 @@ export function incomeWaterfall(b) {
   if (b.stopAt !== "operating_income") {
     if (b.nonOperating) steps.push({ label: "業外收支", value: b.nonOperating, type: "delta" });
     if (b.tax) steps.push({ label: "所得稅", value: b.tax, type: "use" });
+    for (const x of b.afterTax || []) if (x.value) steps.push({ label: x.name, value: x.value, type: "delta" });
     steps.push({ label: "淨利", value: b.netIncome, type: "total" });
   }
   return { unit: b.unit, kind: "amount", steps };

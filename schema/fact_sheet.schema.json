@@ -27,9 +27,10 @@
         "1.5",
         "1.6",
         "1.7",
-        "1.8"
+        "1.8",
+        "1.9"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）；1.8 新增 headline_figures（新聞稿重點數字，供圖卡數字核對預填）"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）；1.8 新增 headline_figures（新聞稿重點數字，供圖卡數字核對預填）；1.9 新增 post_tax_items（所得稅之後、淨利之前的其他列）"
     },
     "comment": {
       "type": "string",
@@ -327,6 +328,38 @@
           },
           "amount": {
             "$ref": "#/$defs/pair"
+          }
+        }
+      }
+    },
+    "post_tax_items": {
+      "description": "損益表上「所得稅」之後、「淨利（Net income）」之前的其他列，依原文順序逐列照抄，例如採權益法認列之投資損益（Equity in earnings/losses of affiliates）、停業單位損益（Income/loss from discontinued operations, net of tax）。小計列（例如 Income from continuing operations）不要放。所得稅後直接就是淨利的公司給空陣列。淨利勾稽為：淨利＝稅前淨利−所得稅＋這些列的合計。",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "label_source",
+          "amount"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$",
+            "description": "由原文名稱轉成的英文小寫代號，例如 equity_in_losses_of_affiliates"
+          },
+          "label_source": {
+            "type": "string",
+            "description": "原文名稱，逐字照抄"
+          },
+          "label_zh": {
+            "type": "string",
+            "description": "label_source 的中文名稱，用台灣常用的財報用語翻譯（例如 Restructuring charges → 重組費用；不要保留英文）。工具先用公司設定與科目對照表，對照表沒有時才用這個譯名，並列入出圖工具的「公司規範｜科目中文名稱」讓人確認（確認後記進該公司的規範）。原文本身是中文時可省略。"
+          },
+          "amount": {
+            "$ref": "#/$defs/pair",
+            "description": "照抄原文正負號：使淨利增加的為正數，使淨利減少的（原文以括號或負號列示的損失）為負數"
           }
         }
       }
@@ -1189,7 +1222,8 @@
               "1.5",
               "1.6",
               "1.7",
-              "1.8"
+              "1.8",
+              "1.9"
             ]
           }
         }
@@ -1216,7 +1250,8 @@
               "1.5",
               "1.6",
               "1.7",
-              "1.8"
+              "1.8",
+              "1.9"
             ]
           }
         }

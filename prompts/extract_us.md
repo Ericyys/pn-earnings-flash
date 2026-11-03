@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v1.0）
+# PN 財報快報｜美股數據抽取指令（v1.1）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -31,7 +31,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.8"`。
+- 填 `"1.9"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -108,6 +108,12 @@
 
 ### market_specific.us
 - 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `notes` 註明即可。
+
+### post_tax_items（所得稅之後、淨利之前的列）
+- 損益表上「所得稅」之後、「淨利（Net income）」之前若還有其他列，依原文順序逐列照抄到這裡，例如 Equity in earnings (losses) of affiliates、Income (loss) from discontinued operations, net of tax。
+- 小計列（例如 Income from continuing operations）不要放。
+- 照抄原文正負號：使淨利增加的為正數，原文以括號或負號列示的損失為負數。
+- 所得稅之後直接就是淨利的公司給空陣列。工具會驗算：淨利＝稅前淨利−所得稅＋這些列的合計。
 
 ### cross_check（只在修正要求時填）
 - 第一次抽取不用填。修正要求中若列出「另一個 AI 抽到、你的版本沒有」的項目，每一項在 `cross_check` 回應一筆：

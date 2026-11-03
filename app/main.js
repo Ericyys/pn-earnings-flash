@@ -5,7 +5,7 @@
 // 計算在 lib/compute.js、修改在 lib/review.js、公司規範（算式、科目名稱）在 lib/company_rules.js、
 // 公司規範畫面在 company_panel.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.8.0（2026-11-02）";
+export const APP_VERSION = "1.9.0（2026-11-04）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -222,6 +222,7 @@ function layer2Items() {
     addPair("損益表", FIELD_ZH[k], `income_statement.${k}`, A.income_statement[k], k === epsK ? "每股" : k === shK ? `股（${A.meta.share_unit}）` : unit);
   }
   for (const it of A.operating_expense_items || []) addPair("費用逐列", it.label_source, `operating_expense_items[${it.key}].amount`, it.amount);
+  for (const it of A.post_tax_items || []) addPair("所得稅之後、淨利之前", it.label_source, `post_tax_items[${it.key}].amount`, it.amount);
   for (const s of A.segments || []) { addPair("部門", s.label_source, `segments[${s.key}].revenue`, s.revenue); addPair("部門佔比", s.label_source, `segments[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const s of A.geographies || []) { addPair("地區", s.label_source, `geographies[${s.key}].revenue`, s.revenue); addPair("地區佔比", s.label_source, `geographies[${s.key}].share_percent`, s.share_percent, "%"); }
   for (const k of A.kpis || []) {
@@ -266,6 +267,7 @@ const AI_REQUEST = {
   guidance_unit: "請依財測表格或段落的單位說明填入 guidance_next.monetary_unit，並附出處。",
   eps_basis: "請依規則填 meta.eps_basis：美股 diluted、台股 basic；其他市場依新聞稿標題使用的 EPS，並在 meta.eps_basis_src 附標題原句。",
   eps_present: "請補抽口徑對應的 EPS（本季與去年同期，美股 eps_diluted、台股 eps_basic）與同口徑的加權平均股數，附出處。",
+  net_income_identity: "請回損益表確認：所得稅之後、淨利之前是否還有其他列（例如採權益法認列之投資損益 Equity in earnings/losses of affiliates、停業單位損益 Discontinued operations, net of tax）。有的話逐列抽到 post_tax_items（照抄原文正負號，小計列不要放）；沒有的話，確認稅前淨利、所得稅、淨利是否抓錯列或抓錯欄。",
 };
 const GENERIC_FAIL = "請回原文確認相關科目是否抓錯列、漏列或放錯欄位並修正；若原文確實如此，在 notes 說明原因。";
 const AMB_REQUEST = "請依原文自行判斷並處理：能從原文確定的，照規則修正數據並把說明移到 notes；只有原文無法確定、需要人決定的，才留在 ambiguities，並寫清楚需要人決定什麼。";

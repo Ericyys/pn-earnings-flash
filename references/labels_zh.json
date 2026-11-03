@@ -26,6 +26,16 @@
     "hedging gains": "避險損益",
     "hedging losses": "避險損益",
     "hedging gains/losses": "避險損益",
-    "hedging gain (loss)": "避險損益"
+    "hedging gain (loss)": "避險損益",
+    "equity in earnings of affiliates": "採權益法認列之投資損益",
+    "equity in losses of affiliates": "採權益法認列之投資損益",
+    "equity in earnings (losses) of affiliates": "採權益法認列之投資損益",
+    "equity in net income (loss) of affiliates": "採權益法認列之投資損益",
+    "equity in net earnings (losses) of affiliates": "採權益法認列之投資損益",
+    "equity method investment income (loss)": "採權益法認列之投資損益",
+    "income (loss) from discontinued operations, net of tax": "停業單位損益",
+    "income from discontinued operations, net of tax": "停業單位損益",
+    "loss from discontinued operations, net of tax": "停業單位損益",
+    "discontinued operations, net of tax": "停業單位損益"
   }
 }

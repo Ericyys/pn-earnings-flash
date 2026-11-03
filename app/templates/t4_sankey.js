@@ -8,6 +8,7 @@
 //   operatingIncome,
 //   nonOperating: 0,                               // 業外收支淨額（可正可負）
 //   tax,                                           // 所得稅費用（負數＝所得稅利益）
+//   afterTax: [{ name: "採權益法認列之投資損益", value: -0.12 }],   // 選填：所得稅之後、淨利之前的其他列（正＝增加淨利，負＝減少淨利）
 //   netIncome,
 //   margins: { gross: 58.6, operating: 31.2, net: 26.4 },
 //   showPct: true,                                 // 選填：非利潤節點在金額後標佔營收 %（灰色、小一號，例如「−20.64 16.2%」）；單位列註明「% 為佔營收比」
@@ -30,6 +31,7 @@ export function sankeyFlows(b) {
   const pos = (v) => Math.max(v || 0, 0);
   const neg = (v) => Math.max(-(v || 0), 0);
   const other = b.otherOperating || 0, nonop = b.nonOperating || 0, tax = b.tax || 0;
+  const after = (b.afterTax || []).filter((x) => x.value);
   // 有毛利節點：原文有營業成本，且毛利有數字（原文列出或使用者同意由 PN 計算）
   const hasGP = b.grossProfit !== null && b.grossProfit !== undefined && b.cogs > 0;
   // stopAt="operating_income"：使用者不採用 PN 計算的業外數字時，圖只畫到營業利益
@@ -49,6 +51,8 @@ export function sankeyFlows(b) {
   // 流入淨利的收益節點放在營業利益上方：流向帶水平進入淨利頂端，不與其他帶交錯
   if (toNI && pos(nonop)) add("nonGain", 2 + o, "業外收益" + star, "gain");
   if (toNI && neg(tax)) add("taxBen", 2 + o, "所得稅利益", "gain");
+  // 所得稅之後的收益列：和業外收益一樣放在營業利益上方，流入淨利
+  if (toNI) after.forEach((x, i) => { if (x.value > 0) add(`atGain${i}`, 2 + o, x.name, "gain"); });
   add("oi", 2 + o, "營業利益", "profit", { margin: ["營益率", b.margins?.operating] });
   if (!hasGP && b.cogs > 0) add("cogs", 2 + o, "營業成本", "cost");
   b.opex.forEach((x, i) => add(`opex${i}`, 2 + o, x.name, "cost"));
@@ -58,6 +62,8 @@ export function sankeyFlows(b) {
     add("ni", 3 + o, "淨利", "profit", { margin: ["淨利率", b.margins?.net] });
     if (neg(nonop)) add("nonLoss", 3 + o, "業外損失" + star, "loss");
     if (pos(tax)) add("tax", 3 + o, "所得稅", "cost");
+    // 所得稅之後的損失列：和所得稅一樣從營業利益流出，放在所得稅下方
+    after.forEach((x, i) => { if (x.value < 0) add(`atLoss${i}`, 3 + o, x.name, "loss"); });
   }
 
   const L = [];
@@ -68,11 +74,14 @@ export function sankeyFlows(b) {
   if (pos(other)) L.push(["othGain", "oi", pos(other)]);
   if (neg(other)) L.push([src, "othLoss", neg(other)]);
   if (toNI) {
-    L.push(["oi", "ni", b.netIncome - pos(nonop) - neg(tax)]);
+    const atGain = after.reduce((a, x) => a + pos(x.value), 0);
+    L.push(["oi", "ni", b.netIncome - pos(nonop) - neg(tax) - atGain]);
     if (pos(tax)) L.push(["oi", "tax", pos(tax)]);
     if (neg(nonop)) L.push(["oi", "nonLoss", neg(nonop)]);
+    after.forEach((x, i) => { if (x.value < 0) L.push(["oi", `atLoss${i}`, neg(x.value)]); });
     if (pos(nonop)) L.push(["nonGain", "ni", pos(nonop)]);
     if (neg(tax)) L.push(["taxBen", "ni", neg(tax)]);
+    after.forEach((x, i) => { if (x.value > 0) L.push([`atGain${i}`, "ni", x.value]); });
   }
 
   if (L.some((l) => !(l[2] >= 0))) return null;

@@ -251,15 +251,28 @@ export function analyze(fs, ctx) {
   }
 
   // ── 6. 所得稅正負號：依勾稽判斷公司的呈現方式（有的公司以括號列示費用）
+  //   所得稅之後、淨利之前若還有其他列（post_tax_items，例如採權益法認列之投資損益、停業單位損益），
+  //   淨利＝稅前淨利−所得稅＋這些列的合計。這些列照抄原文正負號（增加淨利為正、損失為負）。
+  const postTax = (fs.post_tax_items || []).map((it) => ({ key: it.key, label: it.label_source, nm: nameOf(it, `post:${it.key}`, ctx), c: cur(it.amount), p: pri(it.amount) }));
+  const ptSum = { c: postTax.reduce((a, x) => (a === null || x.c === null ? null : a + x.c), 0), p: postTax.reduce((a, x) => (a === null || x.p === null ? null : a + x.p), 0) };
   const taxRaw = { c: cur(IS.income_tax), p: pri(IS.income_tax) };
   let tax = { c: null, p: null };
+  const tolNI = tol(2 + postTax.length);
   for (const k of ["c", "p"]) {
     if (taxRaw[k] === null || pretax[k] === null || ni[k] === null) continue;
-    if (Math.abs(pretax[k] - taxRaw[k] - ni[k]) <= tol(2)) tax[k] = taxRaw[k];        // 正數＝費用
-    else if (Math.abs(pretax[k] + taxRaw[k] - ni[k]) <= tol(2)) tax[k] = -taxRaw[k];  // 原文以負數列示費用
+    const after = ptSum[k] ?? 0;
+    if (Math.abs(pretax[k] - taxRaw[k] + after - ni[k]) <= tolNI) tax[k] = taxRaw[k];        // 正數＝費用
+    else if (Math.abs(pretax[k] + taxRaw[k] + after - ni[k]) <= tolNI) tax[k] = -taxRaw[k];  // 原文以負數列示費用
   }
-  add("net_income_identity", "淨利＝稅前淨利−所得稅", tax.c !== null ? "pass" : "fail",
-    tax.c !== null && taxRaw.c < 0 ? "公司以負數（括號）列示所得稅費用，已自動轉換" : tax.c === null ? "兩種正負號解讀都對不上" : "");
+  const ptZh = postTax.length ? `＋${postTax.map((x) => x.nm.zh).join("＋")}` : "";
+  let niDetail = "";
+  if (tax.c !== null) niDetail = taxRaw.c < 0 ? "公司以負數（括號）列示所得稅費用，已自動轉換" : "";
+  else if (taxRaw.c !== null && pretax.c !== null && ni.c !== null) {
+    // 對不上：算出「稅後到淨利之間」還差多少，提示可能漏抽了所得稅之後的列
+    const gap = Math.min(...[taxRaw.c, -taxRaw.c].map((t) => ni.c - (pretax.c - t + (ptSum.c ?? 0))).map((x) => Math.abs(x)));
+    niDetail = `兩種所得稅正負號解讀都對不上（最接近時差 ${gap.toLocaleString("en-US")}）${postTax.length ? "" : "；若原文在所得稅之後、淨利之前還有其他列（例如採權益法認列之投資損益、停業單位損益），應抽到 post_tax_items"}`;
+  } else niDetail = "缺稅前淨利、所得稅或淨利";
+  add("net_income_identity", `淨利＝稅前淨利−所得稅${ptZh}`, tax.c !== null ? "pass" : "fail", niDetail);
 
   // ── 7. EPS：口徑依市場規則（美股稀釋、台股基本；其他市場依新聞稿標題），AI 在 meta.eps_basis 標示
   const ruleBasis = profile.defaults.eps_basis || null;
@@ -612,7 +625,7 @@ export function analyze(fs, ctx) {
   const stopAtOI = overridden("pretax_identity") || overridden("net_income_identity");
   if (stopAtOI) dropped.push("損益流向圖的業外、所得稅、淨利段（勾稽不符，使用者確認原文如此）");
   const cMiss = [...missingOf([["營收", rev.c], ["營業利益", oi.c]]), ...(cogs.c === null && !items.length ? ["營業成本或費用"] : []),
-    ...(stopAtOI ? [] : missingOf([["淨利", niP.c], ["所得稅", tax.c], ["業外收支", nonop.c]]))];
+    ...(stopAtOI ? [] : missingOf([["淨利", niP.c], ["所得稅", tax.c], ["業外收支", nonop.c], ...postTax.map((x) => [x.nm.zh, x.c])]))];
   if (overridden("operating_income_identity_c")) dropped.push("損益流向卡（營業利益與各項費用對不起來，使用者確認原文如此）");
   else if (cMiss.length) incomplete.push({ card: "C", reason: `缺${cMiss.join("、")}` });
   else cards.push({
@@ -626,6 +639,8 @@ export function analyze(fs, ctx) {
       opex: items.map((it) => ({ name: useName(it.nm), value: disp(it.c) })),
       otherOperating: disp(other.c || 0), operatingIncome: disp(oi.c),
       nonOperating: disp(nonop.c || 0), tax: disp(tax.c ?? 0), netIncome: disp(niP.c),
+      // 所得稅之後、淨利之前的其他列（正＝增加淨利、負＝減少淨利）
+      afterTax: postTax.filter((x) => x.c).map((x) => ({ name: useName(x.nm), value: disp(x.c) })),
       margins: { gross: chartGp.c !== null && cogs.c !== null ? M.gross_margin : undefined, operating: M.operating_margin, net: M.net_margin },
       // 圖下註記：公司標示的一次性項目（＊）；淨利口徑（條件觸發）
       note: hl && fs.notable_items?.length ? fs.notable_items.map((x) => `${useName(nameOf(x, `notable:${x.label_source}`, ctx))} ${fmt2(disp(num(x.amount)))}`).join("；") : undefined,
