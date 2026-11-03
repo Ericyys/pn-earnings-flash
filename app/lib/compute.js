@@ -713,12 +713,15 @@ export function analyze(fs, ctx) {
   const curShort = profile.defaults.display_currency;
   const STD_NAMES = { revenue: "營收", operating_income: "營業利益", operating_margin: "營益率", gross_margin: "毛利率", eps: "EPS", free_cash_flow: "自由現金流" };
   // 財測項目名稱：公司規範有指定就用；否則標準項目用固定名稱，其他依科目中文名稱的順序
+  // Non-GAAP 的財測（basis 為 non-GAAP，或原文名稱寫 Non-GAAP／Adjusted）：名稱前加「Non-GAAP」，和圖卡其他 GAAP 數字區分
+  const isNonGaap = (it) => it.basis === "non-GAAP" || /non[-\s]?gaap|adjusted/i.test(it.label_source || "");
   const labelOf = (it, id) => {
     const ruled = rules.labels[id];
     if (ruled) useName({ id, en: it.label_source, zh: ruled, origin: "rules" });
     let zh = ruled || STD_NAMES[it.metric] || useName(nameOf(it, id, ctx));
     // 財測的 EPS 口徑依原文名稱（Diluted／Basic）；原文沒寫就只寫 EPS，不推定
     if (it.metric === "eps" && !ruled) zh = /dilut|稀釋/i.test(it.label_source) ? "稀釋 EPS" : /basic|基本/i.test(it.label_source) ? "基本 EPS" : "EPS";
+    if (isNonGaap(it) && !/non-gaap|調整後/i.test(zh)) zh = `Non-GAAP ${zh.replace(/^調整後/, "")}`;
     return it.unit === "monetary" ? `${zh}（${unitText}）` : it.unit === "per_share" ? `${zh}（${curShort}）` : zh;
   };
   /**
@@ -727,18 +730,22 @@ export function analyze(fs, ctx) {
    * - 未經換算的數字（百分比、每股、單位相同的金額）依原文位數；同一列取位數最多的，不足補 0，不四捨五入。
    * scale＝原文金額單位的 10 次方。
    */
+  // 區間（low、high 都有）一律顯示區間，即使 AI 另外填了中點；「中心值 ± 幅度」顯示成「65.00 ±2%」
+  const isRange = (v) => typeof v.low === "number" && typeof v.high === "number";
   const showItem = (vals, unit, scale) => {
     const factor = unit === "monetary" ? scale / Math.pow(10, dispPow) : 1;
     const converted = factor !== 1;
-    const d = converted ? 2 : itemDecimals(vals.flatMap((v) => [[v, "point"], [v, "low"], [v, "high"]]));
+    const d = converted ? 2 : itemDecimals(vals.flatMap((v) => (isRange(v) ? [[v, "low"], [v, "high"]] : [[v, "point"]])));
     const one = (x) => {
       const t = converted ? fmt2(x * factor) : fixed(x, d);
       return unit === "percent" ? `${t}%` : t;
     };
-    return vals.map((v) => (v.point !== null && v.point !== undefined ? one(v.point) : `${one(v.low)}–${one(v.high)}`));
+    const pm = (p) => (p.unit === "percent" ? `${fixed(p.value, decOf(p, "value"))}%` : converted ? fmt2(p.value * factor) : fixed(p.value, Math.max(d, decOf(p, "value"))));
+    return vals.map((v) => (isRange(v) ? `${one(v.low)}–${one(v.high)}`
+      : v.plus_minus && typeof v.plus_minus.value === "number" ? `${one(v.point)} ±${pm(v.plus_minus)}` : one(v.point)));
   };
-  const mid = (v) => (v.point !== null && v.point !== undefined ? v.point : (v.low + v.high) / 2);
-  const complete = (v) => v && ((typeof v.point === "number") || (typeof v.low === "number" && typeof v.high === "number"));
+  const mid = (v) => (isRange(v) ? (v.low + v.high) / 2 : v.point);
+  const complete = (v) => v && (isRange(v) || typeof v.point === "number");
   const dropRows = [];
 
   const gRows = [];
@@ -855,6 +862,9 @@ export function analyze(fs, ctx) {
     }
     addAlt("net_income", niAlts((x) => amt(x.c)), niOurs);
     addAlt("net_margin", niAlts((x) => pctv(x.c, rev.c)), `${niOurs}計算`);
+    const ngGP = { c: cur(nonGaap.non_gaap_gross_profit), p: pri(nonGaap.non_gaap_gross_profit) };
+    addAlt("gross_profit", ngGP.c !== null ? [{ value: amt(ngGP.c), def: "Non-GAAP 毛利" }] : [], "GAAP 毛利");
+    addAlt("gross_margin", ngGP.c !== null ? [{ value: pctv(ngGP.c, rev.c), def: "Non-GAAP 毛利計算" }] : [], "GAAP 毛利計算");
     addAlt("operating_income", ngOI.c !== null ? [{ value: amt(ngOI.c), def: "Non-GAAP 營業利益" }] : [], "GAAP 營業利益");
     addAlt("operating_margin", ngOI.c !== null ? [{ value: pctv(ngOI.c, rev.c), def: "Non-GAAP 營業利益計算" }] : [], "GAAP 營業利益計算");
     const otherBasis = epsBasis === "basic" ? IS.eps_diluted : IS.eps_basic;
@@ -876,7 +886,7 @@ export function analyze(fs, ctx) {
       if (!r || r.prefill) continue;
       const v = h.unit === "monetary" ? toDispAmount(h.value, h.monetary_unit) : h.value;
       const d = h.unit === "monetary" && UNIT_POWER[h.monetary_unit] !== undefined && h.monetary_unit !== "billions" ? Math.max(0, 2) : decOf(h, "value");
-      r.prefill = { value: fmtIn(v, d), src: h.src?.quote || "" };
+      r.prefill = { value: fmtIn(v, d), src: h.src?.quote || "", nonGaap: h.basis === "non-GAAP" };
     }
     for (const sm of fs.stated_metrics || []) {
       const key = sm.metric === "revenue_amount" ? "revenue" : sm.metric;

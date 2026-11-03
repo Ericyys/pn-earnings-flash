@@ -1,4 +1,4 @@
-# PN 財報快報｜美股數據抽取指令（v1.1）
+# PN 財報快報｜美股數據抽取指令（v1.2）
 
 > 使用方式：開一個新對話，上傳「財報新聞稿 PDF」與「fact_sheet.schema.json」，然後把這份指令從下一行起整段貼上。
 
@@ -31,7 +31,7 @@
 ## 逐區說明
 
 ### schema_version
-- 填 `"1.9"`。
+- 填 `"2.0"`。
 
 ### extraction
 - `ai_name`：你的產品名稱（例如 Claude、ChatGPT）；`ai_model`：你的模型名稱，不知道就省略。
@@ -82,10 +82,12 @@
 - **`monetary_unit` 必填**：照抄財測表格或段落的單位說明（常與損益表不同，例如財測用百萬、損益表用仟元），並在 `monetary_unit_src` 附出處。
 - 每一項的 `metric` 盡量用標準代號（revenue、operating_income、operating_margin、gross_margin、eps）；淨利、年增率等沒有標準代號的用 `other`。
 - 數字照抄原文的小數位數（例如 `26.0%` 寫 `26.0`、`$0.70` 寫 `0.70`），圖卡會依原文位數顯示。
+- **區間照區間抄**：原文給區間（例如「$13.2 billion to $13.6 billion」「between 30% and 31%」）→ 填 `low`／`high`，**不要另外把中點填進 `point`**。只給單一數字（含「approximately」）→ 填 `point`。寫成「中心值 ± 幅度」（例如「$65.0 billion, plus or minus 2%」）→ `point` 填中心值、`plus_minus` 填幅度（`{ "value": 2, "unit": "percent" }`；幅度與中心值同單位時 `unit` 填 `same`）。不要自己算出上下限。
+- **`basis` 依原文標示**：項目名稱或句子寫 Non-GAAP、Adjusted（調整後）、excluding stock-based compensation 等 → `non-GAAP`；明確寫 GAAP → `GAAP`；沒寫 → `unspecified`。同一項目 GAAP 與 Non-GAAP 都有財測時，兩筆都列（`label_source` 照抄各自的原文名稱）。
 
 ### guidance_revisions（財測上修／下修）
 - 只收公司在本次文件中**明確寫出調整前與調整後數字**的財測調整，例如「全年營收財測由 $49.5B 上調至 $51.1B」「2026 FCF 預估調整為約 $12.0B（先前為 $12.5B）」。
-- 全年寫 `period_label: "FY2026"`，單季寫 `"FY2026Q4"`。`previous` 是前次財測、`current` 是本次財測，區間填 `low`／`high`，單一數字填 `point`。
+- 全年寫 `period_label: "FY2026"`，單季寫 `"FY2026Q4"`。`previous` 是前次財測、`current` 是本次財測，區間填 `low`／`high`（不要另外填中點），單一數字填 `point`，「± 幅度」填 `point`＋`plus_minus`。`basis` 規則同 guidance_next。
 - `previous_date`：原文寫出前次財測的發布日期（月、日都有）時才填，格式 `M/D`，例如「our July 17 letter」→ `"7/17"`；只寫月份或沒寫就省略。
 - 金額類（`unit: "monetary"`）必填 `monetary_unit`，照原文寫法（例如 `$12.0B` → `billions`，數字填 12.0）。
 - `metric`：營收 revenue、營業利益 operating_income、營益率 operating_margin、毛利率 gross_margin、EPS eps、自由現金流 free_cash_flow，其他用 other。
@@ -104,10 +106,12 @@
 - 新聞稿標題、Highlights、第一段或摘要表**用文字或大字寫出的本季重點數字**照抄一筆，例如「Revenue of $12.9 billion, up 17%」→ revenue（12.9、monetary、billions）與 revenue_yoy（17、percent）兩筆；「operating margin of 31.5%」→ operating_margin。
 - 部門或地區營收用 `segment_revenue`，並在 `item` 填你在 segments／geographies 用的 key。
 - 數字與位數照抄原文，不換算、不自己算；下降寫負數。`src` 附原句。
+- **`basis`**：原句或表格寫 Non-GAAP、Adjusted（調整後）、excluding ... 的填 `non-GAAP`；明確寫 GAAP 的填 `GAAP`；沒寫填 `unspecified`。新聞稿標題常用 Non-GAAP 數字（例如「Adjusted EPS of $1.23」），一定要標出來。
 - 這一區用來和圖卡數字對照；財務報表裡的數字已經在其他欄位，不用重複抄。沒有就給空陣列。
 
 ### market_specific.us
-- 有 Non-GAAP EPS、Non-GAAP 營業利益或 Non-GAAP 淨利才填；沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這三個欄位，存在的話在 `notes` 註明即可。
+- 有 Non-GAAP（或 Adjusted）毛利、營業利益、淨利、稀釋 EPS 才填，通常在「GAAP 與 Non-GAAP 調節表」；本季與去年同期都抄，附出處。沒有就省略。其他調整後指標（例如 Adjusted EBITDA）不屬於這些欄位，存在的話在 `notes` 註明即可。
+- 這些數字不會畫在圖卡上；工具用來判斷新聞稿的重點數字是不是 Non-GAAP，並在圖卡加註，所以新聞稿有寫 Non-GAAP 數字時一定要抽。
 
 ### post_tax_items（所得稅之後、淨利之前的列）
 - 損益表上「所得稅」之後、「淨利（Net income）」之前若還有其他列，依原文順序逐列照抄到這裡，例如 Equity in earnings (losses) of affiliates、Income (loss) from discontinued operations, net of tax。

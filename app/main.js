@@ -5,7 +5,7 @@
 // 計算在 lib/compute.js、修改在 lib/review.js、公司規範（算式、科目名稱）在 lib/company_rules.js、
 // 公司規範畫面在 company_panel.js、畫圖在 templates/，這裡只負責畫面與狀態。
 
-export const APP_VERSION = "1.9.0（2026-11-04）";
+export const APP_VERSION = "2.0.0（2026-11-04）";
 
 import { analyze, parseFactSheet, diffForReview } from "./lib/compute.js";
 import { validate } from "./lib/validate.js";
@@ -78,7 +78,8 @@ async function runCheck() {
     sentToAI: new Set(prev ? [...prev.sentToAI, ...(prev.aiIds || [])] : []),
     // A／B 名稱統一：B 的代號在本機改成選定的名稱（只影響比對）；noPair＝使用者判斷不是同一項目
     bKeyMap: prev ? prev.bKeyMap : {}, noPair: new Set(prev ? prev.noPair : []),
-    press: prev ? prev.press : {} }; // 圖卡數字核對：使用者填的新聞稿數字（同一家公司同一季重貼時保留）
+    press: prev ? prev.press : {}, // 圖卡數字核對：使用者填的新聞稿數字（同一家公司同一季重貼時保留）
+    pressNG: prev ? prev.pressNG || {} : {} }; // 圖卡數字核對：使用者勾選「新聞稿為 Non-GAAP」
   // 公司規範（算式、科目名稱）：同一家公司同一季重貼 → 沿用目前的規範；否則讀 history/<市場>/<代號>/company_rules.json（沒有就用通用算式）
   const cpath = $("company").value; // 例如 us/NFLX.json
   const market = cpath ? cpath.split("/")[0] : A.meta?.market || "us";
@@ -790,24 +791,28 @@ function renderVerify() {
   const rows = state.out.verify || [];
   const res = rows.map((r) => {
     const input = state.press[r.key] !== undefined ? state.press[r.key] : r.prefill?.value ?? "";
-    return { r, input, c: classify(r, input) };
+    // 新聞稿數字是否為 Non-GAAP：AI 預填時依它標示的 basis；使用者可以勾選或取消
+    const ng = state.pressNG[r.key] !== undefined ? state.pressNG[r.key] : !!r.prefill?.nonGaap;
+    return { r, input, ng, c: classify(r, input, ng) };
   });
   state.verifyResult = res;
   const ST = {
     match: `<span class="pass">相符</span>`, empty: `<span class="note">未填（新聞稿沒寫）</span>`,
-    definition: `<span class="warn">定義不同 → 自動加附註</span>`, error: `<span class="fail">對不上，必須修正</span>`, invalid: `<span class="fail">不是數字</span>`,
+    definition: `<span class="warn">定義不同 → 自動加附註</span>`, unverified: `<span class="warn">Non-GAAP（無法驗算）→ 自動加附註</span>`, error: `<span class="fail">對不上，必須修正</span>`, invalid: `<span class="fail">不是數字</span>`,
   };
-  const row = ({ r, input, c }) => `<tr class="${c.status === "error" || c.status === "invalid" ? "edited" : ""}">
+  const row = ({ r, input, ng, c }) => `<tr class="${c.status === "error" || c.status === "invalid" ? "edited" : ""}">
     <td>${esc(r.label)}<div class="note">${esc(r.cards.map((x) => CARD_ZH[x] || x).join("、"))}</div></td>
     <td class="num">${esc(r.shown)} <span class="note">${r.kind === "pct" ? "" : esc(r.unit)}</span></td>
     <td><input type="text" data-press="${esc(r.key)}" value="${esc(input)}" placeholder="新聞稿數字" style="width:120px">
+      <label class="choice"><input type="checkbox" data-ng="${esc(r.key)}" ${ng ? "checked" : ""}> Non-GAAP</label>
       ${r.prefill && state.press[r.key] === undefined ? `<div class="note">AI 預填${r.prefill.src ? `：「${esc(r.prefill.src.slice(0, 60))}${r.prefill.src.length > 60 ? "…" : ""}」` : ""}</div>` : ""}</td>
-    <td>${ST[c.status]}${c.status === "definition" ? `<div class="note">附註：${esc(c.note)}</div>` : ""}${c.status === "error" ? `<div class="note">${esc(c.hint)}。請回到步驟 3：第二層改數字或交給 AI，或在「公司規範」調整這家公司的算式。</div>` : ""}${c.via ? `<div class="note">（${esc(c.via)}，屬四捨五入差異）</div>` : ""}</td></tr>`;
+    <td>${c.unverified ? ST.unverified : ST[c.status]}${c.status === "definition" ? `<div class="note">附註：${esc(c.note)}</div>` : ""}${c.unverified ? `<div class="note">沒有抽到對應的 Non-GAAP 數字可以驗算，請對照新聞稿確認這個數字確實標示為 Non-GAAP／Adjusted。</div>` : ""}${c.status === "error" ? `<div class="note">${esc(c.hint)}。請回到步驟 3：第二層改數字或交給 AI，或在「公司規範」調整這家公司的算式。</div>` : ""}${c.via ? `<div class="note">（${esc(c.via)}，屬四捨五入差異）</div>` : ""}</td></tr>`;
   const flagged = res.filter((x) => ["error", "invalid", "definition"].includes(x.c.status));
   const ordered = [...flagged, ...res.filter((x) => !flagged.includes(x))]; // 被標記的行排在最前面
   $("verifyBox").innerHTML = rows.length ? `<div class="tablewrap pad"><table><thead><tr><th>項目（用在）</th><th>圖卡數字</th><th>新聞稿數字</th><th>結果</th></tr></thead><tbody>${ordered.map(row).join("")}</tbody></table></div>`
     : `<p class="pad note">這次的圖卡沒有需要對照新聞稿的數字。</p>`;
   $("verifyBox").querySelectorAll("[data-press]").forEach((inp) => inp.addEventListener("change", () => { state.press[inp.dataset.press] = inp.value.trim(); renderVerify(); }));
+  $("verifyBox").querySelectorAll("[data-ng]").forEach((cb) => cb.addEventListener("change", () => { state.pressNG[cb.dataset.ng] = cb.checked; renderVerify(); }));
   const bad = res.filter((x) => x.c.status === "error" || x.c.status === "invalid");
   const empty = res.filter((x) => x.c.status === "empty").length;
   $("btnDraw").disabled = bad.length > 0;
@@ -847,8 +852,18 @@ async function drawCards() {
   }
   $("nextDateNote").textContent = !k1 && nd ? "這次沒有 K1（公司沒給財測，也沒有財測調整），下次財報日期不會顯示。" : "";
   // 圖卡數字核對：與新聞稿定義不同的項目，在用到它的圖卡頁尾加附註（口徑，優先順序 2）
+  //   GAAP／Non-GAAP 的附註同一張卡合併成一句：「營益率、稀釋 EPS為 GAAP 數字，新聞稿採 Non-GAAP。」
+  const gaapBy = {};
   for (const { r, c } of state.verifyResult || []) {
-    if (c.status !== "definition") continue;
+    if (c.status !== "definition" || !c.gaap) continue;
+    for (const id of r.cards) (gaapBy[id] = gaapBy[id] || []).push(r.label);
+  }
+  for (const [id, labs] of Object.entries(gaapBy)) {
+    const spec = cards.find((x) => x.id === id);
+    if (spec) spec.notes = [...(spec.notes || []), { text: `${[...new Set(labs)].join("、")}為 GAAP 數字，新聞稿採 Non-GAAP。`, p: 2 }];
+  }
+  for (const { r, c } of state.verifyResult || []) {
+    if (c.status !== "definition" || c.gaap) continue;
     for (const id of r.cards) {
       const spec = cards.find((x) => x.id === id);
       if (spec && !(spec.notes || []).some((n) => n.text === c.note)) spec.notes = [...(spec.notes || []), { text: c.note, p: 2 }];
@@ -932,7 +947,7 @@ $("btnArchive").onclick = () => {
     company_rules: diffRules(state.rules), // 本季套用的公司規範（與通用算式不同的部分；完整規範另存 company_rules.json）
     checks: out.checks,
     incomplete: out.selection.incomplete,  // 資料不完整而沒有產出的圖卡
-    press_check: (state.verifyResult || []).map(({ r, input, c }) => ({ item: r.label, cards: r.cards, card_value: r.shown, press_value: input, result: c.status, note: c.note || c.via || c.hint || "" })), // 圖卡數字核對
+    press_check: (state.verifyResult || []).map(({ r, input, ng, c }) => ({ item: r.label, cards: r.cards, card_value: r.shown, press_value: input, press_non_gaap: ng, result: c.unverified ? "definition_unverified" : c.status, note: c.note || c.via || c.hint || "" })), // 圖卡數字核對
     dropped_notes: state.droppedNotes || [], // 頁尾放不下、請寫進貼文的附註
     derived: out.derived,
     selection: out.selection,

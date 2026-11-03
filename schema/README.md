@@ -47,6 +47,13 @@
 
 - `cross_check`：修正要求列出「另一個 AI 抽到、你的版本沒有」的項目時，A 逐項回應：`same_item`（其實已經抽了，只是代號不同，`key` 寫自己的路徑）、`added`（漏抽，已補上）、`not_applicable`（依規則不該抽）。A 是主要的抽取結果，同一個項目以 A 為準；出圖工具讀到後會自動消除這些「A 沒有、B 有」的差異。
 
+## 2.0 版新增
+
+- 財測（`guidance_next`、`guidance_revisions`）：區間一律填 `low`／`high`，不再另外填中點；新增 `plus_minus`，給「$65.0B ± 2%」這類寫法。圖卡有區間時一律顯示區間（例如「13.20–13.60」），「±」寫法顯示為「65.00 ±2%」。
+- 財測的 `basis` 為 non-GAAP（或原文名稱寫 Non-GAAP／Adjusted）時，K1 的項目名稱前加「Non-GAAP」。
+- `headline_figures[].basis`：新聞稿重點數字是否為 Non-GAAP。圖卡一律用 GAAP 數字；新聞稿是 Non-GAAP 時，「圖卡數字核對」會和抽到的 Non-GAAP 數字比對，並在圖卡頁尾加註「…為 GAAP 數字，新聞稿採 Non-GAAP。」
+- `market_specific.us.non_gaap_gross_profit`：Non-GAAP 毛利。
+
 ## 1.9 版新增
 
 - `post_tax_items`：損益表上所得稅之後、淨利之前的其他列（例如採權益法認列之投資損益、停業單位損益），逐列照抄、照原文正負號（增加淨利為正、損失為負），小計列不放。工具的淨利勾稽改為「淨利＝稅前淨利−所得稅＋這些列的合計」，損益流向圖也會把它們畫成節點（收益流入淨利、損失從營業利益流出）。沒有這類列的公司給空陣列。

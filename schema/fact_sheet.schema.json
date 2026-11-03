@@ -28,9 +28,10 @@
         "1.6",
         "1.7",
         "1.8",
-        "1.9"
+        "1.9",
+        "2.0"
       ],
-      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）；1.8 新增 headline_figures（新聞稿重點數字，供圖卡數字核對預填）；1.9 新增 post_tax_items（所得稅之後、淨利之前的其他列）"
+      "description": "1.1 起財測必須標單位；1.2 新增 notes 與 guidance_revisions；1.3 新增 meta.eps_basis（EPS 口徑）與財測調整的 previous_date；1.4 新增 label_zh（科目中文名稱）；1.5 新增部門／地區的 reconciling（調節項目）；1.6 新增 net_income_to_common、preferred_dividends（EPS 分子用歸屬普通股股東淨利的公司）；1.7 新增 cross_check（回應另一份抽取多出來的項目）；1.8 新增 headline_figures（新聞稿重點數字，供圖卡數字核對預填）；1.9 新增 post_tax_items（所得稅之後、淨利之前的其他列）；2.0 新增財測的 plus_minus（「±2%」這類寫法）、headline_figures 的 basis（GAAP／non-GAAP）、market_specific.us.non_gaap_gross_profit"
     },
     "comment": {
       "type": "string",
@@ -551,7 +552,8 @@
               "non-GAAP",
               "IFRS",
               "unspecified"
-            ]
+            ],
+            "description": "依原文標示：寫 Non-GAAP、Adjusted（調整後）、excluding ... 的填 non-GAAP；寫 GAAP 的填 GAAP；沒寫填 unspecified。圖卡會在 Non-GAAP 項目名稱前標「Non-GAAP」"
           },
           "unit": {
             "enum": [
@@ -740,6 +742,14 @@
           "src": {
             "$ref": "#/$defs/source",
             "description": "含該數字的原句"
+          },
+          "basis": {
+            "enum": [
+              "GAAP",
+              "non-GAAP",
+              "unspecified"
+            ],
+            "description": "這個數字是否為 Non-GAAP：原句或表格寫 Non-GAAP、Adjusted（調整後）、excluding ... 的填 non-GAAP；明確寫 GAAP 的填 GAAP；沒寫填 unspecified。圖卡用的是 GAAP 數字，新聞稿是 Non-GAAP 時圖卡會加註"
           }
         }
       }
@@ -751,8 +761,12 @@
         "us": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Non-GAAP 數字。市場預期的 EPS 多半是 Non-GAAP，E 模組比較時必須同基準。",
+          "description": "Non-GAAP 數字（通常在 GAAP 與 Non-GAAP 調節表）。圖卡一律用 GAAP 數字；這些數字用來判斷新聞稿的重點數字是否為 Non-GAAP，並在圖卡加註。",
           "properties": {
+            "non_gaap_gross_profit": {
+              "$ref": "#/$defs/pair",
+              "description": "Non-GAAP 毛利（原文有才填）"
+            },
             "non_gaap_eps_diluted": {
               "$ref": "#/$defs/pair"
             },
@@ -1123,7 +1137,8 @@
             "non-GAAP",
             "IFRS",
             "unspecified"
-          ]
+          ],
+          "description": "依原文標示：寫 Non-GAAP、Adjusted（調整後）、excluding ... 的填 non-GAAP；寫 GAAP 的填 GAAP；沒寫填 unspecified。圖卡會在 Non-GAAP 項目名稱前標「Non-GAAP」"
         },
         "unit": {
           "enum": [
@@ -1137,23 +1152,46 @@
           "type": [
             "number",
             "null"
-          ]
+          ],
+          "description": "區間下限。公司給區間時填 low／high，不要另外把中點填進 point"
         },
         "high": {
           "type": [
             "number",
             "null"
-          ]
+          ],
+          "description": "區間上限"
         },
         "point": {
           "type": [
             "number",
             "null"
           ],
-          "description": "公司只給單一數字時使用"
+          "description": "公司只給單一數字（含「約」、「±」寫法的中心值）時使用；公司給區間時不要填中點"
         },
         "src": {
           "$ref": "#/$defs/source"
+        },
+        "plus_minus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "description": "公司寫成「中心值 ± 幅度」時填，例如「$65.0 billion, plus or minus 2%」→ point 65.0、plus_minus { value: 2, unit: percent }；「$8.7 billion ± $200 million」→ point 8.7、plus_minus { value: 0.2, unit: same }（換算成與 point 相同單位時，原文必須寫得出來；寫不出來就照抄成 notes）。不要自己算出區間上下限。",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "percent",
+                "same"
+              ],
+              "description": "percent：幅度是百分比；same：幅度與 point 同單位"
+            }
+          }
         }
       },
       "anyOf": [
@@ -1171,7 +1209,7 @@
       ]
     },
     "guidance_value": {
-      "description": "財測數值：區間填 low／high，單一數字填 point",
+      "description": "財測數值：區間填 low／high（不要另外填中點）；單一數字填 point；「中心值 ± 幅度」填 point＋plus_minus",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -1192,6 +1230,27 @@
             "number",
             "null"
           ]
+        },
+        "plus_minus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "description": "公司寫成「中心值 ± 幅度」時填，例如「$65.0 billion, plus or minus 2%」→ point 65.0、plus_minus { value: 2, unit: percent }；「$8.7 billion ± $200 million」→ point 8.7、plus_minus { value: 0.2, unit: same }（換算成與 point 相同單位時，原文必須寫得出來；寫不出來就照抄成 notes）。不要自己算出區間上下限。",
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "enum": [
+                "percent",
+                "same"
+              ],
+              "description": "percent：幅度是百分比；same：幅度與 point 同單位"
+            }
+          }
         }
       },
       "anyOf": [
@@ -1223,7 +1282,8 @@
               "1.6",
               "1.7",
               "1.8",
-              "1.9"
+              "1.9",
+              "2.0"
             ]
           }
         }
@@ -1251,7 +1311,8 @@
               "1.6",
               "1.7",
               "1.8",
-              "1.9"
+              "1.9",
+              "2.0"
             ]
           }
         }
