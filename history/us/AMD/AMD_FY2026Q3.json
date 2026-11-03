@@ -1,0 +1,4234 @@
+{
+  "archive_version": "1.6",
+  "app_version": "1.9.0（2026-11-04）",
+  "created_at": "2026-11-03T23:22:54.468Z",
+  "fact_sheet": {
+    "schema_version": "1.9",
+    "extraction": {
+      "ai_name": "Claude",
+      "ai_model": "Claude Opus 5.5",
+      "run_id": "A",
+      "extracted_at": "2026-11-04T07:05:00+08:00"
+    },
+    "meta": {
+      "company_name": "Advanced Micro Devices, Inc.",
+      "ticker": "AMD",
+      "market": "us",
+      "fiscal_period": "FY2026Q3",
+      "period_end": "2026-09-26",
+      "period_end_src": {
+        "doc": "pr",
+        "page": 9,
+        "row_label": "Net revenue",
+        "column_label": "Three Months Ended September 26, 2026"
+      },
+      "report_date": "2026-11-03",
+      "currency": "USD",
+      "monetary_unit": "millions",
+      "monetary_unit_src": {
+        "doc": "pr",
+        "page": 9,
+        "quote": "(Millions except per share amounts and percentages) (Unaudited)"
+      },
+      "share_unit": "millions",
+      "accounting_basis": "US GAAP",
+      "eps_basis": "diluted",
+      "source_docs": [
+        {
+          "id": "pr",
+          "type": "press_release",
+          "title": "AMD Reports Third Quarter 2026 Financial Results"
+        }
+      ]
+    },
+    "income_statement": {
+      "revenue": {
+        "current": {
+          "value": 13377,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 9246,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 11536,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "cost_of_revenue": {
+        "current": {
+          "value": 6167,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 4466,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 5333,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "gross_profit": {
+        "current": {
+          "value": 7210,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 4780,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 6203,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "rd_expense": {
+        "current": {
+          "value": 2803,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 2139,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2528,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "sm_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "ga_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "sga_expense": {
+        "current": {
+          "value": 1298,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1069,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1401,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "other_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "operating_expenses_total": {
+        "current": {
+          "value": 4378,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 3510,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 4213,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "operating_income": {
+        "current": {
+          "value": 2832,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1270,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1990,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "non_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_disclosed"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_disclosed"
+        }
+      },
+      "pretax_income": {
+        "current": {
+          "value": 1868,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1315,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2551,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "income_tax": {
+        "current": {
+          "value": -555,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 153,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 252,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "net_income": {
+        "current": {
+          "value": 2428,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1243,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2297,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "net_income_to_parent": {
+        "current": {
+          "value": 2428,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1243,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2297,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "eps_diluted": {
+        "current": {
+          "value": 1.46,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 0.75,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1.38,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "shares_diluted": {
+        "current": {
+          "value": 1661,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1641,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1659,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      }
+    },
+    "operating_expense_items": [
+      {
+        "key": "research_and_development",
+        "label_source": "Research and development",
+        "label_zh": "研究發展費用",
+        "amount": {
+          "current": {
+            "value": 2803,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2139,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2528,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "marketing_general_and_administrative",
+        "label_source": "Marketing, general and administrative",
+        "label_zh": "行銷及管理費用",
+        "amount": {
+          "current": {
+            "value": 1298,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1069,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 1401,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "amortization_of_acquisition_related_intangibles",
+        "label_source": "Amortization of acquisition-related intangibles",
+        "label_zh": "收購相關無形資產攤銷",
+        "amount": {
+          "current": {
+            "value": 277,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 302,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 284,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "post_tax_items": [
+      {
+        "key": "equity_income_in_investee",
+        "label_source": "Equity income in investee",
+        "label_zh": "採用權益法認列之投資收益",
+        "amount": {
+          "current": {
+            "value": 5,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 10,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 6,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "income_loss_from_discontinued_operations_net_of_tax",
+        "label_source": "Income (loss) from discontinued operations, net of tax",
+        "label_zh": "停業單位損益（稅後）",
+        "amount": {
+          "current": {
+            "value": 0,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 71,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": -8,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "segments": [
+      {
+        "key": "data_center",
+        "label_source": "Data Center Segment",
+        "label_zh": "資料中心部門",
+        "revenue": {
+          "current": {
+            "value": 8546,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 4341,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 6718,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "operating_income": {
+          "current": {
+            "value": 2882,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1074,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2103,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "client",
+        "label_source": "Client",
+        "label_zh": "用戶端",
+        "revenue": {
+          "current": {
+            "value": 2949,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2750,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 3062,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "gaming",
+        "label_source": "Gaming",
+        "label_zh": "遊戲",
+        "revenue": {
+          "current": {
+            "value": 773,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1298,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 779,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "embedded",
+        "label_source": "Embedded Segment",
+        "label_zh": "嵌入式部門",
+        "revenue": {
+          "current": {
+            "value": 1109,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 857,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 977,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "operating_income": {
+          "current": {
+            "value": 453,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 283,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 386,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "geographies": [],
+    "kpis": [],
+    "cash_flow": {
+      "operating_cash_flow": {
+        "current": {
+          "value": 1202,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1788,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2366,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "capex": {
+        "current": {
+          "value": -648,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -258,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": -808,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "free_cash_flow_stated": {
+        "current": {
+          "value": 554,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1530,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1558,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      }
+    },
+    "capital_return": {
+      "buybacks": {
+        "current": {
+          "value": 0,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Repurchases of common stock",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -89,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Repurchases of common stock",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "guidance_next": {
+      "period_label": "FY2026Q4",
+      "monetary_unit": "billions",
+      "monetary_unit_src": {
+        "doc": "pr",
+        "page": 4,
+        "quote": "For the fourth quarter of 2026, AMD expects revenue to be approximately $17 billion, plus or minus 3%."
+      },
+      "items": [
+        {
+          "metric": "revenue",
+          "label_source": "revenue",
+          "label_zh": "營收",
+          "basis": "unspecified",
+          "unit": "monetary",
+          "point": 17,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "For the fourth quarter of 2026, AMD expects revenue to be approximately $17 billion, plus or minus 3%."
+          }
+        },
+        {
+          "metric": "other",
+          "label_source": "year-over-year growth",
+          "label_zh": "營收年增率（財測中點）",
+          "basis": "unspecified",
+          "unit": "percent",
+          "point": 66,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "The mid-point of the revenue range represents year-over-year growth of approximately 66% and a sequential increase of approximately 27%."
+          }
+        },
+        {
+          "metric": "other",
+          "label_source": "sequential increase",
+          "label_zh": "營收季增率（財測中點）",
+          "basis": "unspecified",
+          "unit": "percent",
+          "point": 27,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "The mid-point of the revenue range represents year-over-year growth of approximately 66% and a sequential increase of approximately 27%."
+          }
+        },
+        {
+          "metric": "gross_margin",
+          "label_source": "Non-GAAP gross margin",
+          "label_zh": "非 GAAP 毛利率",
+          "basis": "non-GAAP",
+          "unit": "percent",
+          "point": 55,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "Non-GAAP gross margin is expected to be approximately 55%."
+          }
+        }
+      ]
+    },
+    "notable_items": [],
+    "stated_metrics": [
+      {
+        "metric": "revenue_amount",
+        "value": 13.4,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Revenue ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "revenue_qoq",
+        "value": 16,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Revenue ($M)",
+          "column_label": "Q/Q"
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 9,
+          "row_label": "Gross margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "operating_margin",
+        "value": 21,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "GAAP operating margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 95,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Diluted earnings per share",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:operating_income_yoy",
+        "value": 123,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Operating income ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:net_income_yoy",
+        "value": 95,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Net income ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:non_gaap_gross_margin",
+        "value": 56,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "Non-GAAP gross margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "other:non_gaap_operating_margin",
+        "value": 29,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "Non-GAAP operating margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "other:non_gaap_eps_yoy",
+        "value": 74,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "Non-GAAP(*) Quarterly Financial Results: Diluted earnings per share",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:non_gaap_eps_yoy",
+        "value": 74,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "segment:data_center:yoy",
+        "value": 97,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Data Center segment revenue was a record $8.5 billion, up 97% year-over-year, driven by strong demand for AMD EPYC™ processors and the launch of AMD Instinct™ MI450 Series GPUs."
+        }
+      },
+      {
+        "metric": "segment:client_and_gaming:yoy",
+        "value": -8,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client and Gaming segment revenue was $3.7 billion, down 8% year-over-year."
+        }
+      },
+      {
+        "metric": "segment:client:yoy",
+        "value": 7,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client business revenue was $2.9 billion, up 7% year-over-year, driven by sales of AMD Ryzen™ mobile processors."
+        }
+      },
+      {
+        "metric": "segment:gaming:yoy",
+        "value": -40,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Gaming business revenue was $773 million, down 40% year-over-year, due to lower semi-custom and graphics revenue."
+        }
+      },
+      {
+        "metric": "segment:embedded:yoy",
+        "value": 29,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Embedded segment revenue was $1.1 billion, up 29% year-over-year, led by growth in aerospace and defense, automotive, communications and industrial end markets."
+        }
+      }
+    ],
+    "headline_figures": [
+      {
+        "metric": "revenue",
+        "value": 13.4,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "operating_income",
+        "value": 2.8,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "net_income",
+        "value": 2.4,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "eps",
+        "value": 1.46,
+        "unit": "per_share",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "data_center",
+        "value": 8.5,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Data Center segment revenue was a record $8.5 billion, up 97% year-over-year, driven by strong demand for AMD EPYC™ processors and the launch of AMD Instinct™ MI450 Series GPUs."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "client",
+        "value": 2.9,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client business revenue was $2.9 billion, up 7% year-over-year, driven by sales of AMD Ryzen™ mobile processors."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "gaming",
+        "value": 773,
+        "unit": "monetary",
+        "monetary_unit": "millions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Gaming business revenue was $773 million, down 40% year-over-year, due to lower semi-custom and graphics revenue."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "embedded",
+        "value": 1.1,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Embedded segment revenue was $1.1 billion, up 29% year-over-year, led by growth in aerospace and defense, automotive, communications and industrial end markets."
+        }
+      }
+    ],
+    "market_specific": {
+      "us": {
+        "non_gaap_eps_diluted": {
+          "current": {
+            "value": 2.09,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1.2,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 1.66,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "non_gaap_operating_income": {
+          "current": {
+            "value": 3923,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2238,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 3094,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "non_gaap_net_income": {
+          "current": {
+            "value": 3471,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1965,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2760,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    },
+    "ambiguities": [],
+    "notes": [
+      {
+        "note": "上傳文件只有一份 PDF（新聞稿含財務報表），代號 pr。第 1–8 頁有印刷頁碼；第 9 頁以後無頁碼，page 依 PDF 順序推定：9＝損益表、10＝資產負債表、11＝現金流量表、12＝Selected Corporate Data、13＝Adjusted EBITDA 與 Free Cash Flow 調節表。"
+      },
+      {
+        "note": "AMD 季度期末不是日曆月底：本季期末為 September 26, 2026，去年同期 September 27, 2025，上一季 June 27, 2026（上一財年期末 December 27, 2025）。公司稱本季為 third quarter of 2026，填 FY2026Q3。",
+        "related_field": "meta.fiscal_period"
+      },
+      {
+        "note": "幣別原文只寫 $，填 USD。",
+        "related_field": "meta.currency"
+      },
+      {
+        "note": "損益表表頭為「(Millions except per share amounts and percentages)」，股數列（Shares used in per share calculation）未另標單位，依表頭填 millions。",
+        "related_field": "meta.share_unit"
+      },
+      {
+        "note": "ticker 取自原文「AMD (NASDAQ:AMD)」。",
+        "related_field": "meta.ticker"
+      },
+      {
+        "note": "cost_of_revenue 填「Total cost of sales」6,167，其下含「Cost of sales」5,910 與營業成本區的「Amortization of acquisition-related intangibles」257（去年同期 4,206＋260、上一季 5,073＋260）。營業成本區的攤銷依規則不放入 operating_expense_items。",
+        "related_field": "income_statement.cost_of_revenue"
+      },
+      {
+        "note": "原文費用列「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義（銷管費用合併列示時使用）填 sga_expense；sm_expense、ga_expense 依規則填 null（not_applicable）。",
+        "related_field": "income_statement.sga_expense"
+      },
+      {
+        "note": "原文沒有業外收支合計列，只分列 Interest expense（本季 (62)、去年同期 (37)、上一季 (37)）與 Other income (expense), net（本季 (902)、去年同期 82、上一季 598），依規則填 null，不自行加總。",
+        "related_field": "income_statement.non_operating_net"
+      },
+      {
+        "note": "所得稅列名為「Income tax provision (benefit)」，本季原文 (555) 照抄為 -555（所得稅利益）。",
+        "related_field": "income_statement.income_tax"
+      },
+      {
+        "note": "原文沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。原文無特別股相關列。",
+        "related_field": "income_statement.net_income_to_parent"
+      },
+      {
+        "note": "eps_diluted 取「Diluted earnings per share」合計列，不是「Diluted earnings from continuing operations」（本季兩者皆為 1.46）。",
+        "related_field": "income_statement.eps_diluted"
+      },
+      {
+        "note": "post_tax_items：所得稅之後依序為 Equity income in investee、小計 Income from continuing operations, net of tax（未放入）、Income (loss) from discontinued operations, net of tax。停業單位本季原文為「—」，填 0。",
+        "related_field": "post_tax_items"
+      },
+      {
+        "note": "segments 為兩層結構：Client and Gaming Segment（Total Client and Gaming 本季 3,722、去年同期 4,048、上一季 3,841）下分 Client 與 Gaming，依規則放最細層。部門營業利益中 Client and Gaming Segment（573／867／582）只揭露在部門層級，無法對應到 Client 或 Gaming，未填入；「All other」營業損失（(1,076)／(954)／(1,081)）沒有營收，不是營收拆分項目，未列入。四項營收加總等於 Total net revenue。",
+        "related_field": "segments"
+      },
+      {
+        "note": "原文沒有地區營收拆分，geographies 給空陣列；沒有營運指標段落，kpis 給空陣列。"
+      },
+      {
+        "note": "營業現金流改用繼續營業單位口徑：公司原文定義 Free cash flow 為「GAAP net cash provided by operating activities of continuing operations」減資本支出，capex 亦取自繼續營業單位，故 operating_cash_flow、capex 改取第 13 頁 FCF 調節表（本季 1,202／去年同期 1,788／上一季 2,366；(648)／(258)／(808)），三者可與 free_cash_flow_stated 勾稽；該表有 June 27, 2026 欄，依規則一併填 prior_quarter。現金流量表（第 11 頁）的合計列「Net cash provided by operating activities」去年同期為 2,159（含停業單位 371），未採用；本季與去年同期 capex 與第 11 頁相同。",
+        "related_field": "cash_flow.operating_cash_flow"
+      },
+      {
+        "note": "Selected Corporate Data（第 12 頁）另以正數列示「Capital expenditures」648／808／258，未採用（以調節表的負號原文為準）。",
+        "related_field": "cash_flow.capex"
+      },
+      {
+        "note": "free_cash_flow_stated 取自 FCF 調節表（第 13 頁），第 12 頁 Selected Corporate Data 亦列相同數字。公司另揭露 Free cash flow margin % 本季 4%。",
+        "related_field": "cash_flow.free_cash_flow_stated"
+      },
+      {
+        "note": "buybacks 依原文列名取「Repurchases of common stock」（本季原文為「—」填 0，去年同期 (89)）。「Stock repurchases for tax withholding on employee equity plans」（本季 (1,495)、去年同期 (371)）是員工股權計畫代扣稅款的買回，原文另列一行、不是股票回購列，依規則不計入。原文沒有股利支付列，dividends_paid 省略；原文沒有新增回購授權。",
+        "related_field": "capital_return.buybacks"
+      },
+      {
+        "note": "營收財測原文為「approximately $17 billion, plus or minus 3%」，±3% 未換算成區間，填 point 17；原文未註明 GAAP 或 non-GAAP，basis 填 unspecified。66% 與 27% 為營收區間中點的年增率與季增率。原文沒有全年財測，也沒有財測調整，guidance_revisions 省略。",
+        "related_field": "guidance_next"
+      },
+      {
+        "note": "公司未將任何項目標示為一次性或非經常性，notable_items 給空陣列。非 GAAP 調節表中的調整項（例如 Stock-based compensation 523、Amortization of acquisition-related intangibles 534、Change in fair value of warrant liability 1,097、Loss contingency on legal matters 7、Acquisition-related and other costs 27、(Gains) loss on long-term investments, net (67)）原文只說明為非 GAAP 調整，未稱一次性，依規則不列。",
+        "related_field": "notable_items"
+      },
+      {
+        "note": "公司另揭露 Adjusted EBITDA（本季 4,162、去年同期 2,430、上一季 3,315），不屬於 market_specific.us 的三個欄位，未填。",
+        "related_field": "market_specific.us"
+      },
+      {
+        "note": "非 GAAP 淨利與 EPS 取自第 6 頁調節表，每個 Three Months Ended 欄下分金額與每股兩個子欄，淨利取金額子欄、EPS 取每股子欄。",
+        "related_field": "market_specific.us"
+      },
+      {
+        "note": "stated_metrics 中取自第 2 頁摘要表的比率，原表頭即為「Y/Y」「Q/Q」（Y/Y 比較 Q3'26 與 Q3'25，Q/Q 比較 Q3'26 與 Q2'26），column_label 照抄。",
+        "related_field": "stated_metrics"
+      },
+      {
+        "note": "headline_figures 未列第一段的 non-GAAP 數字（毛利率 56%、營業利益 $3.9B、淨利 $3.5B、EPS $2.09），因此區欄位不分 GAAP／non-GAAP；Client and Gaming segment $3.7 billion 在 segments 中沒有對應 key（已拆為 client、gaming），未列，其年增 -8% 記於 stated_metrics。",
+        "related_field": "headline_figures"
+      },
+      {
+        "note": "原文兩張調節表的「Acquisition-related and other costs」上一季與去年同期不一致（營業利益調節表 40／42，淨利調節表 41／43；本季皆為 27）。本檔沒有任何欄位使用這兩個數字，不需決定，僅記錄供參考。"
+      }
+    ],
+    "cross_check": [
+      {
+        "other_path": "cash_flow.capex",
+        "result": "added",
+        "key": "cash_flow.capex.prior_quarter",
+        "reason": "capex 改取第 13 頁 FCF 調節表，該表有 June 27, 2026 欄 (808)，依規則補上 prior_quarter -808。"
+      },
+      {
+        "other_path": "income_statement.ga_expense.null_reason",
+        "result": "same_item",
+        "key": "income_statement.ga_expense.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "income_statement.other_operating_net.null_reason",
+        "result": "same_item",
+        "key": "income_statement.other_operating_net.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "income_statement.sga_expense.null_reason",
+        "result": "not_applicable",
+        "reason": "原文「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義應填 1,298，不填 null。"
+      },
+      {
+        "other_path": "income_statement.sm_expense.null_reason",
+        "result": "same_item",
+        "key": "income_statement.sm_expense.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "notable_items[0].amount",
+        "result": "not_applicable",
+        "reason": "Stock-based compensation 523 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[0].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[1].amount",
+        "result": "not_applicable",
+        "reason": "Amortization of acquisition-related intangibles 534 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[1].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[2].amount",
+        "result": "not_applicable",
+        "reason": "Acquisition-related and other costs 27 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[2].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[3].amount",
+        "result": "not_applicable",
+        "reason": "Loss contingency on legal matters 7 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[3].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[4].amount",
+        "result": "not_applicable",
+        "reason": "Recovery of inventory loss at contract manufacturer (67) 為去年同期的非 GAAP 調整項（本季為「—」），公司未標示為一次性。"
+      },
+      {
+        "other_path": "notable_items[4].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[5].amount",
+        "result": "not_applicable",
+        "reason": "Change in fair value of warrant liability 1,097 原文說明為每季重新衡量，未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[5].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notes[0].related_field",
+        "result": "same_item",
+        "key": "notes[4].related_field",
+        "reason": "ticker 說明已在 notes[4]，related_field 為 meta.ticker。"
+      },
+      {
+        "other_path": "segments[all_other].operating_income",
+        "result": "not_applicable",
+        "reason": "All other 只有營業損失、沒有營收，不是營收拆分項目，無法依 schema 列入 segments；數字已記於 notes。"
+      },
+      {
+        "other_path": "segments[client_and_gaming].operating_income",
+        "result": "not_applicable",
+        "reason": "多層拆分依規則放最細層（segments[client]、segments[gaming]），部門層級營業利益 573／867／582 已記於 notes。"
+      },
+      {
+        "other_path": "segments[client_and_gaming].revenue",
+        "result": "not_applicable",
+        "reason": "多層拆分依規則放最細層，Client and Gaming 小計由 segments[client] 與 segments[gaming] 組成。"
+      }
+    ]
+  },
+  "ai_fact_sheet": {
+    "schema_version": "1.9",
+    "extraction": {
+      "ai_name": "Claude",
+      "ai_model": "Claude Opus 5.5",
+      "run_id": "A",
+      "extracted_at": "2026-11-04T07:05:00+08:00"
+    },
+    "meta": {
+      "company_name": "Advanced Micro Devices, Inc.",
+      "ticker": "AMD",
+      "market": "us",
+      "fiscal_period": "FY2026Q3",
+      "period_end": "2026-09-26",
+      "period_end_src": {
+        "doc": "pr",
+        "page": 9,
+        "row_label": "Net revenue",
+        "column_label": "Three Months Ended September 26, 2026"
+      },
+      "report_date": "2026-11-03",
+      "currency": "USD",
+      "monetary_unit": "millions",
+      "monetary_unit_src": {
+        "doc": "pr",
+        "page": 9,
+        "quote": "(Millions except per share amounts and percentages) (Unaudited)"
+      },
+      "share_unit": "millions",
+      "accounting_basis": "US GAAP",
+      "eps_basis": "diluted",
+      "source_docs": [
+        {
+          "id": "pr",
+          "type": "press_release",
+          "title": "AMD Reports Third Quarter 2026 Financial Results"
+        }
+      ]
+    },
+    "income_statement": {
+      "revenue": {
+        "current": {
+          "value": 13377,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 9246,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 11536,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net revenue",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "cost_of_revenue": {
+        "current": {
+          "value": 6167,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 4466,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 5333,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total cost of sales",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "gross_profit": {
+        "current": {
+          "value": 7210,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 4780,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 6203,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Gross profit",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "rd_expense": {
+        "current": {
+          "value": 2803,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 2139,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2528,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Research and development",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "sm_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "ga_expense": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "sga_expense": {
+        "current": {
+          "value": 1298,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1069,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1401,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Marketing, general and administrative",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "other_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_applicable"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_applicable"
+        }
+      },
+      "operating_expenses_total": {
+        "current": {
+          "value": 4378,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 3510,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 4213,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Total operating expenses",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "operating_income": {
+        "current": {
+          "value": 2832,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1270,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1990,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Operating income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "non_operating_net": {
+        "current": {
+          "value": null,
+          "null_reason": "not_disclosed"
+        },
+        "prior_year": {
+          "value": null,
+          "null_reason": "not_disclosed"
+        }
+      },
+      "pretax_income": {
+        "current": {
+          "value": 1868,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1315,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2551,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income from continuing operations before income taxes and equity income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "income_tax": {
+        "current": {
+          "value": -555,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 153,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 252,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Income tax provision (benefit)",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "net_income": {
+        "current": {
+          "value": 2428,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1243,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2297,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "net_income_to_parent": {
+        "current": {
+          "value": 2428,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1243,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2297,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Net income",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "eps_diluted": {
+        "current": {
+          "value": 1.46,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 0.75,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1.38,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Earnings per share: Diluted earnings per share",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "shares_diluted": {
+        "current": {
+          "value": 1661,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1641,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1659,
+          "src": {
+            "doc": "pr",
+            "page": 9,
+            "row_label": "Shares used in per share calculation: Diluted",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      }
+    },
+    "operating_expense_items": [
+      {
+        "key": "research_and_development",
+        "label_source": "Research and development",
+        "label_zh": "研究發展費用",
+        "amount": {
+          "current": {
+            "value": 2803,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2139,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2528,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Research and development",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "marketing_general_and_administrative",
+        "label_source": "Marketing, general and administrative",
+        "label_zh": "行銷及管理費用",
+        "amount": {
+          "current": {
+            "value": 1298,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1069,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 1401,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Marketing, general and administrative",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "amortization_of_acquisition_related_intangibles",
+        "label_source": "Amortization of acquisition-related intangibles",
+        "label_zh": "收購相關無形資產攤銷",
+        "amount": {
+          "current": {
+            "value": 277,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 302,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 284,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Amortization of acquisition-related intangibles (operating expenses section)",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "post_tax_items": [
+      {
+        "key": "equity_income_in_investee",
+        "label_source": "Equity income in investee",
+        "label_zh": "採用權益法認列之投資收益",
+        "amount": {
+          "current": {
+            "value": 5,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 10,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 6,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Equity income in investee",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "income_loss_from_discontinued_operations_net_of_tax",
+        "label_source": "Income (loss) from discontinued operations, net of tax",
+        "label_zh": "停業單位損益（稅後）",
+        "amount": {
+          "current": {
+            "value": 0,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 71,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": -8,
+            "src": {
+              "doc": "pr",
+              "page": 9,
+              "row_label": "Income (loss) from discontinued operations, net of tax",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "segments": [
+      {
+        "key": "data_center",
+        "label_source": "Data Center Segment",
+        "label_zh": "資料中心部門",
+        "revenue": {
+          "current": {
+            "value": 8546,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 4341,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 6718,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Data Center Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "operating_income": {
+          "current": {
+            "value": 2882,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1074,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2103,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Data Center Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "client",
+        "label_source": "Client",
+        "label_zh": "用戶端",
+        "revenue": {
+          "current": {
+            "value": 2949,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2750,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 3062,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Client",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "gaming",
+        "label_source": "Gaming",
+        "label_zh": "遊戲",
+        "revenue": {
+          "current": {
+            "value": 773,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1298,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 779,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Client and Gaming Segment: Gaming",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      },
+      {
+        "key": "embedded",
+        "label_source": "Embedded Segment",
+        "label_zh": "嵌入式部門",
+        "revenue": {
+          "current": {
+            "value": 1109,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 857,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 977,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Net Revenue: Embedded Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "operating_income": {
+          "current": {
+            "value": 453,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 283,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 386,
+            "src": {
+              "doc": "pr",
+              "page": 12,
+              "row_label": "Operating Income (Loss): Embedded Segment",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    ],
+    "geographies": [],
+    "kpis": [],
+    "cash_flow": {
+      "operating_cash_flow": {
+        "current": {
+          "value": 1202,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1788,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 2366,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "GAAP net cash provided by operating activities of continuing operations",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "capex": {
+        "current": {
+          "value": -648,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -258,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": -808,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Purchases of property and equipment",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      },
+      "free_cash_flow_stated": {
+        "current": {
+          "value": 554,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": 1530,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        },
+        "prior_quarter": {
+          "value": 1558,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 13,
+            "row_label": "Free cash flow",
+            "column_label": "Three Months Ended June 27, 2026"
+          }
+        }
+      }
+    },
+    "capital_return": {
+      "buybacks": {
+        "current": {
+          "value": 0,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Repurchases of common stock",
+            "column_label": "Three Months Ended September 26, 2026"
+          }
+        },
+        "prior_year": {
+          "value": -89,
+          "period_type": "quarter",
+          "src": {
+            "doc": "pr",
+            "page": 11,
+            "row_label": "Repurchases of common stock",
+            "column_label": "Three Months Ended September 27, 2025"
+          }
+        }
+      }
+    },
+    "guidance_next": {
+      "period_label": "FY2026Q4",
+      "monetary_unit": "billions",
+      "monetary_unit_src": {
+        "doc": "pr",
+        "page": 4,
+        "quote": "For the fourth quarter of 2026, AMD expects revenue to be approximately $17 billion, plus or minus 3%."
+      },
+      "items": [
+        {
+          "metric": "revenue",
+          "label_source": "revenue",
+          "label_zh": "營收",
+          "basis": "unspecified",
+          "unit": "monetary",
+          "point": 17,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "For the fourth quarter of 2026, AMD expects revenue to be approximately $17 billion, plus or minus 3%."
+          }
+        },
+        {
+          "metric": "other",
+          "label_source": "year-over-year growth",
+          "label_zh": "營收年增率（財測中點）",
+          "basis": "unspecified",
+          "unit": "percent",
+          "point": 66,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "The mid-point of the revenue range represents year-over-year growth of approximately 66% and a sequential increase of approximately 27%."
+          }
+        },
+        {
+          "metric": "other",
+          "label_source": "sequential increase",
+          "label_zh": "營收季增率（財測中點）",
+          "basis": "unspecified",
+          "unit": "percent",
+          "point": 27,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "The mid-point of the revenue range represents year-over-year growth of approximately 66% and a sequential increase of approximately 27%."
+          }
+        },
+        {
+          "metric": "gross_margin",
+          "label_source": "Non-GAAP gross margin",
+          "label_zh": "非 GAAP 毛利率",
+          "basis": "non-GAAP",
+          "unit": "percent",
+          "point": 55,
+          "src": {
+            "doc": "pr",
+            "page": 4,
+            "quote": "Non-GAAP gross margin is expected to be approximately 55%."
+          }
+        }
+      ]
+    },
+    "notable_items": [],
+    "stated_metrics": [
+      {
+        "metric": "revenue_amount",
+        "value": 13.4,
+        "unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Revenue ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "revenue_qoq",
+        "value": 16,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Revenue ($M)",
+          "column_label": "Q/Q"
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 9,
+          "row_label": "Gross margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "operating_margin",
+        "value": 21,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "GAAP operating margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "eps_yoy",
+        "value": 95,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Diluted earnings per share",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:operating_income_yoy",
+        "value": 123,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Operating income ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:net_income_yoy",
+        "value": 95,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "GAAP Quarterly Financial Results: Net income ($M)",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:non_gaap_gross_margin",
+        "value": 56,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "Non-GAAP gross margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "other:non_gaap_operating_margin",
+        "value": 29,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 5,
+          "row_label": "Non-GAAP operating margin",
+          "column_label": "Three Months Ended September 26, 2026"
+        }
+      },
+      {
+        "metric": "other:non_gaap_eps_yoy",
+        "value": 74,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "row_label": "Non-GAAP(*) Quarterly Financial Results: Diluted earnings per share",
+          "column_label": "Y/Y"
+        }
+      },
+      {
+        "metric": "other:non_gaap_eps_yoy",
+        "value": 74,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "segment:data_center:yoy",
+        "value": 97,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Data Center segment revenue was a record $8.5 billion, up 97% year-over-year, driven by strong demand for AMD EPYC™ processors and the launch of AMD Instinct™ MI450 Series GPUs."
+        }
+      },
+      {
+        "metric": "segment:client_and_gaming:yoy",
+        "value": -8,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client and Gaming segment revenue was $3.7 billion, down 8% year-over-year."
+        }
+      },
+      {
+        "metric": "segment:client:yoy",
+        "value": 7,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client business revenue was $2.9 billion, up 7% year-over-year, driven by sales of AMD Ryzen™ mobile processors."
+        }
+      },
+      {
+        "metric": "segment:gaming:yoy",
+        "value": -40,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Gaming business revenue was $773 million, down 40% year-over-year, due to lower semi-custom and graphics revenue."
+        }
+      },
+      {
+        "metric": "segment:embedded:yoy",
+        "value": 29,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Embedded segment revenue was $1.1 billion, up 29% year-over-year, led by growth in aerospace and defense, automotive, communications and industrial end markets."
+        }
+      }
+    ],
+    "headline_figures": [
+      {
+        "metric": "revenue",
+        "value": 13.4,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "gross_margin",
+        "value": 54,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "operating_income",
+        "value": 2.8,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "net_income",
+        "value": 2.4,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "eps",
+        "value": 1.46,
+        "unit": "per_share",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue was $13.4 billion, gross margin was 54%, operating income was $2.8 billion, net income was $2.4 billion and diluted earnings per share was $1.46."
+        }
+      },
+      {
+        "metric": "revenue_yoy",
+        "value": 45,
+        "unit": "percent",
+        "src": {
+          "doc": "pr",
+          "page": 1,
+          "quote": "Third quarter revenue grew 45% year-over-year to a record $13.4 billion, while non-GAAP earnings per share grew 74%, demonstrating the significant operating leverage in our business model as our Data Center business drives scale,"
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "data_center",
+        "value": 8.5,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Data Center segment revenue was a record $8.5 billion, up 97% year-over-year, driven by strong demand for AMD EPYC™ processors and the launch of AMD Instinct™ MI450 Series GPUs."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "client",
+        "value": 2.9,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Client business revenue was $2.9 billion, up 7% year-over-year, driven by sales of AMD Ryzen™ mobile processors."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "gaming",
+        "value": 773,
+        "unit": "monetary",
+        "monetary_unit": "millions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Gaming business revenue was $773 million, down 40% year-over-year, due to lower semi-custom and graphics revenue."
+        }
+      },
+      {
+        "metric": "segment_revenue",
+        "item": "embedded",
+        "value": 1.1,
+        "unit": "monetary",
+        "monetary_unit": "billions",
+        "src": {
+          "doc": "pr",
+          "page": 2,
+          "quote": "Embedded segment revenue was $1.1 billion, up 29% year-over-year, led by growth in aerospace and defense, automotive, communications and industrial end markets."
+        }
+      }
+    ],
+    "market_specific": {
+      "us": {
+        "non_gaap_eps_diluted": {
+          "current": {
+            "value": 2.09,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1.2,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 1.66,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "non_gaap_operating_income": {
+          "current": {
+            "value": 3923,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 2238,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 3094,
+            "src": {
+              "doc": "pr",
+              "page": 5,
+              "row_label": "Non-GAAP operating income",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        },
+        "non_gaap_net_income": {
+          "current": {
+            "value": 3471,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 26, 2026"
+            }
+          },
+          "prior_year": {
+            "value": 1965,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended September 27, 2025"
+            }
+          },
+          "prior_quarter": {
+            "value": 2760,
+            "src": {
+              "doc": "pr",
+              "page": 6,
+              "row_label": "Non-GAAP net income / earnings per share",
+              "column_label": "Three Months Ended June 27, 2026"
+            }
+          }
+        }
+      }
+    },
+    "ambiguities": [],
+    "notes": [
+      {
+        "note": "上傳文件只有一份 PDF（新聞稿含財務報表），代號 pr。第 1–8 頁有印刷頁碼；第 9 頁以後無頁碼，page 依 PDF 順序推定：9＝損益表、10＝資產負債表、11＝現金流量表、12＝Selected Corporate Data、13＝Adjusted EBITDA 與 Free Cash Flow 調節表。"
+      },
+      {
+        "note": "AMD 季度期末不是日曆月底：本季期末為 September 26, 2026，去年同期 September 27, 2025，上一季 June 27, 2026（上一財年期末 December 27, 2025）。公司稱本季為 third quarter of 2026，填 FY2026Q3。",
+        "related_field": "meta.fiscal_period"
+      },
+      {
+        "note": "幣別原文只寫 $，填 USD。",
+        "related_field": "meta.currency"
+      },
+      {
+        "note": "損益表表頭為「(Millions except per share amounts and percentages)」，股數列（Shares used in per share calculation）未另標單位，依表頭填 millions。",
+        "related_field": "meta.share_unit"
+      },
+      {
+        "note": "ticker 取自原文「AMD (NASDAQ:AMD)」。",
+        "related_field": "meta.ticker"
+      },
+      {
+        "note": "cost_of_revenue 填「Total cost of sales」6,167，其下含「Cost of sales」5,910 與營業成本區的「Amortization of acquisition-related intangibles」257（去年同期 4,206＋260、上一季 5,073＋260）。營業成本區的攤銷依規則不放入 operating_expense_items。",
+        "related_field": "income_statement.cost_of_revenue"
+      },
+      {
+        "note": "原文費用列「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義（銷管費用合併列示時使用）填 sga_expense；sm_expense、ga_expense 依規則填 null（not_applicable）。",
+        "related_field": "income_statement.sga_expense"
+      },
+      {
+        "note": "原文沒有業外收支合計列，只分列 Interest expense（本季 (62)、去年同期 (37)、上一季 (37)）與 Other income (expense), net（本季 (902)、去年同期 82、上一季 598），依規則填 null，不自行加總。",
+        "related_field": "income_statement.non_operating_net"
+      },
+      {
+        "note": "所得稅列名為「Income tax provision (benefit)」，本季原文 (555) 照抄為 -555（所得稅利益）。",
+        "related_field": "income_statement.income_tax"
+      },
+      {
+        "note": "原文沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。原文無特別股相關列。",
+        "related_field": "income_statement.net_income_to_parent"
+      },
+      {
+        "note": "eps_diluted 取「Diluted earnings per share」合計列，不是「Diluted earnings from continuing operations」（本季兩者皆為 1.46）。",
+        "related_field": "income_statement.eps_diluted"
+      },
+      {
+        "note": "post_tax_items：所得稅之後依序為 Equity income in investee、小計 Income from continuing operations, net of tax（未放入）、Income (loss) from discontinued operations, net of tax。停業單位本季原文為「—」，填 0。",
+        "related_field": "post_tax_items"
+      },
+      {
+        "note": "segments 為兩層結構：Client and Gaming Segment（Total Client and Gaming 本季 3,722、去年同期 4,048、上一季 3,841）下分 Client 與 Gaming，依規則放最細層。部門營業利益中 Client and Gaming Segment（573／867／582）只揭露在部門層級，無法對應到 Client 或 Gaming，未填入；「All other」營業損失（(1,076)／(954)／(1,081)）沒有營收，不是營收拆分項目，未列入。四項營收加總等於 Total net revenue。",
+        "related_field": "segments"
+      },
+      {
+        "note": "原文沒有地區營收拆分，geographies 給空陣列；沒有營運指標段落，kpis 給空陣列。"
+      },
+      {
+        "note": "營業現金流改用繼續營業單位口徑：公司原文定義 Free cash flow 為「GAAP net cash provided by operating activities of continuing operations」減資本支出，capex 亦取自繼續營業單位，故 operating_cash_flow、capex 改取第 13 頁 FCF 調節表（本季 1,202／去年同期 1,788／上一季 2,366；(648)／(258)／(808)），三者可與 free_cash_flow_stated 勾稽；該表有 June 27, 2026 欄，依規則一併填 prior_quarter。現金流量表（第 11 頁）的合計列「Net cash provided by operating activities」去年同期為 2,159（含停業單位 371），未採用；本季與去年同期 capex 與第 11 頁相同。",
+        "related_field": "cash_flow.operating_cash_flow"
+      },
+      {
+        "note": "Selected Corporate Data（第 12 頁）另以正數列示「Capital expenditures」648／808／258，未採用（以調節表的負號原文為準）。",
+        "related_field": "cash_flow.capex"
+      },
+      {
+        "note": "free_cash_flow_stated 取自 FCF 調節表（第 13 頁），第 12 頁 Selected Corporate Data 亦列相同數字。公司另揭露 Free cash flow margin % 本季 4%。",
+        "related_field": "cash_flow.free_cash_flow_stated"
+      },
+      {
+        "note": "buybacks 依原文列名取「Repurchases of common stock」（本季原文為「—」填 0，去年同期 (89)）。「Stock repurchases for tax withholding on employee equity plans」（本季 (1,495)、去年同期 (371)）是員工股權計畫代扣稅款的買回，原文另列一行、不是股票回購列，依規則不計入。原文沒有股利支付列，dividends_paid 省略；原文沒有新增回購授權。",
+        "related_field": "capital_return.buybacks"
+      },
+      {
+        "note": "營收財測原文為「approximately $17 billion, plus or minus 3%」，±3% 未換算成區間，填 point 17；原文未註明 GAAP 或 non-GAAP，basis 填 unspecified。66% 與 27% 為營收區間中點的年增率與季增率。原文沒有全年財測，也沒有財測調整，guidance_revisions 省略。",
+        "related_field": "guidance_next"
+      },
+      {
+        "note": "公司未將任何項目標示為一次性或非經常性，notable_items 給空陣列。非 GAAP 調節表中的調整項（例如 Stock-based compensation 523、Amortization of acquisition-related intangibles 534、Change in fair value of warrant liability 1,097、Loss contingency on legal matters 7、Acquisition-related and other costs 27、(Gains) loss on long-term investments, net (67)）原文只說明為非 GAAP 調整，未稱一次性，依規則不列。",
+        "related_field": "notable_items"
+      },
+      {
+        "note": "公司另揭露 Adjusted EBITDA（本季 4,162、去年同期 2,430、上一季 3,315），不屬於 market_specific.us 的三個欄位，未填。",
+        "related_field": "market_specific.us"
+      },
+      {
+        "note": "非 GAAP 淨利與 EPS 取自第 6 頁調節表，每個 Three Months Ended 欄下分金額與每股兩個子欄，淨利取金額子欄、EPS 取每股子欄。",
+        "related_field": "market_specific.us"
+      },
+      {
+        "note": "stated_metrics 中取自第 2 頁摘要表的比率，原表頭即為「Y/Y」「Q/Q」（Y/Y 比較 Q3'26 與 Q3'25，Q/Q 比較 Q3'26 與 Q2'26），column_label 照抄。",
+        "related_field": "stated_metrics"
+      },
+      {
+        "note": "headline_figures 未列第一段的 non-GAAP 數字（毛利率 56%、營業利益 $3.9B、淨利 $3.5B、EPS $2.09），因此區欄位不分 GAAP／non-GAAP；Client and Gaming segment $3.7 billion 在 segments 中沒有對應 key（已拆為 client、gaming），未列，其年增 -8% 記於 stated_metrics。",
+        "related_field": "headline_figures"
+      },
+      {
+        "note": "原文兩張調節表的「Acquisition-related and other costs」上一季與去年同期不一致（營業利益調節表 40／42，淨利調節表 41／43；本季皆為 27）。本檔沒有任何欄位使用這兩個數字，不需決定，僅記錄供參考。"
+      }
+    ],
+    "cross_check": [
+      {
+        "other_path": "cash_flow.capex",
+        "result": "added",
+        "key": "cash_flow.capex.prior_quarter",
+        "reason": "capex 改取第 13 頁 FCF 調節表，該表有 June 27, 2026 欄 (808)，依規則補上 prior_quarter -808。"
+      },
+      {
+        "other_path": "income_statement.ga_expense.null_reason",
+        "result": "same_item",
+        "key": "income_statement.ga_expense.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "income_statement.other_operating_net.null_reason",
+        "result": "same_item",
+        "key": "income_statement.other_operating_net.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "income_statement.sga_expense.null_reason",
+        "result": "not_applicable",
+        "reason": "原文「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義應填 1,298，不填 null。"
+      },
+      {
+        "other_path": "income_statement.sm_expense.null_reason",
+        "result": "same_item",
+        "key": "income_statement.sm_expense.current.null_reason",
+        "reason": "已填 not_applicable（current 與 prior_year 皆有）。"
+      },
+      {
+        "other_path": "notable_items[0].amount",
+        "result": "not_applicable",
+        "reason": "Stock-based compensation 523 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[0].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[1].amount",
+        "result": "not_applicable",
+        "reason": "Amortization of acquisition-related intangibles 534 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[1].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[2].amount",
+        "result": "not_applicable",
+        "reason": "Acquisition-related and other costs 27 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[2].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[3].amount",
+        "result": "not_applicable",
+        "reason": "Loss contingency on legal matters 7 為非 GAAP 調整項，公司未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[3].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[4].amount",
+        "result": "not_applicable",
+        "reason": "Recovery of inventory loss at contract manufacturer (67) 為去年同期的非 GAAP 調整項（本季為「—」），公司未標示為一次性。"
+      },
+      {
+        "other_path": "notable_items[4].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notable_items[5].amount",
+        "result": "not_applicable",
+        "reason": "Change in fair value of warrant liability 1,097 原文說明為每季重新衡量，未標示為一次性或非經常性。"
+      },
+      {
+        "other_path": "notable_items[5].line_item",
+        "result": "not_applicable",
+        "reason": "同上，該項不列入 notable_items。"
+      },
+      {
+        "other_path": "notes[0].related_field",
+        "result": "same_item",
+        "key": "notes[4].related_field",
+        "reason": "ticker 說明已在 notes[4]，related_field 為 meta.ticker。"
+      },
+      {
+        "other_path": "segments[all_other].operating_income",
+        "result": "not_applicable",
+        "reason": "All other 只有營業損失、沒有營收，不是營收拆分項目，無法依 schema 列入 segments；數字已記於 notes。"
+      },
+      {
+        "other_path": "segments[client_and_gaming].operating_income",
+        "result": "not_applicable",
+        "reason": "多層拆分依規則放最細層（segments[client]、segments[gaming]），部門層級營業利益 573／867／582 已記於 notes。"
+      },
+      {
+        "other_path": "segments[client_and_gaming].revenue",
+        "result": "not_applicable",
+        "reason": "多層拆分依規則放最細層，Client and Gaming 小計由 segments[client] 與 segments[gaming] 組成。"
+      }
+    ]
+  },
+  "edits": [],
+  "overrides": [],
+  "review_items": [
+    {
+      "group": "auto",
+      "item": "計算得出的數字：業外收支淨額＝稅前淨利 − 營業利益",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜capital_return.buybacks｜A＝本季 0；去年 -89｜B＝本季 -1495；去年 -371",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜cash_flow.operating_cash_flow｜A＝上季 2366；去年 1788｜B＝上季 （無）；去年 2159",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜guidance_next.items[other|sequential increase]｜A＝基準 unspecified；數值 27｜B＝基準 （無）；數值 （無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜guidance_next.items[other|year-over-year growth]｜A＝基準 unspecified；數值 66｜B＝基準 （無）；數值 （無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "user",
+      "item": "A 沒有、B 有：income_statement.ga_expense.null_reason｜B＝not_applicable",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜income_statement.non_operating_net｜A＝本季 null；上季 （無）；去年 null｜B＝本季 -964；上季 561；去年 45",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "user",
+      "item": "A 沒有、B 有：income_statement.other_operating_net.null_reason｜B＝not_applicable",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜income_statement.sga_expense｜A＝本季 1298；上季 1401；去年 1069｜B＝本季 null；上季 （無）；去年 null",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：income_statement.sga_expense.null_reason｜B＝not_applicable",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "user",
+      "item": "A 沒有、B 有：income_statement.sm_expense.null_reason｜B＝not_applicable",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[0].amount｜B＝523",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[0].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[1].amount｜B＝534",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[1].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[2].amount｜B＝27",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[2].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[3].amount｜B＝7",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[3].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[4].amount｜B＝-67",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[4].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[5].amount｜B＝1097",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：notable_items[5].line_item｜B＝unknown",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[0].note｜A＝上傳文件只有一份 PDF（新聞稿含財務報表），代號 pr。第 1–8 頁有印刷頁碼；第 9 頁以後無頁碼，page 依 PDF 順序推定：9＝損益表、10＝資產負債表、11＝現金流量表、12＝Selected Corporate Data、13＝Adjusted EBITDA 與 Free Cash Flow 調節表。｜B＝ticker 填寫為 AMD，來源於新聞稿提及之 NASDAQ 代號。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "user",
+      "item": "A 沒有、B 有：notes[0].related_field｜B＝meta.ticker",
+      "choice": "ok",
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[10].note｜A＝eps_diluted 取「Diluted earnings per share」合計列，不是「Diluted earnings from continuing operations」（本季兩者皆為 1.46）。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[10].related_field｜A＝income_statement.eps_diluted｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[11].note｜A＝post_tax_items：所得稅之後依序為 Equity income in investee、小計 Income from continuing operations, net of tax（未放入）、Income (loss) from discontinued operations, net of tax。停業單位本季原文為「—」，填 0。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[11].related_field｜A＝post_tax_items｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[12].note｜A＝segments 為兩層結構：Client and Gaming Segment（Total Client and Gaming 本季 3,722、去年同期 4,048、上一季 3,841）下分 Client 與 Gaming，依規則放最細層。部門營業利益中 Client and Gaming Segment（573／867／582）只揭露在部門層級，無法對應到 Client 或 Gaming，未填入；「All other」營業損失（(1,076)／(954)／(1,081)）沒有營收，不是營收拆分項目，未列入。四項營收加總等於 Total net revenue。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[12].related_field｜A＝segments｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[13].note｜A＝原文沒有地區營收拆分，geographies 給空陣列；沒有營運指標段落，kpis 給空陣列。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[14].note｜A＝營業現金流改用繼續營業單位口徑：公司原文定義 Free cash flow 為「GAAP net cash provided by operating activities of continuing operations」減資本支出，capex 亦取自繼續營業單位，故 operating_cash_flow、capex 改取第 13 頁 FCF 調節表（本季 1,202／去年同期 1,788／上一季 2,366；(648)／(258)／(808)），三者可與 free_cash_flow_stated 勾稽；該表有 June 27, 2026 欄，依規則一併填 prior_quarter。現金流量表（第 11 頁）的合計列「Net cash provided by operating activities」去年同期為 2,159（含停業單位 371），未採用；本季與去年同期 capex 與第 11 頁相同。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[14].related_field｜A＝cash_flow.operating_cash_flow｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[15].note｜A＝Selected Corporate Data（第 12 頁）另以正數列示「Capital expenditures」648／808／258，未採用（以調節表的負號原文為準）。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[15].related_field｜A＝cash_flow.capex｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[16].note｜A＝free_cash_flow_stated 取自 FCF 調節表（第 13 頁），第 12 頁 Selected Corporate Data 亦列相同數字。公司另揭露 Free cash flow margin % 本季 4%。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[16].related_field｜A＝cash_flow.free_cash_flow_stated｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[17].note｜A＝buybacks 依原文列名取「Repurchases of common stock」（本季原文為「—」填 0，去年同期 (89)）。「Stock repurchases for tax withholding on employee equity plans」（本季 (1,495)、去年同期 (371)）是員工股權計畫代扣稅款的買回，原文另列一行、不是股票回購列，依規則不計入。原文沒有股利支付列，dividends_paid 省略；原文沒有新增回購授權。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[17].related_field｜A＝capital_return.buybacks｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[18].note｜A＝營收財測原文為「approximately $17 billion, plus or minus 3%」，±3% 未換算成區間，填 point 17；原文未註明 GAAP 或 non-GAAP，basis 填 unspecified。66% 與 27% 為營收區間中點的年增率與季增率。原文沒有全年財測，也沒有財測調整，guidance_revisions 省略。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[18].related_field｜A＝guidance_next｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[19].note｜A＝公司未將任何項目標示為一次性或非經常性，notable_items 給空陣列。非 GAAP 調節表中的調整項（例如 Stock-based compensation 523、Amortization of acquisition-related intangibles 534、Change in fair value of warrant liability 1,097、Loss contingency on legal matters 7、Acquisition-related and other costs 27、(Gains) loss on long-term investments, net (67)）原文只說明為非 GAAP 調整，未稱一次性，依規則不列。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[19].related_field｜A＝notable_items｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[1].note｜A＝AMD 季度期末不是日曆月底：本季期末為 September 26, 2026，去年同期 September 27, 2025，上一季 June 27, 2026（上一財年期末 December 27, 2025）。公司稱本季為 third quarter of 2026，填 FY2026Q3。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[1].related_field｜A＝meta.fiscal_period｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[20].note｜A＝公司另揭露 Adjusted EBITDA（本季 4,162、去年同期 2,430、上一季 3,315），不屬於 market_specific.us 的三個欄位，未填。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[20].related_field｜A＝market_specific.us｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[21].note｜A＝非 GAAP 淨利與 EPS 取自第 6 頁調節表，每個 Three Months Ended 欄下分金額與每股兩個子欄，淨利取金額子欄、EPS 取每股子欄。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[21].related_field｜A＝market_specific.us｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[22].note｜A＝stated_metrics 中取自第 2 頁摘要表的比率，原表頭即為「Y/Y」「Q/Q」（Y/Y 比較 Q3'26 與 Q3'25，Q/Q 比較 Q3'26 與 Q2'26），column_label 照抄。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[22].related_field｜A＝stated_metrics｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[23].note｜A＝headline_figures 未列第一段的 non-GAAP 數字（毛利率 56%、營業利益 $3.9B、淨利 $3.5B、EPS $2.09），因此區欄位不分 GAAP／non-GAAP；Client and Gaming segment $3.7 billion 在 segments 中沒有對應 key（已拆為 client、gaming），未列，其年增 -8% 記於 stated_metrics。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[23].related_field｜A＝headline_figures｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[24].note｜A＝原文兩張調節表的「Acquisition-related and other costs」上一季與去年同期不一致（營業利益調節表 40／42，淨利調節表 41／43；本季皆為 27）。本檔沒有任何欄位使用這兩個數字，不需決定，僅記錄供參考。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[2].note｜A＝幣別原文只寫 $，填 USD。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[2].related_field｜A＝meta.currency｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[3].note｜A＝損益表表頭為「(Millions except per share amounts and percentages)」，股數列（Shares used in per share calculation）未另標單位，依表頭填 millions。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[3].related_field｜A＝meta.share_unit｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[4].note｜A＝ticker 取自原文「AMD (NASDAQ:AMD)」。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[4].related_field｜A＝meta.ticker｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[5].note｜A＝cost_of_revenue 填「Total cost of sales」6,167，其下含「Cost of sales」5,910 與營業成本區的「Amortization of acquisition-related intangibles」257（去年同期 4,206＋260、上一季 5,073＋260）。營業成本區的攤銷依規則不放入 operating_expense_items。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[5].related_field｜A＝income_statement.cost_of_revenue｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[6].note｜A＝原文費用列「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義（銷管費用合併列示時使用）填 sga_expense；sm_expense、ga_expense 依規則填 null（not_applicable）。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[6].related_field｜A＝income_statement.sga_expense｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[7].note｜A＝原文沒有業外收支合計列，只分列 Interest expense（本季 (62)、去年同期 (37)、上一季 (37)）與 Other income (expense), net（本季 (902)、去年同期 82、上一季 598），依規則填 null，不自行加總。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[7].related_field｜A＝income_statement.non_operating_net｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[8].note｜A＝所得稅列名為「Income tax provision (benefit)」，本季原文 (555) 照抄為 -555（所得稅利益）。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[8].related_field｜A＝income_statement.income_tax｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[9].note｜A＝原文沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。原文無特別股相關列。｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜notes[9].related_field｜A＝income_statement.net_income_to_parent｜B＝（無）",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A／B 不同｜post_tax_items[income_loss_from_discontinued_operations_net_of_tax].amount｜A＝本季 0｜B＝本季 null",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：segments[all_other].operating_income｜B＝本季 -1076；上季 -1081；去年 -954",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：segments[client_and_gaming].operating_income｜B＝本季 573；上季 582；去年 867",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "A 沒有、B 有：segments[client_and_gaming].revenue｜B＝本季 3722；上季 3841；去年 4048",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（—）：上傳文件只有一份 PDF（新聞稿含財務報表），代號 pr。第 1–8 頁有印刷頁碼；第 9 頁以後無頁碼，page 依 PDF 順序推定：9＝損益表、10＝資產負債表、11＝現金流量表、12＝Selected Corporate Data、13＝Adjusted EBITDA 與 Free Cash Flow 調節表。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.fiscal_period）：AMD 季度期末不是日曆月底：本季期末為 September 26, 2026，去年同期 September 27, 2025，上一季 June 27, 2026（上一財年期末 December 27, 2025）。公司稱本季為 third quarter of 2026，填 FY2026Q3。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.currency）：幣別原文只寫 $，填 USD。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.share_unit）：損益表表頭為「(Millions except per share amounts and percentages)」，股數列（Shares used in per share calculation）未另標單位，依表頭填 millions。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（meta.ticker）：ticker 取自原文「AMD (NASDAQ:AMD)」。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.cost_of_revenue）：cost_of_revenue 填「Total cost of sales」6,167，其下含「Cost of sales」5,910 與營業成本區的「Amortization of acquisition-related intangibles」257（去年同期 4,206＋260、上一季 5,073＋260）。營業成本區的攤銷依規則不放入 operating_expense_items。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.sga_expense）：原文費用列「Marketing, general and administrative」為行銷與管理費用合併列示，依 sga_expense 定義（銷管費用合併列示時使用）填 sga_expense；sm_expense、ga_expense 依規則填 null（not_applicable）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.non_operating_net）：原文沒有業外收支合計列，只分列 Interest expense（本季 (62)、去年同期 (37)、上一季 (37)）與 Other income (expense), net（本季 (902)、去年同期 82、上一季 598），依規則填 null，不自行加總。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.income_tax）：所得稅列名為「Income tax provision (benefit)」，本季原文 (555) 照抄為 -555（所得稅利益）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.net_income_to_parent）：原文沒有 attributable to 列，net_income_to_parent 與 net_income 相同並附同一出處。原文無特別股相關列。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（income_statement.eps_diluted）：eps_diluted 取「Diluted earnings per share」合計列，不是「Diluted earnings from continuing operations」（本季兩者皆為 1.46）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（post_tax_items）：post_tax_items：所得稅之後依序為 Equity income in investee、小計 Income from continuing operations, net of tax（未放入）、Income (loss) from discontinued operations, net of tax。停業單位本季原文為「—」，填 0。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（segments）：segments 為兩層結構：Client and Gaming Segment（Total Client and Gaming 本季 3,722、去年同期 4,048、上一季 3,841）下分 Client 與 Gaming，依規則放最細層。部門營業利益中 Client and Gaming Segment（573／867／582）只揭露在部門層級，無法對應到 Client 或 Gaming，未填入；「All other」營業損失（(1,076)／(954)／(1,081)）沒有營收，不是營收拆分項目，未列入。四項營收加總等於 Total net revenue。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（—）：原文沒有地區營收拆分，geographies 給空陣列；沒有營運指標段落，kpis 給空陣列。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow.operating_cash_flow）：營業現金流改用繼續營業單位口徑：公司原文定義 Free cash flow 為「GAAP net cash provided by operating activities of continuing operations」減資本支出，capex 亦取自繼續營業單位，故 operating_cash_flow、capex 改取第 13 頁 FCF 調節表（本季 1,202／去年同期 1,788／上一季 2,366；(648)／(258)／(808)），三者可與 free_cash_flow_stated 勾稽；該表有 June 27, 2026 欄，依規則一併填 prior_quarter。現金流量表（第 11 頁）的合計列「Net cash provided by operating activities」去年同期為 2,159（含停業單位 371），未採用；本季與去年同期 capex 與第 11 頁相同。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow.capex）：Selected Corporate Data（第 12 頁）另以正數列示「Capital expenditures」648／808／258，未採用（以調節表的負號原文為準）。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（cash_flow.free_cash_flow_stated）：free_cash_flow_stated 取自 FCF 調節表（第 13 頁），第 12 頁 Selected Corporate Data 亦列相同數字。公司另揭露 Free cash flow margin % 本季 4%。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（capital_return.buybacks）：buybacks 依原文列名取「Repurchases of common stock」（本季原文為「—」填 0，去年同期 (89)）。「Stock repurchases for tax withholding on employee equity plans」（本季 (1,495)、去年同期 (371)）是員工股權計畫代扣稅款的買回，原文另列一行、不是股票回購列，依規則不計入。原文沒有股利支付列，dividends_paid 省略；原文沒有新增回購授權。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（guidance_next）：營收財測原文為「approximately $17 billion, plus or minus 3%」，±3% 未換算成區間，填 point 17；原文未註明 GAAP 或 non-GAAP，basis 填 unspecified。66% 與 27% 為營收區間中點的年增率與季增率。原文沒有全年財測，也沒有財測調整，guidance_revisions 省略。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（notable_items）：公司未將任何項目標示為一次性或非經常性，notable_items 給空陣列。非 GAAP 調節表中的調整項（例如 Stock-based compensation 523、Amortization of acquisition-related intangibles 534、Change in fair value of warrant liability 1,097、Loss contingency on legal matters 7、Acquisition-related and other costs 27、(Gains) loss on long-term investments, net (67)）原文只說明為非 GAAP 調整，未稱一次性，依規則不列。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（market_specific.us）：公司另揭露 Adjusted EBITDA（本季 4,162、去年同期 2,430、上一季 3,315），不屬於 market_specific.us 的三個欄位，未填。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（market_specific.us）：非 GAAP 淨利與 EPS 取自第 6 頁調節表，每個 Three Months Ended 欄下分金額與每股兩個子欄，淨利取金額子欄、EPS 取每股子欄。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（stated_metrics）：stated_metrics 中取自第 2 頁摘要表的比率，原表頭即為「Y/Y」「Q/Q」（Y/Y 比較 Q3'26 與 Q3'25，Q/Q 比較 Q3'26 與 Q2'26），column_label 照抄。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（headline_figures）：headline_figures 未列第一段的 non-GAAP 數字（毛利率 56%、營業利益 $3.9B、淨利 $3.5B、EPS $2.09），因此區欄位不分 GAAP／non-GAAP；Client and Gaming segment $3.7 billion 在 segments 中沒有對應 key（已拆為 client、gaming），未列，其年增 -8% 記於 stated_metrics。",
+      "choice": null,
+      "note": ""
+    },
+    {
+      "group": "auto",
+      "item": "AI 說明（—）：原文兩張調節表的「Acquisition-related and other costs」上一季與去年同期不一致（營業利益調節表 40／42，淨利調節表 41／43；本季皆為 27）。本檔沒有任何欄位使用這兩個數字，不需決定，僅記錄供參考。",
+      "choice": null,
+      "note": ""
+    }
+  ],
+  "correction_rounds": 1,
+  "company_rules": {
+    "labels": {
+      "opex:marketing_general_and_administrative": "行銷及管理費用",
+      "opex:amortization_of_acquisition_related_intangibles": "收購相關無形資產攤銷",
+      "post:equity_income_in_investee": "權益法投資收益",
+      "post:loss_income_from_discontinued_operations_net_of_tax": "停業單位損益",
+      "seg:data_center": "資料中心",
+      "seg:client": "用戶端",
+      "seg:gaming": "遊戲",
+      "seg:embedded": "嵌入式",
+      "guidance:other|year-over-year growth": "年增率(以中位數計)",
+      "guidance:other|sequential increase": "季增率(以中位數計)"
+    }
+  },
+  "checks": [
+    {
+      "id": "gross_profit_identity",
+      "label": "毛利＝營收−營業成本",
+      "status": "pass",
+      "detail": "差 0"
+    },
+    {
+      "id": "operating_income_identity_c",
+      "label": "本季：營業利益＝毛利−營業費用",
+      "status": "pass",
+      "detail": "計算 2832，原文 2832，差 0"
+    },
+    {
+      "id": "operating_income_identity_p",
+      "label": "去年同期：營業利益＝毛利−營業費用",
+      "status": "pass",
+      "detail": "計算 1270，原文 1270，差 0"
+    },
+    {
+      "id": "pretax_identity",
+      "label": "稅前淨利＝營業利益＋業外",
+      "status": "skip",
+      "detail": "原文未列業外合計，依損益表科目計算"
+    },
+    {
+      "id": "net_income_identity",
+      "label": "淨利＝稅前淨利−所得稅＋權益法投資收益＋停業單位損益",
+      "status": "pass",
+      "detail": "公司以負數（括號）列示所得稅費用，已自動轉換"
+    },
+    {
+      "id": "eps_basis",
+      "label": "EPS 口徑",
+      "status": "pass",
+      "detail": "稀釋 EPS"
+    },
+    {
+      "id": "eps_identity_c",
+      "label": "本季：EPS≈淨利÷稀釋股數",
+      "status": "pass",
+      "detail": "計算 1.4618，原文 1.46"
+    },
+    {
+      "id": "eps_identity_p",
+      "label": "去年同期：EPS≈淨利÷稀釋股數",
+      "status": "pass",
+      "detail": "計算 0.7575，原文 0.75"
+    },
+    {
+      "id": "segments_sum_c",
+      "label": "本季：部門加總＝營收",
+      "status": "pass",
+      "detail": "加總 13377，營收 13377"
+    },
+    {
+      "id": "segments_sum_p",
+      "label": "去年同期：部門加總＝營收",
+      "status": "pass",
+      "detail": "加總 9246，營收 9246"
+    },
+    {
+      "id": "geographies_sum",
+      "label": "地區加總＝營收",
+      "status": "skip",
+      "detail": "無資料"
+    },
+    {
+      "id": "cash_flow_period",
+      "label": "現金流量為單季數字",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "fcf_identity",
+      "label": "自由現金流＝營業現金流−資本支出",
+      "status": "pass",
+      "detail": "差 0（公司定義可能不同）"
+    },
+    {
+      "id": "eps_yoy_source",
+      "label": "EPS 年增率的來源",
+      "status": "pass",
+      "detail": "採用公司公布的 95%（與公布 EPS 一致）"
+    },
+    {
+      "id": "range_gross_margin",
+      "label": "毛利率在合理範圍",
+      "status": "pass",
+      "detail": "53.9%"
+    },
+    {
+      "id": "range_operating_margin",
+      "label": "營益率在合理範圍",
+      "status": "pass",
+      "detail": "21.2%"
+    },
+    {
+      "id": "range_net_margin",
+      "label": "淨利率在合理範圍",
+      "status": "pass",
+      "detail": "18.2%"
+    },
+    {
+      "id": "yoy_outlier",
+      "label": "營收年增率未超過 ±100%",
+      "status": "pass",
+      "detail": "44.7%"
+    },
+    {
+      "id": "guidance_unit",
+      "label": "財測金額單位",
+      "status": "pass",
+      "detail": "財測單位 billions、報表單位 millions，已換算（單位本身在第二層核對）"
+    },
+    {
+      "id": "revenue_amount_13.4",
+      "label": "內文營收金額 13.4 billions 與報表一致",
+      "status": "pass",
+      "detail": ""
+    },
+    {
+      "id": "fiscal_period_vs_end",
+      "label": "會計期間與期末日一致",
+      "status": "pass",
+      "detail": "FY2026Q3＝2026Q3"
+    },
+    {
+      "id": "guidance_magnitude",
+      "label": "下季財測營收與本季營收量級一致",
+      "status": "pass",
+      "detail": "財測營收為本季營收的 1.27 倍"
+    }
+  ],
+  "incomplete": [],
+  "press_check": [
+    {
+      "item": "營收",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "13.38",
+      "press_value": "13.4",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營收年增率",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "44.7%",
+      "press_value": "45",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營益率",
+      "cards": [
+        "A1",
+        "C",
+        "D"
+      ],
+      "card_value": "21.2%",
+      "press_value": "21",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "稀釋 EPS",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "1.46",
+      "press_value": "1.46",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "稀釋 EPS 年增率",
+      "cards": [
+        "A1"
+      ],
+      "card_value": "95%",
+      "press_value": "95",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "毛利",
+      "cards": [
+        "C"
+      ],
+      "card_value": "7.21",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "毛利率",
+      "cards": [
+        "C",
+        "D"
+      ],
+      "card_value": "53.9%",
+      "press_value": "54",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "營業利益",
+      "cards": [
+        "C"
+      ],
+      "card_value": "2.83",
+      "press_value": "2.8",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "淨利",
+      "cards": [
+        "C"
+      ],
+      "card_value": "2.43",
+      "press_value": "2.4",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "淨利率",
+      "cards": [
+        "C",
+        "D"
+      ],
+      "card_value": "18.2%",
+      "press_value": "",
+      "result": "empty",
+      "note": ""
+    },
+    {
+      "item": "資料中心營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "8.55",
+      "press_value": "8.5",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "用戶端營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "2.95",
+      "press_value": "2.9",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "遊戲營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "0.77",
+      "press_value": "0.77",
+      "result": "match",
+      "note": ""
+    },
+    {
+      "item": "嵌入式營收",
+      "cards": [
+        "B"
+      ],
+      "card_value": "1.11",
+      "press_value": "1.1",
+      "result": "match",
+      "note": ""
+    }
+  ],
+  "dropped_notes": [
+    {
+      "card": "C",
+      "text": "業外收支淨額依損益表科目計算。"
+    }
+  ],
+  "derived": [
+    "業外收支淨額（稅前淨利−營業利益）"
+  ],
+  "selection": {
+    "fired": {
+      "B": [
+        "segment_share_change_pp_yoy=16.94",
+        "segment_yoy_gap_pp=85.13"
+      ],
+      "D": [
+        "gross_margin_change_pp_yoy=2.20",
+        "operating_margin_change_pp_yoy=7.43",
+        "operating_margin_change_pp_qoq=3.92"
+      ],
+      "G": [
+        "capex_yoy=1.51",
+        "capital_return_yoy=-1.00"
+      ]
+    },
+    "skipped": {
+      "E:outside": [
+        "guidance_position"
+      ],
+      "E:inside": [
+        "guidance_position",
+        "consensus_gap"
+      ],
+      "F": [
+        "kpi_extreme",
+        "kpi_growth_sign_flip"
+      ],
+      "I": [
+        "peers_available"
+      ]
+    },
+    "chosen": [
+      "B",
+      "D"
+    ],
+    "deck": [
+      "A1",
+      "C",
+      "B",
+      "D",
+      "K1"
+    ],
+    "unbuilt": [],
+    "incompleteFired": [],
+    "dropped": [],
+    "incomplete": []
+  },
+  "second_extraction_used": true,
+  "diff_count": 74
+}
