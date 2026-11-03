@@ -3,6 +3,6 @@
   "companies": [
     { "path": "us/GOOGL.json", "label": "GOOGL｜Alphabet" },
     { "path": "us/AAPL.json", "label": "AAPL" },
-    { "path": "us/AMD.json", "label": "AMD" },
+    { "path": "us/AMD.json", "label": "AMD" }
   ]
 }
